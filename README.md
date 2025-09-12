@@ -27,6 +27,7 @@
 - **Mobile**: React Native app for community data collection
 - **Database**: PostgreSQL with PostGIS for geospatial data
 - **Cloud**: AWS/Azure for scalable satellite data processing
+- **NASA APIs**: Real-time satellite imagery and Earth data integration
 
 ## 🌟 Key Features
 
@@ -98,6 +99,15 @@
    python launch_pwa_demo.py
    ```
 
+5. **Test NASA API Integration**
+   ```bash
+   # Test NASA API connection and capabilities
+   python nasa_api_test.py
+   
+   # Run NASA API integration
+   python nasa_api_integration.py
+   ```
+
 ## 📁 Project Structure
 
 ```
@@ -165,6 +175,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **[🌟 Feature Documentation](docs/FEATURE_DOCUMENTATION.md)** - Complete feature documentation
 - **[📁 File Inventory](docs/COMPLETE_FILE_INVENTORY.md)** - Complete file inventory and structure
 - **[🏆 Achievements](docs/ACHIEVEMENTS_AND_MILESTONES.md)** - Achievements and milestones
+- **[🛰️ NASA API Integration](docs/NASA_API_INTEGRATION.md)** - NASA API integration documentation
 
 ### **Implementation Guides**
 - **[🚀 Implementation Guide](CURSOR_IDE_IMPLEMENTATION_GUIDE.md)** - Complete setup guide
