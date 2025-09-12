@@ -1,8 +1,12 @@
-# 🛰️ NASA API Integration for ORUN.IO
+# 🛰️ Enhanced NASA API Integration for ORUN.IO
 
 ## 🌍 Overview
 
-This document outlines the integration of NASA's APIs into the ORUN.IO Climate Impact Verification Platform, enhancing our satellite data capabilities for climate monitoring in Africa.
+This document outlines the comprehensive integration of NASA's APIs into the ORUN.IO Climate Impact Verification Platform, enhancing our satellite data capabilities for climate monitoring in Africa.
+
+**Based on research from:**
+- [NASA API Explorer](https://nasa-api-explorer.vercel.app/) - Interactive API exploration platform
+- [pynasapower](https://github.com/alekfal/pynasapower) - NASA POWER meteorological data client
 
 ## 🔑 API Key Information
 
@@ -32,16 +36,28 @@ https://api.nasa.gov/endpoint?api_key=Xg6dZj1TSPPviT7syaDbySlsbjJAM9BStOwqoMRA
   - `date`: Date in YYYY-MM-DD format
   - `dim`: Dimension of image in degrees
 
-### **2. Earth Assets API**
-- **Endpoint**: `/planetary/earth/assets`
-- **Purpose**: Get available imagery assets for coordinates
-- **Use Case**: Historical data analysis for impact verification
-- **Parameters**:
-  - `lat`: Latitude
-  - `lon`: Longitude
-  - `date`: Date in YYYY-MM-DD format
+### **2. Earth Polychromatic Imaging Camera (EPIC)**
+- **Endpoint**: `/EPIC/api/natural` and `/EPIC/api/enhanced`
+- **Purpose**: Daily Earth imagery from DSCOVR satellite
+- **Use Case**: Global Earth monitoring and climate visualization
+- **Features**: Natural color and enhanced imagery
+- **Source**: [NASA API Explorer EPIC](https://nasa-api-explorer.vercel.app/)
 
-### **3. Astronomy Picture of the Day (APOD)**
+### **3. NASA Image and Video Library**
+- **Endpoint**: `/search`
+- **Purpose**: Search NASA's database of 140,000+ images
+- **Use Case**: Historical climate imagery and educational content
+- **Features**: Advanced search with filters
+- **Source**: [NASA API Explorer Image Library](https://nasa-api-explorer.vercel.app/)
+
+### **4. NASA POWER Meteorological Data**
+- **Endpoint**: `https://power.larc.nasa.gov/api/temporal/daily/point`
+- **Purpose**: Global meteorological data for agriculture and climate
+- **Use Case**: Climate monitoring and agricultural impact analysis
+- **Parameters**: Temperature, precipitation, solar radiation, humidity, wind
+- **Source**: [pynasapower](https://github.com/alekfal/pynasapower)
+
+### **5. Astronomy Picture of the Day (APOD)**
 - **Endpoint**: `/planetary/apod`
 - **Purpose**: Get daily astronomy images
 - **Use Case**: Educational content and inspiration
@@ -49,15 +65,14 @@ https://api.nasa.gov/endpoint?api_key=Xg6dZj1TSPPviT7syaDbySlsbjJAM9BStOwqoMRA
   - `date`: Date in YYYY-MM-DD format
   - `hd`: High definition image (boolean)
 
-### **4. Near Earth Objects (NEO)**
-- **Endpoint**: `/neo/rest/v1/feed`
-- **Purpose**: Get asteroid and comet data
-- **Use Case**: Space-related educational content
-
-### **5. Mars Weather API**
-- **Endpoint**: `/insight_weather/`
-- **Purpose**: Get Mars weather data
-- **Use Case**: Comparative planetary climate studies
+### **6. Earth Assets API**
+- **Endpoint**: `/planetary/earth/assets`
+- **Purpose**: Get available imagery assets for coordinates
+- **Use Case**: Historical data analysis for impact verification
+- **Parameters**:
+  - `lat`: Latitude
+  - `lon`: Longitude
+  - `date`: Date in YYYY-MM-DD format
 
 ## 🌍 ORUN.IO Integration Features
 
@@ -93,24 +108,51 @@ The integration focuses on African regions relevant to ORUN.IO's climate adaptat
 - **Focus**: Water management efficiency
 - **Data**: Water extent and irrigation monitoring
 
-## 🔧 Implementation Details
+## 🔧 Enhanced Implementation Details
 
-### **Python Integration Class**
+### **Enhanced Python Integration Class**
 ```python
-class NASAAPIIntegration:
+class EnhancedNASAIntegration:
     def __init__(self, api_key: str):
         self.api_key = api_key
         self.base_url = "https://api.nasa.gov"
-        self.rate_limit_remaining = 1000
+        self.power_url = "https://power.larc.nasa.gov/api/temporal/daily/point"
+        self.epic_url = "https://api.nasa.gov/EPIC/api"
+        self.image_library_url = "https://images-api.nasa.gov"
     
-    def get_earth_imagery(self, lat: float, lon: float, date: str = None):
-        # Get satellite imagery for coordinates
+    def get_epic_imagery(self, date: str = None, natural: bool = True):
+        # Get Earth Polychromatic Imaging Camera imagery
     
-    def get_africa_climate_data(self, country: str = None):
-        # Get climate data for African regions
+    def get_nasa_image_library(self, query: str, media_type: str = "image"):
+        # Search NASA's 140,000+ image database
     
-    def get_orun_pilot_regions_data(self):
-        # Get data for ORUN.IO pilot regions
+    def get_power_meteorological_data(self, lat: float, lon: float, start_date: date, end_date: date):
+        # Get NASA POWER meteorological data
+    
+    def get_africa_climate_analysis(self, country: str, days_back: int = 30):
+        # Comprehensive climate analysis for African countries
+    
+    def get_orun_pilot_comprehensive_data(self):
+        # Comprehensive data for ORUN.IO pilot regions
+```
+
+### **NASA POWER Meteorological Parameters**
+```python
+power_parameters = [
+    'TOA_SW_DWN',           # Top of atmosphere solar radiation
+    'ALLSKY_SF_SW_DWN',     # Surface solar radiation
+    'T2M',                  # Temperature at 2m
+    'T2M_MIN',              # Minimum temperature
+    'T2M_MAX',              # Maximum temperature
+    'T2MDEW',               # Dew point temperature
+    'WS2M',                 # Wind speed at 2m
+    'PRECTOTCORR',          # Precipitation
+    'RH2M',                 # Relative humidity
+    'PS',                   # Surface pressure
+    'QV2M',                 # Specific humidity
+    'ALLSKY_SFC_PAR_TOT',   # Photosynthetically active radiation
+    'ALLSKY_SFC_UV_INDEX'   # UV index
+]
 ```
 
 ### **Rate Limiting Implementation**

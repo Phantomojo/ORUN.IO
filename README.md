@@ -101,7 +101,10 @@
 
 5. **Test NASA API Integration**
    ```bash
-   # Test NASA API connection and capabilities
+   # Test enhanced NASA API connection and capabilities
+   python enhanced_nasa_integration.py
+   
+   # Test basic NASA API integration
    python nasa_api_test.py
    
    # Run NASA API integration
