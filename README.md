@@ -156,10 +156,25 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **PHANTOMOJO** - Lead Developer & Climate Tech Innovator
 
+## 📚 Comprehensive Documentation
+
+### **Complete Project Documentation**
+- **[📋 Project Overview](docs/PROJECT_OVERVIEW.md)** - Complete project overview and features
+- **[⏱️ Development Timeline](docs/DEVELOPMENT_TIMELINE.md)** - Development timeline and milestones
+- **[🔧 Technical Specifications](docs/TECHNICAL_SPECIFICATIONS.md)** - Technical architecture and specifications
+- **[🌟 Feature Documentation](docs/FEATURE_DOCUMENTATION.md)** - Complete feature documentation
+- **[📁 File Inventory](docs/COMPLETE_FILE_INVENTORY.md)** - Complete file inventory and structure
+- **[🏆 Achievements](docs/ACHIEVEMENTS_AND_MILESTONES.md)** - Achievements and milestones
+
+### **Implementation Guides**
+- **[🚀 Implementation Guide](CURSOR_IDE_IMPLEMENTATION_GUIDE.md)** - Complete setup guide
+- **[📊 Prototype Overview](PROTOTYPE_OVERVIEW.md)** - Prototype documentation
+- **[📱 PWA Guide](PWA_README.md)** - Progressive web app guide
+
 ## 🌐 Links
 
 - **Live Demo**: [https://phantomojo.github.io/ORUN.IO/](https://phantomojo.github.io/ORUN.IO/)
-- **Documentation**: [Implementation Guide](CURSOR_IDE_IMPLEMENTATION_GUIDE.md)
+- **GitHub Repository**: [https://github.com/Phantomojo/ORUN.IO](https://github.com/Phantomojo/ORUN.IO)
 - **Climate Whitepaper**: [Climate Impact Verification](Orun.io_ClimateImpactVerification_.pdf)
 
 ## 🏆 Awards & Recognition
