@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ORUN.IO - Professional Earth Visualization</title>
+    
+    <!-- CesiumJS - Professional 3D Globe Engine -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.107.1/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.107.1/Build/Cesium/Widgets/widgets.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #1a1a1a 100%);
+            color: #ffffff;
+            overflow: hidden;
+        }
+        
+        #cesiumContainer {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        /* UI Overlay */
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .ui-panel {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            pointer-events: auto;
+            transition: all 0.3s ease;
+        }
+        
+        .ui-panel:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-5px);
+        }
+        
+        .logo-panel {
+            top: 30px;
+            left: 30px;
+        }
+        
+        .status-panel {
+            top: 30px;
+            right: 30px;
+        }
+        
+        .data-panel {
+            bottom: 30px;
+            left: 30px;
+        }
+        
+        .metrics-panel {
+            bottom: 30px;
+            right: 30px;
+        }
+        
+        .title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #00d4ff, #ffd700, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+        }
+        
+        .metric-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #00d4ff;
+            display: block;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00d4ff;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        .floating-text {
+            position: absolute;
+            color: rgba(0, 212, 255, 0.6);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            pointer-events: none;
+            animation: float 20s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #1a1a1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-content {
+            text-align: center;
+        }
+        
+        .loading-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #00d4ff, #ffd700, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+        
+        .loading-subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+        }
+        
+        .loading-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #ffd700);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .ui-panel {
+                padding: 15px;
+                border-radius: 10px;
+            }
+            
+            .title {
+                font-size: 1.5rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .metric-value {
+                font-size: 2rem;
+            }
+            
+            .logo-panel {
+                top: 20px;
+                left: 20px;
+                right: 20px;
+            }
+            
+            .status-panel {
+                top: 100px;
+                right: 20px;
+            }
+            
+            .data-panel {
+                bottom: 100px;
+                left: 20px;
+            }
+            
+            .metrics-panel {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+        
+        /* Touch optimizations */
+        body {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <h1 class="loading-title">ORUN.IO</h1>
+            <p class="loading-subtitle">Initializing Professional Earth Visualization...</p>
+            <div class="loading-bar">
+                <div class="loading-progress" id="loadingProgress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cesium Container -->
+    <div id="cesiumContainer"></div>
+    
+    <!-- UI Overlay -->
+    <div class="ui-overlay">
+        <!-- Logo Panel -->
+        <div class="ui-panel logo-panel">
+            <h1 class="title">ORUN.IO</h1>
+            <p class="subtitle">Climate Impact Verification Platform</p>
+        </div>
+        
+        <!-- Status Panel -->
+        <div class="ui-panel status-panel">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>Live Monitoring</span>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot" style="background: #ffd700;"></div>
+                <span>Satellite Active</span>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot" style="background: #ff6b6b;"></div>
+                <span>Data Streaming</span>
+            </div>
+        </div>
+        
+        <!-- Data Panel -->
+        <div class="ui-panel data-panel">
+            <span class="metric-value">78.5%</span>
+            <span class="metric-label">Resilience Score</span>
+        </div>
+        
+        <!-- Metrics Panel -->
+        <div class="ui-panel metrics-panel">
+            <span class="metric-value">16,000</span>
+            <span class="metric-label">Beneficiaries</span>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Cesium with professional settings
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2ZDM5NWIwMy03ZWY1LTQwMGQtYThiYi1hNGFkOTg1ZTg5YWMiLCJpZCI6MzM5OTAyLCJpYXQiOjE3NTc0NDg3MzB9.rfeA_lF3pbqGbATrzAVA4vcBDPQgEVXKsKTqaKq_aso';
+        
+        const viewer = new Cesium.Viewer('cesiumContainer', {
+            // Professional imagery
+            imageryProvider: new Cesium.IonImageryProvider({ assetId: 2 }), // Bing Maps Aerial
+            
+            // High-resolution terrain
+            terrainProvider: Cesium.createWorldTerrain({
+                requestVertexNormals: true,
+                requestWaterMask: true
+            }),
+            
+            // Clean UI
+            baseLayerPicker: false,
+            geocoder: false,
+            homeButton: false,
+            sceneModePicker: false,
+            navigationHelpButton: false,
+            animation: false,
+            timeline: false,
+            fullscreenButton: false,
+            vrButton: false,
+            infoBox: false,
+            selectionIndicator: false
+        });
+        
+        // Enable realistic lighting
+        viewer.scene.globe.enableLighting = true;
+        viewer.scene.globe.dynamicAtmosphereLighting = true;
+        viewer.scene.globe.dynamicAtmosphereLightingFromSun = true;
+        
+        // Set initial camera position over Africa
+        viewer.camera.setView({
+            destination: Cesium.Cartesian3.fromDegrees(20.0, 0.0, 15000000.0),
+            orientation: {
+                heading: Cesium.Math.toRadians(0.0),
+                pitch: Cesium.Math.toRadians(-45.0),
+                roll: 0.0
+            }
+        });
+        
+        // Add satellite entities
+        const satellites = [
+            {
+                name: 'Climate Monitor',
+                position: Cesium.Cartesian3.fromDegrees(0, 0, 20000000),
+                color: Cesium.Color.CYAN
+            },
+            {
+                name: 'Temperature Sensor',
+                position: Cesium.Cartesian3.fromDegrees(120, 0, 25000000),
+                color: Cesium.Color.RED
+            },
+            {
+                name: 'Carbon Tracker',
+                position: Cesium.Cartesian3.fromDegrees(240, 0, 30000000),
+                color: Cesium.Color.YELLOW
+            }
+        ];
+        
+        satellites.forEach(satellite => {
+            viewer.entities.add({
+                name: satellite.name,
+                position: satellite.position,
+                point: {
+                    pixelSize: 10,
+                    color: satellite.color,
+                    outlineColor: Cesium.Color.WHITE,
+                    outlineWidth: 2,
+                    heightReference: Cesium.HeightReference.NONE
+                }
+            });
+        });
+        
+        // Add project markers in Africa
+        const projects = [
+            { name: 'Makueni Sand Dams', lon: 37.5, lat: -2.0, country: 'Kenya' },
+            { name: 'Niger Delta Restoration', lon: 6.4, lat: 5.5, country: 'Nigeria' },
+            { name: 'Okavango Water Management', lon: 24.0, lat: -20.0, country: 'Botswana' }
+        ];
+        
+        projects.forEach(project => {
+            viewer.entities.add({
+                name: project.name,
+                position: Cesium.Cartesian3.fromDegrees(project.lon, project.lat, 0),
+                point: {
+                    pixelSize: 15,
+                    color: Cesium.Color.LIME,
+                    outlineColor: Cesium.Color.WHITE,
+                    outlineWidth: 3,
+                    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                },
+                label: {
+                    text: project.name,
+                    font: '12pt sans-serif',
+                    fillColor: Cesium.Color.WHITE,
+                    outlineColor: Cesium.Color.BLACK,
+                    outlineWidth: 2,
+                    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                    pixelOffset: new Cesium.Cartesian2(0, -40),
+                    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                }
+            });
+        });
+        
+        // Animate satellites
+        function animateSatellites() {
+            const time = Cesium.JulianDate.now();
+            satellites.forEach((satellite, index) => {
+                const angle = time.secondsOfDay * 0.1 + index * 2.0;
+                const radius = 20000000 + index * 5000000;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                const z = Math.sin(angle * 0.5) * 2000000;
+                
+                const position = new Cesium.Cartesian3(x, y, z);
+                viewer.entities.getById(satellite.name).position = position;
+            });
+        }
+        
+        // Start animation
+        viewer.clock.onTick.addEventListener(animateSatellites);
+        
+        // Create floating text elements
+        function createFloatingText() {
+            const texts = [
+                '37.5°E, -2.0°N', '6.4°E, 5.5°N', '24.0°E, -20.0°S',
+                'Climate Resilience', 'AI Insights', 'Satellite Analytics',
+                'Carbon Credits', 'Impact Verification', 'Community Data'
+            ];
+            
+            texts.forEach((text, index) => {
+                const element = document.createElement('div');
+                element.className = 'floating-text';
+                element.textContent = text;
+                element.style.left = Math.random() * 100 + '%';
+                element.style.animationDelay = Math.random() * 20 + 's';
+                element.style.animationDuration = (15 + Math.random() * 10) + 's';
+                document.body.appendChild(element);
+                
+                setTimeout(() => {
+                    if (element.parentNode) {
+                        element.parentNode.removeChild(element);
+                    }
+                }, 25000);
+            });
+        }
+        
+        // Initialize floating text
+        setInterval(createFloatingText, 3000);
+        
+        // Loading animation
+        let progress = 0;
+        const loadingInterval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(loadingInterval);
+                setTimeout(() => {
+                    document.getElementById('loadingScreen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loadingScreen').style.display = 'none';
+                    }, 500);
+                }, 500);
+            }
+            document.getElementById('loadingProgress').style.width = progress + '%';
+        }, 100);
+        
+        // GSAP animations for UI
+        gsap.from('.ui-panel', {
+            opacity: 0,
+            y: 50,
+            duration: 1,
+            stagger: 0.2,
+            delay: 2
+        });
+        
+        gsap.to('.status-dot', {
+            scale: 1.2,
+            duration: 1,
+            repeat: -1,
+            yoyo: true,
+            stagger: 0.3
+        });
+    </script>
+</body>
+</html>

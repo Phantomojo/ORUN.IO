@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ORUN.IO - Interactive World Globe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #globe-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #333;
+        }
+        
+        .loading h2 {
+            color: #00ff88;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .loading .progress {
+            width: 300px;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        
+        .loading .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #0088ff);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .controls button {
+            padding: 8px 12px;
+            background: #111;
+            color: #fff;
+            border: 1px solid #333;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            min-width: 80px;
+            touch-action: manipulation;
+        }
+        
+        .controls button:hover, .controls button:active {
+            background: #222;
+            border-color: #00ff88;
+        }
+        
+        .controls button.active {
+            background: #00ff88;
+            color: #000;
+        }
+        
+        .info-panel {
+            position: absolute;
+            top: 80px;
+            left: 10px;
+            right: 10px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            backdrop-filter: blur(10px);
+            font-size: 0.8rem;
+        }
+        
+        .info-panel h4 {
+            color: #00ff88;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .info-panel .stat {
+            margin: 3px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .data-panel {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            backdrop-filter: blur(10px);
+            font-size: 0.8rem;
+        }
+        
+        .data-panel h4 {
+            color: #00ff88;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .data-panel .data-item {
+            margin: 3px 0;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .performance-stats {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            font-size: 0.7rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            text-align: center;
+            background: rgba(255, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #ff0000;
+            max-width: 90%;
+        }
+        
+        .error h3 {
+            margin: 0 0 10px 0;
+            color: white;
+        }
+        
+        .error button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: white;
+            color: red;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .controls {
+                top: 5px;
+                left: 5px;
+                right: 5px;
+                padding: 10px;
+            }
+            
+            .controls button {
+                padding: 6px 10px;
+                font-size: 0.7rem;
+                min-width: 70px;
+            }
+            
+            .info-panel {
+                top: 70px;
+                left: 5px;
+                right: 5px;
+                padding: 10px;
+                font-size: 0.7rem;
+            }
+            
+            .data-panel {
+                bottom: 5px;
+                left: 5px;
+                right: 5px;
+                padding: 10px;
+                font-size: 0.7rem;
+            }
+            
+            .performance-stats {
+                bottom: 5px;
+                right: 5px;
+                padding: 6px;
+                font-size: 0.6rem;
+            }
+            
+            .loading {
+                padding: 20px;
+                margin: 0 20px;
+            }
+            
+            .loading h2 {
+                font-size: 1.2rem;
+            }
+            
+            .loading .progress {
+                width: 250px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .controls button {
+                padding: 5px 8px;
+                font-size: 0.6rem;
+                min-width: 60px;
+            }
+            
+            .info-panel, .data-panel {
+                font-size: 0.6rem;
+            }
+            
+            .loading .progress {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="globe-container"></div>
+        
+        <div class="loading" id="loading">
+            <h2>Loading World Globe</h2>
+            <div class="progress">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div id="loading-text">Loading...</div>
+        </div>
+        
+        <div class="controls" id="controls" style="display: none;">
+            <button onclick="toggleAutoRotate()" id="rotate-btn">Auto Rotate</button>
+            <button onclick="togglePoints()" id="points-btn">Cities</button>
+            <button onclick="toggleArcs()" id="arcs-btn">Connections</button>
+            <button onclick="toggleLabels()" id="labels-btn">Labels</button>
+            <button onclick="changeMapStyle()">Map Style</button>
+            <button onclick="resetView()">Reset</button>
+        </div>
+        
+        <div class="info-panel" id="info-panel" style="display: none;">
+            <h4>Globe Statistics</h4>
+            <div class="stat">
+                <span>Cities:</span>
+                <span id="data-points">0</span>
+            </div>
+            <div class="stat">
+                <span>Connections:</span>
+                <span id="arcs-count">0</span>
+            </div>
+            <div class="stat">
+                <span>FPS:</span>
+                <span id="fps">0</span>
+            </div>
+            <div class="stat">
+                <span>Map:</span>
+                <span id="map-style">NASA Topography</span>
+            </div>
+        </div>
+        
+        <div class="data-panel" id="data-panel">
+            <h4>City Information</h4>
+            <div class="data-item">
+                <span>Name:</span>
+                <span id="city-name">-</span>
+            </div>
+            <div class="data-item">
+                <span>Country:</span>
+                <span id="city-country">-</span>
+            </div>
+            <div class="data-item">
+                <span>Population:</span>
+                <span id="city-population">-</span>
+            </div>
+            <div class="data-item">
+                <span>Region:</span>
+                <span id="city-region">-</span>
+            </div>
+        </div>
+        
+        <div class="performance-stats" id="perf-stats">
+            <div>FPS: <span id="frame-time">0</span></div>
+            <div>Memory: <span id="memory-usage">0</span>MB</div>
+        </div>
+    </div>
+
+    <!-- Load React Globe.gl - try local first, then CDN -->
+    <script>
+        // Load scripts with fallback
+        function loadScript(src, fallback, onLoad, onError) {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = onLoad;
+            script.onerror = () => {
+                console.log(`Failed to load ${src}, trying fallback...`);
+                if (fallback) {
+                    loadScript(fallback, null, onLoad, onError);
+                } else if (onError) {
+                    onError();
+                }
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Load React
+        loadScript(
+            './react.min.js',
+            'https://unpkg.com/react@18/umd/react.production.min.js',
+            () => console.log('React loaded'),
+            () => console.error('Failed to load React')
+        );
+        
+        // Load ReactDOM
+        loadScript(
+            './react-dom.min.js',
+            'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
+            () => console.log('ReactDOM loaded'),
+            () => console.error('Failed to load ReactDOM')
+        );
+        
+        // Load React Globe.gl
+        loadScript(
+            './react-globe.gl.min.js',
+            'https://unpkg.com/react-globe.gl@2.33.2/dist/react-globe.gl.js',
+            () => console.log('React Globe.gl loaded'),
+            () => console.error('Failed to load React Globe.gl')
+        );
+    </script>
+    
+    <script>
+        // Global variables
+        let globeRef;
+        let autoRotate = false;
+        let showPoints = true;
+        let showArcs = true;
+        let showLabels = false;
+        let currentMapStyle = 0;
+        
+        // Performance tracking
+        let frameCount = 0;
+        let lastTime = 0;
+        let fps = 0;
+        
+        // City data - optimized for mobile
+        const cityData = [
+            { lat: 40.7128, lng: -74.0060, name: 'New York', country: 'USA', region: 'North America', population: '8.3M', color: '#ff6b6b' },
+            { lat: 51.5074, lng: -0.1278, name: 'London', country: 'UK', region: 'Europe', population: '9.5M', color: '#4ecdc4' },
+            { lat: 35.6762, lng: 139.6503, name: 'Tokyo', country: 'Japan', region: 'Asia', population: '37.4M', color: '#45b7d1' },
+            { lat: -33.8688, lng: 151.2093, name: 'Sydney', country: 'Australia', region: 'Oceania', population: '5.3M', color: '#96ceb4' },
+            { lat: -22.9068, lng: -43.1729, name: 'Rio de Janeiro', country: 'Brazil', region: 'South America', population: '6.7M', color: '#feca57' },
+            { lat: 55.7558, lng: 37.6176, name: 'Moscow', country: 'Russia', region: 'Europe', population: '12.5M', color: '#ff9ff3' },
+            { lat: 19.0760, lng: 72.8777, name: 'Mumbai', country: 'India', region: 'Asia', population: '20.4M', color: '#54a0ff' },
+            { lat: -26.2041, lng: 28.0473, name: 'Johannesburg', country: 'South Africa', region: 'Africa', population: '5.6M', color: '#5f27cd' },
+            { lat: 48.8566, lng: 2.3522, name: 'Paris', country: 'France', region: 'Europe', population: '11.0M', color: '#26de81' },
+            { lat: 39.9042, lng: 116.4074, name: 'Beijing', country: 'China', region: 'Asia', population: '21.5M', color: '#00d2d3' },
+            { lat: 34.0522, lng: -118.2437, name: 'Los Angeles', country: 'USA', region: 'North America', population: '4.0M', color: '#ff6b6b' },
+            { lat: 41.8781, lng: -87.6298, name: 'Chicago', country: 'USA', region: 'North America', population: '2.7M', color: '#ff6b6b' },
+            { lat: 43.6532, lng: -79.3832, name: 'Toronto', country: 'Canada', region: 'North America', population: '2.9M', color: '#ff9f43' },
+            { lat: 19.4326, lng: -99.1332, name: 'Mexico City', country: 'Mexico', region: 'North America', population: '9.2M', color: '#feca57' },
+            { lat: -23.5505, lng: -46.6333, name: 'São Paulo', country: 'Brazil', region: 'South America', population: '12.3M', color: '#feca57' },
+            { lat: -34.6118, lng: -58.3960, name: 'Buenos Aires', country: 'Argentina', region: 'South America', population: '3.1M', color: '#ff9ff3' },
+            { lat: 52.5200, lng: 13.4050, name: 'Berlin', country: 'Germany', region: 'Europe', population: '3.7M', color: '#a55eea' },
+            { lat: 41.9028, lng: 12.4964, name: 'Rome', country: 'Italy', region: 'Europe', population: '2.9M', color: '#ff9f43' },
+            { lat: 40.4168, lng: -3.7038, name: 'Madrid', country: 'Spain', region: 'Europe', population: '6.6M', color: '#feca57' },
+            { lat: 31.2304, lng: 121.4737, name: 'Shanghai', country: 'China', region: 'Asia', population: '24.3M', color: '#00d2d3' },
+            { lat: 28.6139, lng: 77.2090, name: 'New Delhi', country: 'India', region: 'Asia', population: '32.9M', color: '#54a0ff' },
+            { lat: 37.5665, lng: 126.9780, name: 'Seoul', country: 'South Korea', region: 'Asia', population: '9.7M', color: '#5f27cd' },
+            { lat: 1.3521, lng: 103.8198, name: 'Singapore', country: 'Singapore', region: 'Asia', population: '5.9M', color: '#ff6b6b' },
+            { lat: 6.5244, lng: 3.3792, name: 'Lagos', country: 'Nigeria', region: 'Africa', population: '15.4M', color: '#ff6b6b' },
+            { lat: 30.0444, lng: 31.2357, name: 'Cairo', country: 'Egypt', region: 'Africa', population: '20.9M', color: '#26de81' },
+            { lat: -37.8136, lng: 144.9631, name: 'Melbourne', country: 'Australia', region: 'Oceania', population: '5.2M', color: '#96ceb4' },
+            { lat: -36.8485, lng: 174.7633, name: 'Auckland', country: 'New Zealand', region: 'Oceania', population: '1.7M', color: '#45b7d1' }
+        ];
+        
+        // City connections
+        const cityConnections = [
+            { startLat: 40.7128, startLng: -74.0060, endLat: 51.5074, endLng: -0.1278, color: '#ff6b6b' },
+            { startLat: 51.5074, startLng: -0.1278, endLat: 35.6762, endLng: 139.6503, color: '#4ecdc4' },
+            { startLat: 35.6762, startLng: 139.6503, endLat: -33.8688, endLng: 151.2093, color: '#45b7d1' },
+            { startLat: -33.8688, startLng: 151.2093, endLat: -22.9068, endLng: -43.1729, color: '#96ceb4' },
+            { startLat: -22.9068, startLng: -43.1729, endLat: 55.7558, endLng: 37.6176, color: '#feca57' },
+            { startLat: 55.7558, startLng: 37.6176, endLat: 19.0760, endLng: 72.8777, color: '#ff9ff3' },
+            { startLat: 19.0760, startLng: 72.8777, endLat: -26.2041, endLng: 28.0473, color: '#54a0ff' },
+            { startLat: -26.2041, startLng: 28.0473, endLat: 40.7128, endLng: -74.0060, color: '#5f27cd' }
+        ];
+        
+        // Map styles - using local files for offline use
+        const MAP_STYLES = [
+            { name: "NASA Topography", url: "./world-map-topography.jpg" },
+            { name: "NASA Night Lights", url: "./world-map-night.jpg" },
+            { name: "NASA Blue Marble", url: "./world-map-blue-marble.jpg" },
+            { name: "Political Map", url: "./world-map-political.png" },
+            { name: "Satellite View", url: "./world-satellite-base.jpg" }
+        ];
+        
+        // Initialize the application
+        function init() {
+            updateProgress(20, "Loading libraries...");
+            
+            // Wait for libraries to load
+            setTimeout(() => {
+                if (typeof window.React === 'undefined' || typeof window.ReactDOM === 'undefined' || typeof window.Globe === 'undefined') {
+                    showError('Failed to load required libraries. Please check your internet connection.');
+                    return;
+                }
+                
+                updateProgress(50, "Libraries loaded, initializing globe...");
+                initGlobe();
+            }, 2000);
+        }
+        
+        // Initialize the globe
+        function initGlobe() {
+            updateProgress(80, "Initializing World Globe...");
+            
+            // Create React Globe component
+            const GlobeComponent = () => {
+                const [displaySettings, setDisplaySettings] = React.useState({
+                    showPoints: true,
+                    showArcs: true,
+                    showLabels: false,
+                    autoRotate: false,
+                    mapStyle: 0
+                });
+                
+                React.useEffect(() => {
+                    updateProgress(90, "Setting up data layers...");
+                    
+                    // Update statistics
+                    document.getElementById('data-points').textContent = cityData.length;
+                    document.getElementById('arcs-count').textContent = cityConnections.length;
+                    document.getElementById('map-style').textContent = MAP_STYLES[displaySettings.mapStyle].name;
+                    
+                    updateProgress(100, "World Globe ready!");
+                    
+                    setTimeout(() => {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('controls').style.display = 'flex';
+                        document.getElementById('info-panel').style.display = 'block';
+                    }, 500);
+                }, []);
+                
+                return React.createElement('div', {
+                    style: { width: '100%', height: '100%' }
+                }, React.createElement(window.Globe, {
+                    ref: (ref) => { 
+                        globeRef = ref;
+                        window.setDisplaySettings = setDisplaySettings;
+                    },
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                    backgroundColor: '#000011',
+                    globeImageUrl: MAP_STYLES[displaySettings.mapStyle].url,
+                    pointsData: displaySettings.showPoints ? cityData : [],
+                    arcsData: displaySettings.showArcs ? cityConnections : [],
+                    labelsData: displaySettings.showLabels ? cityData.map(city => ({
+                        lat: city.lat,
+                        lng: city.lng,
+                        text: city.name,
+                        size: 0.5,
+                        color: city.color
+                    })) : [],
+                    onGlobeReady: () => {
+                        console.log('World Globe ready!');
+                        updateProgress(95, "Globe ready, adding data layers...");
+                        
+                        // Set up auto-rotation
+                        if (displaySettings.autoRotate && globeRef) {
+                            globeRef.controls().autoRotate = true;
+                            globeRef.controls().autoRotateSpeed = 0.3;
+                        }
+                    },
+                    onError: (error) => {
+                        console.error('Globe error:', error);
+                        showError('Globe initialization failed: ' + error.message);
+                    },
+                    onPointClick: (point) => {
+                        console.log('City clicked:', point);
+                        updateCityInfo(point);
+                    },
+                    pointColor: 'color',
+                    pointAltitude: 0.01,
+                    pointRadius: 0.3,
+                    arcColor: 'color',
+                    arcDashLength: 0.4,
+                    arcDashGap: 0.2,
+                    arcDashAnimateTime: 2000,
+                    labelText: 'text',
+                    labelSize: 0.5,
+                    labelColor: 'color',
+                    labelAltitude: 0.02,
+                    enablePointerInteraction: true,
+                    animateIn: true
+                }));
+            };
+            
+            // Render the globe
+            try {
+                const root = window.ReactDOM.createRoot(document.getElementById('globe-container'));
+                root.render(React.createElement(GlobeComponent));
+                
+                // Start performance monitoring
+                startPerformanceMonitoring();
+                
+            } catch (error) {
+                console.error('Error rendering globe:', error);
+                showError('Failed to render globe: ' + error.message);
+            }
+        }
+        
+        // Start performance monitoring
+        function startPerformanceMonitoring() {
+            function monitorPerformance() {
+                const currentTime = performance.now();
+                const deltaTime = currentTime - lastTime;
+                lastTime = currentTime;
+                
+                frameCount++;
+                if (frameCount % 60 === 0) {
+                    fps = Math.round(1000 / deltaTime);
+                    document.getElementById('fps').textContent = fps;
+                }
+                
+                updatePerformanceStats(deltaTime);
+                requestAnimationFrame(monitorPerformance);
+            }
+            
+            requestAnimationFrame(monitorPerformance);
+        }
+        
+        // Update progress bar
+        function updateProgress(percent, text) {
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('loading-text').textContent = text;
+        }
+        
+        // Update performance statistics
+        function updatePerformanceStats(frameTime) {
+            document.getElementById('frame-time').textContent = Math.round(1000 / frameTime);
+            
+            // Mock memory usage
+            const memoryUsage = 50 + Math.random() * 20;
+            document.getElementById('memory-usage').textContent = memoryUsage.toFixed(1);
+        }
+        
+        // Update city information panel
+        function updateCityInfo(city) {
+            document.getElementById('city-name').textContent = city.name || 'Unknown';
+            document.getElementById('city-country').textContent = city.country || '-';
+            document.getElementById('city-population').textContent = city.population || '-';
+            document.getElementById('city-region').textContent = city.region || '-';
+        }
+        
+        // Show error message
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.innerHTML = `
+                <h3>Error</h3>
+                <p>${message}</p>
+                <button onclick="location.reload()">Retry</button>
+            `;
+            document.getElementById('container').appendChild(errorDiv);
+        }
+        
+        // Control functions
+        function toggleAutoRotate() {
+            if (window.setDisplaySettings) {
+                window.setDisplaySettings(prev => {
+                    const newAutoRotate = !prev.autoRotate;
+                    
+                    if (globeRef && globeRef.controls) {
+                        globeRef.controls().autoRotate = newAutoRotate;
+                        globeRef.controls().autoRotateSpeed = 0.3;
+                    }
+                    
+                    return {
+                        ...prev,
+                        autoRotate: newAutoRotate
+                    };
+                });
+                document.getElementById('rotate-btn').classList.toggle('active', !autoRotate);
+            }
+        }
+        
+        function togglePoints() {
+            if (window.setDisplaySettings) {
+                window.setDisplaySettings(prev => ({
+                    ...prev,
+                    showPoints: !prev.showPoints
+                }));
+                document.getElementById('points-btn').classList.toggle('active', !showPoints);
+            }
+        }
+        
+        function toggleArcs() {
+            if (window.setDisplaySettings) {
+                window.setDisplaySettings(prev => ({
+                    ...prev,
+                    showArcs: !prev.showArcs
+                }));
+                document.getElementById('arcs-btn').classList.toggle('active', !showArcs);
+            }
+        }
+        
+        function toggleLabels() {
+            if (window.setDisplaySettings) {
+                window.setDisplaySettings(prev => ({
+                    ...prev,
+                    showLabels: !prev.showLabels
+                }));
+                document.getElementById('labels-btn').classList.toggle('active', !showLabels);
+            }
+        }
+        
+        function changeMapStyle() {
+            if (window.setDisplaySettings) {
+                window.setDisplaySettings(prev => {
+                    const newMapStyle = (prev.mapStyle + 1) % MAP_STYLES.length;
+                    document.getElementById('map-style').textContent = MAP_STYLES[newMapStyle].name;
+                    return {
+                        ...prev,
+                        mapStyle: newMapStyle
+                    };
+                });
+            }
+        }
+        
+        function resetView() {
+            if (globeRef) {
+                globeRef.pointOfView({ lat: 0, lng: 0, altitude: 2.5 });
+            }
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (globeRef) {
+                // Globe will auto-adjust
+            }
+        });
+        
+        // Initialize when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORUN.IO Background Test</title>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+        
+        .hero-content {
+            text-align: center;
+            z-index: 2;
+            position: relative;
+        }
+        
+        .test-star {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00d4ff;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div id="particles-js"></div>
+        <div class="hero-content">
+            <h1>ORUN.IO Background Test</h1>
+            <p>You should see:</p>
+            <ul>
+                <li>Interactive particles in the background</li>
+                <li>Twinkling stars</li>
+                <li>Mouse interactions with particles</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Initialize particles
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80 },
+                color: { value: ['#00d4ff', '#ffd700', '#ff6b6b', '#ffffff'] },
+                shape: { type: 'circle' },
+                opacity: { 
+                    value: 0.6, 
+                    random: true, 
+                    anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false } 
+                },
+                size: { 
+                    value: 3, 
+                    random: true, 
+                    anim: { enable: true, speed: 2, size_min: 0.5, sync: false } 
+                },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: '#00d4ff',
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 0.5,
+                    direction: 'none',
+                    random: false,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: {
+                    onhover: { enable: true, mode: 'repulse' },
+                    onclick: { enable: true, mode: 'push' },
+                    resize: true
+                },
+                modes: {
+                    repulse: { distance: 200, duration: 0.4 },
+                    push: { particles_nb: 4 }
+                }
+            },
+            retina_detect: true
+        });
+
+        // Create test stars
+        for (let i = 0; i < 20; i++) {
+            const star = document.createElement('div');
+            star.className = 'test-star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 2 + 's';
+            document.querySelector('.hero').appendChild(star);
+        }
+
+        console.log('Background test initialized');
+    </script>
+</body>
+</html>

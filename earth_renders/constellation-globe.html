@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Constellation Globe - ORUN.IO</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000000;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        #globe-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #globe-canvas {
+            display: block;
+            cursor: grab;
+        }
+        
+        #globe-canvas:active {
+            cursor: grabbing;
+        }
+        
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .controls button {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .controls button:hover {
+            background: #00cc6a;
+        }
+        
+        .info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="globe-container">
+        <canvas id="globe-canvas"></canvas>
+        
+        <div class="controls">
+            <h3>Constellation Globe</h3>
+            <button onclick="toggleContinentOutlines()">Toggle Outlines</button>
+            <button onclick="toggleContinentFill()">Toggle Fill</button>
+            <button onclick="resetCamera()">Reset View</button>
+            <button onclick="toggleAutoRotate()">Auto Rotate</button>
+        </div>
+        
+        <div class="info">
+            <div>Points: <span id="point-count">0</span></div>
+            <div>Continent Lines: <span id="line-count">0</span></div>
+            <div>FPS: <span id="fps">0</span></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <script>
+        // Global variables
+        let scene, camera, renderer, controls;
+        let globePoints, continentLines, continentFill;
+        let autoRotate = false;
+        let frameCount = 0;
+        let lastTime = 0;
+        
+        // Performance tracking
+        let pointCount = 0;
+        let lineCount = 0;
+        
+        // Stripe-inspired optimizations
+        const SCROLL_EPSILON = 0.0016;
+        let isScrolling = false;
+        let scrollTop = 0;
+        let oldScrollTop = 0;
+        
+        // Initialize the constellation globe
+        function init() {
+            console.log('Initializing Constellation Globe...');
+            
+            // Create scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+            
+            // Create camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 0, 15);
+            
+            // Create renderer with Stripe's performance optimization
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: document.getElementById('globe-canvas'),
+                antialias: false, // Stripe optimization: disable antialiasing for performance
+                alpha: true 
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for performance
+            
+            // Create controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.enableZoom = true;
+            controls.enablePan = false;
+            
+            // Create lighting
+            createLighting();
+            
+            // Create constellation globe
+            createConstellationGlobe();
+            
+            // Create continent outlines
+            createContinentOutlines();
+            
+            // Create continent fill
+            createContinentFill();
+            
+            // Add scroll-based rotation (Stripe technique)
+            addScrollRotation();
+            
+            // Start animation loop
+            animate();
+            
+            console.log('Constellation Globe initialized successfully!');
+        }
+        
+        function createLighting() {
+            // Ambient light for overall illumination
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+            scene.add(ambientLight);
+            
+            // Directional light for depth
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 5, 5);
+            scene.add(directionalLight);
+        }
+        
+        function createConstellationGlobe() {
+            // Create high-resolution sphere geometry for point cloud
+            const geometry = new THREE.SphereGeometry(5, 128, 128);
+            
+            // Convert geometry to points
+            const positions = geometry.attributes.position.array;
+            const colors = [];
+            const sizes = [];
+            
+            // Create point cloud with constellation effect
+            for (let i = 0; i < positions.length; i += 3) {
+                const x = positions[i];
+                const y = positions[i + 1];
+                const z = positions[i + 2];
+                
+                // Convert to lat/lon for continent detection
+                const lat = Math.asin(y / 5) * (180 / Math.PI);
+                const lon = Math.atan2(z, x) * (180 / Math.PI);
+                
+                // Determine if point is on land
+                const isOnLand = isPointOnLand(lat, lon);
+                
+                if (isOnLand) {
+                    // Land points - brighter, more prominent
+                    colors.push(0.8, 0.9, 1.0); // Bright blue-white
+                    sizes.push(0.02 + Math.random() * 0.01);
+                } else {
+                    // Ocean points - dimmer, more subtle
+                    colors.push(0.3, 0.4, 0.6); // Dim blue
+                    sizes.push(0.01 + Math.random() * 0.005);
+                }
+            }
+            
+            // Create point cloud geometry
+            const pointGeometry = new THREE.BufferGeometry();
+            pointGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            pointGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            pointGeometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
+            
+            // Create point material
+            const pointMaterial = new THREE.PointsMaterial({
+                size: 0.02,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending,
+                sizeAttenuation: true
+            });
+            
+            globePoints = new THREE.Points(pointGeometry, pointMaterial);
+            scene.add(globePoints);
+            
+            pointCount = positions.length / 3;
+            updateInfo();
+            
+            console.log(`Created constellation globe with ${pointCount} points`);
+        }
+        
+        function createContinentOutlines() {
+            // Simplified continent boundary data (inspired by Stripe's approach)
+            const continentData = {
+                northAmerica: [
+                    [70, -140], [60, -120], [50, -100], [40, -80], [30, -80], [25, -100], [30, -120], [50, -160], [70, -140]
+                ],
+                southAmerica: [
+                    [10, -80], [0, -60], [-10, -40], [-20, -40], [-30, -50], [-40, -60], [-50, -70], [-40, -80], [10, -80]
+                ],
+                europe: [
+                    [70, -10], [60, 0], [50, 10], [40, 20], [35, 10], [40, 0], [50, -10], [60, -20], [70, -10]
+                ],
+                africa: [
+                    [35, -20], [30, 0], [20, 20], [10, 30], [0, 20], [-10, 10], [-20, 0], [-30, -10], [35, -20]
+                ],
+                asia: [
+                    [70, 60], [60, 80], [50, 100], [40, 120], [30, 140], [20, 120], [10, 100], [0, 80], [70, 60]
+                ],
+                australia: [
+                    [-10, 110], [-20, 120], [-30, 130], [-35, 140], [-30, 150], [-20, 160], [-10, 150], [-10, 110]
+                ]
+            };
+            
+            continentLines = new THREE.Group();
+            
+            Object.keys(continentData).forEach(continentName => {
+                const points = continentData[continentName];
+                const linePoints = [];
+                
+                points.forEach(point => {
+                    const [lat, lon] = point;
+                    const pos = latLngToVector3(lat, lon, 5.01); // Slightly above surface
+                    linePoints.push(pos);
+                });
+                
+                const geometry = new THREE.BufferGeometry().setFromPoints(linePoints);
+                const material = new THREE.LineBasicMaterial({
+                    color: 0x00ff88, // Green color like Stripe's style
+                    transparent: true,
+                    opacity: 0.8,
+                    linewidth: 2
+                });
+                
+                const line = new THREE.Line(geometry, material);
+                continentLines.add(line);
+            });
+            
+            scene.add(continentLines);
+            lineCount = Object.keys(continentData).length;
+            updateInfo();
+            
+            console.log(`Created ${lineCount} continent outlines`);
+        }
+        
+        function createContinentFill() {
+            // Create additional points for continent fill effect
+            const fillGeometry = new THREE.SphereGeometry(4.99, 64, 64);
+            const positions = fillGeometry.attributes.position.array;
+            const colors = [];
+            const sizes = [];
+            
+            for (let i = 0; i < positions.length; i += 3) {
+                const x = positions[i];
+                const y = positions[i + 1];
+                const z = positions[i + 2];
+                
+                const lat = Math.asin(y / 4.99) * (180 / Math.PI);
+                const lon = Math.atan2(z, x) * (180 / Math.PI);
+                
+                if (isPointOnLand(lat, lon)) {
+                    colors.push(0.2, 0.8, 0.4); // Green for land
+                    sizes.push(0.015);
+                } else {
+                    colors.push(0, 0, 0); // Transparent for ocean
+                    sizes.push(0);
+                }
+            }
+            
+            const pointGeometry = new THREE.BufferGeometry();
+            pointGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            pointGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            pointGeometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
+            
+            const material = new THREE.PointsMaterial({
+                size: 0.015,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending,
+                sizeAttenuation: true
+            });
+            
+            continentFill = new THREE.Points(pointGeometry, material);
+            scene.add(continentFill);
+            
+            console.log('Created continent fill effect');
+        }
+        
+        function isPointOnLand(lat, lon) {
+            // Simplified land detection based on major continent boundaries
+            // North America
+            if (lat > 15 && lat < 70 && lon > -170 && lon < -50) return true;
+            // South America
+            if (lat > -60 && lat < 15 && lon > -85 && lon < -30) return true;
+            // Europe
+            if (lat > 35 && lat < 70 && lon > -25 && lon < 40) return true;
+            // Africa
+            if (lat > -35 && lat < 35 && lon > -20 && lon < 55) return true;
+            // Asia
+            if (lat > 10 && lat < 70 && lon > 40 && lon < 180) return true;
+            // Australia
+            if (lat > -45 && lat < -10 && lon > 110 && lon < 155) return true;
+            
+            return false;
+        }
+        
+        function latLngToVector3(lat, lng, radius) {
+            const phi = (90 - lat) * (Math.PI / 180);
+            const theta = (lng + 180) * (Math.PI / 180);
+            
+            const x = -(radius * Math.sin(phi) * Math.cos(theta));
+            const y = radius * Math.cos(phi);
+            const z = radius * Math.sin(phi) * Math.sin(theta);
+            
+            return new THREE.Vector3(x, y, z);
+        }
+        
+        function addScrollRotation() {
+            // Stripe-inspired scroll-based rotation
+            document.addEventListener('scroll', throttle(scrollHandler, 16));
+        }
+        
+        function scrollHandler() {
+            isScrolling = true;
+            oldScrollTop = scrollTop;
+            scrollTop = document.scrollingElement.scrollTop || document.body.scrollTop;
+            const scrollDelta = oldScrollTop - scrollTop;
+            const rotationDelta = scrollDelta * SCROLL_EPSILON;
+            
+            if (globePoints) {
+                globePoints.rotation.y += rotationDelta;
+            }
+        }
+        
+        function throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            }
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Update controls
+            controls.update();
+            
+            // Auto rotation
+            if (autoRotate && globePoints) {
+                globePoints.rotation.y += 0.005;
+            }
+            
+            // Update FPS counter
+            frameCount++;
+            const currentTime = performance.now();
+            if (currentTime - lastTime >= 1000) {
+                document.getElementById('fps').textContent = frameCount;
+                frameCount = 0;
+                lastTime = currentTime;
+            }
+            
+            // Render
+            renderer.render(scene, camera);
+        }
+        
+        // Control functions
+        function toggleContinentOutlines() {
+            if (continentLines) {
+                continentLines.visible = !continentLines.visible;
+            }
+        }
+        
+        function toggleContinentFill() {
+            if (continentFill) {
+                continentFill.visible = !continentFill.visible;
+            }
+        }
+        
+        function resetCamera() {
+            camera.position.set(0, 0, 15);
+            controls.reset();
+        }
+        
+        function toggleAutoRotate() {
+            autoRotate = !autoRotate;
+        }
+        
+        function updateInfo() {
+            document.getElementById('point-count').textContent = pointCount.toLocaleString();
+            document.getElementById('line-count').textContent = lineCount;
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Initialize when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

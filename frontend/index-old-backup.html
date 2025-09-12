@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORUN.IO - Verified Climate Impact in Africa</title>
+    
+    <!-- External Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- Three.js removed - included with react-globe.gl -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- Three.js for Simple Globe -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        // Check if OrbitControls loaded properly
+        window.addEventListener('load', function() {
+            if (typeof THREE !== 'undefined' && THREE.OrbitControls) {
+                console.log('✅ OrbitControls loaded successfully');
+            } else {
+                console.error('❌ OrbitControls failed to load');
+                // Try alternative CDN
+                const script = document.createElement('script');
+                script.src = 'https://threejs.org/examples/js/controls/OrbitControls.js';
+                script.onload = () => console.log('✅ OrbitControls loaded from fallback CDN');
+                script.onerror = () => console.error('❌ All OrbitControls CDNs failed');
+                document.head.appendChild(script);
+            }
+        });
+    </script>
+    
+    <!-- Removed Cesium dependencies for offline compatibility -->
+    <script>
+        // Fallback: try different CDN if first one fails
+        if (typeof particlesJS === 'undefined') {
+            console.log('Loading fallback particles.js...');
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js';
+            document.head.appendChild(script);
+        }
+    </script>
+    <script>
+        // Debug: Check if particlesJS loads
+        window.addEventListener('load', function() {
+            console.log('Window loaded, checking particlesJS...');
+            console.log('particlesJS available:', typeof particlesJS !== 'undefined');
+            console.log('particles container exists:', document.getElementById('particles-js') !== null);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-text">ORUN.IO</div>
+            <div class="loading-subtitle">Verifying Climate Impact in Africa</div>
+            
+                    <!-- 3D Globe Loading Animation -->
+                    <div class="globe-loader-container">
+                        <canvas id="loadingGlobe" class="loading-globe"></canvas>
+                    </div>
+            
+            <div class="loading-status">
+                <div class="status-text">Initializing satellite networks...</div>
+                <div class="loading-dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 1: Hero Section -->
+    <section class="slide hero">
+        <div id="particles-js"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">ORUN.IO</h1>
+            <p class="hero-subtitle">We verify real climate impact in Africa using satellites, AI, and blockchain.</p>
+            <p class="hero-subtitle-secondary">Communities need climate funds. We prove results with real data — unlocking finance for resilience projects.</p>
+            <div class="hero-cta">
+                <a href="#contact" class="btn btn-primary">Book a Demo</a>
+                <a href="#partnership" class="btn btn-secondary">Partner With Us</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 2: 3D Earth -->
+    <section class="slide earth-section">
+        <div id="particles-js-2" class="particles-container"></div>
+        <div id="earth-container">
+            <!-- Comprehensive World Globe will be loaded here -->
+        </div>
+        <div class="earth-overlay">
+            <h2 class="earth-title">Real-Time Climate Monitoring</h2>
+            <p class="earth-subtitle">Multi-spectral satellite data from across Africa</p>
+            
+            <!-- Technical Climate Data -->
+            <div class="climate-stats">
+                <div class="stat-item">
+                    <div class="stat-icon">🌡️</div>
+                    <div class="stat-info">
+                        <div class="stat-value">+2.1°C</div>
+                        <div class="stat-label">Surface Temp Anomaly</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🌧️</div>
+                    <div class="stat-info">
+                        <div class="stat-value">-15%</div>
+                        <div class="stat-label">Precipitation Deficit</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-info">
+                        <div class="stat-value">23</div>
+                        <div class="stat-label">Active Alerts</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Monitoring Info -->
+            <div class="monitoring-info">
+                <h3>🛰️ Satellite Monitoring Systems</h3>
+                <div class="tech-specs">
+                    <div class="spec-item">
+                        <span class="spec-label">Landsat-9</span>
+                        <span class="spec-value">30m resolution</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">MODIS</span>
+                        <span class="spec-value">Daily coverage</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Sentinel-2</span>
+                        <span class="spec-value">10m multispectral</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Controls -->
+            <div class="globe-controls">
+                <button onclick="toggleGlobeCities()" class="globe-btn">🏙️ Cities</button>
+                <button onclick="toggleProjectMarkers()" class="globe-btn">💧 Projects</button>
+                <button onclick="toggleClimateData()" class="globe-btn">🌡️ Climate</button>
+                <button onclick="toggleAutoRotate()" class="globe-btn">🔄 Auto-Rotate</button>
+            </div>
+
+            <!-- Data Sources -->
+            <div class="data-sources">
+                <p><strong>Data Sources:</strong> NASA Earth Observatory, NOAA Climate Data, African Climate Research Centers</p>
+                <p><strong>Last Updated:</strong> <span id="last-updated">Loading...</span></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 3: Stats Section -->
+    <section class="slide stats-section">
+        <div id="particles-js-3" class="particles-container"></div>
+        
+        <!-- Header -->
+        <div class="stats-header">
+            <h2 class="stats-title">Impact Metrics</h2>
+            <p class="stats-subtitle">Verified climate resilience data across Africa</p>
+        </div>
+        
+        <!-- Main Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card" data-stat="projects" data-target-slide="4">
+                <div class="card-header">
+                    <div class="stat-icon">
+                        <div class="icon-projects">
+                            <div class="project-dot"></div>
+                            <div class="project-dot"></div>
+                            <div class="project-dot"></div>
+                            <div class="project-line"></div>
+                            <div class="project-line"></div>
+                        </div>
+                    </div>
+                    <div class="trend-indicator trend-up">
+                        <span class="trend-arrow">↗</span>
+                        <span class="trend-value">+2</span>
+                    </div>
+                    <button class="info-btn" data-tooltip="Projects are verified through satellite monitoring, community validation, and blockchain records">ℹ</button>
+                </div>
+                <span class="stat-number" data-target="3">0</span>
+                <div class="stat-label">Pilot Projects Live</div>
+                <div class="stat-description">Active climate resilience initiatives</div>
+                <div class="card-footer">
+                    <span class="click-hint">Click to explore projects →</span>
+                </div>
+            </div>
+            <div class="stat-card" data-stat="people" data-target-slide="9">
+                <div class="card-header">
+                    <div class="stat-icon">
+                        <div class="icon-people">
+                            <div class="person-circle"></div>
+                            <div class="person-circle"></div>
+                            <div class="person-circle"></div>
+                            <div class="connection-line"></div>
+                            <div class="connection-line"></div>
+                        </div>
+                    </div>
+                    <div class="trend-indicator trend-up">
+                        <span class="trend-arrow">↗</span>
+                        <span class="trend-value">+23%</span>
+                    </div>
+                    <button class="info-btn" data-tooltip="Community impact measured through mobile surveys, satellite verification, and local partner validation">ℹ</button>
+                </div>
+                <span class="stat-number" data-target="16000">0</span>
+                <div class="stat-label">Community Members Impacted</div>
+                <div class="stat-description">Lives improved through climate action</div>
+                <div class="card-footer">
+                    <span class="click-hint">Click to see community impact →</span>
+                </div>
+            </div>
+            <div class="stat-card" data-stat="investment" data-target-slide="10">
+                <div class="card-header">
+                    <div class="stat-icon">
+                        <div class="icon-investment">
+                            <div class="dollar-sign">$</div>
+                            <div class="investment-wave"></div>
+                            <div class="investment-wave"></div>
+                            <div class="investment-wave"></div>
+                        </div>
+                    </div>
+                    <div class="trend-indicator trend-up">
+                        <span class="trend-arrow">↗</span>
+                        <span class="trend-value">+45%</span>
+                    </div>
+                    <button class="info-btn" data-tooltip="Investment verification uses blockchain smart contracts, satellite monitoring, and third-party audits">ℹ</button>
+                </div>
+                <span class="stat-number" data-target="1.1">0</span>
+                <div class="stat-label">Climate Investment Verified</div>
+                <div class="stat-description">Million USD in verified climate funding</div>
+                <div class="card-footer">
+                    <span class="click-hint">Click to view verification →</span>
+                </div>
+            </div>
+            <div class="stat-card" data-stat="resilience" data-target-slide="7">
+                <div class="card-header">
+                    <div class="stat-icon">
+                        <div class="icon-resilience">
+                            <div class="resilience-bar"></div>
+                            <div class="resilience-bar"></div>
+                            <div class="resilience-bar"></div>
+                            <div class="resilience-bar"></div>
+                            <div class="resilience-bar"></div>
+                        </div>
+                    </div>
+                    <div class="trend-indicator trend-up">
+                        <span class="trend-arrow">↗</span>
+                        <span class="trend-value">+12%</span>
+                    </div>
+                    <button class="info-btn" data-tooltip="Resilience measured through satellite analysis of vegetation health, water availability, and community surveys">ℹ</button>
+                </div>
+                <span class="stat-number" data-target="78">0</span>
+                <div class="stat-label">Average Climate Resilience Boost</div>
+                <div class="stat-description">Percentage improvement in community resilience</div>
+                <div class="card-footer">
+                    <span class="click-hint">Click to see analytics →</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Country Breakdown -->
+        <div class="country-breakdown">
+            <h3 class="breakdown-title">Active in 4 African Countries</h3>
+            <div class="countries-grid">
+                <div class="country-item" data-country="kenya">
+                    <div class="country-flag">🇰🇪</div>
+                    <div class="country-name">Kenya</div>
+                    <div class="country-projects">1 Project</div>
+                    <div class="country-impact">5,000 people</div>
+                </div>
+                <div class="country-item" data-country="nigeria">
+                    <div class="country-flag">🇳🇬</div>
+                    <div class="country-name">Nigeria</div>
+                    <div class="country-projects">1 Project</div>
+                    <div class="country-impact">2,500 hectares</div>
+                </div>
+                <div class="country-item" data-country="botswana">
+                    <div class="country-flag">🇧🇼</div>
+                    <div class="country-name">Botswana</div>
+                    <div class="country-projects">1 Project</div>
+                    <div class="country-impact">3,200 farmers</div>
+                </div>
+                <div class="country-item" data-country="expansion">
+                    <div class="country-flag">🌍</div>
+                    <div class="country-name">Expanding</div>
+                    <div class="country-projects">+2 countries</div>
+                    <div class="country-impact">Q2 2024</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Impact Info -->
+        <div class="impact-summary">
+            <div class="impact-item">
+                <div class="impact-icon">
+                    <div class="icon-globe">
+                        <div class="globe-ring"></div>
+                        <div class="globe-ring"></div>
+                        <div class="globe-dot"></div>
+                    </div>
+                </div>
+                <span class="impact-text">4 African Countries</span>
+            </div>
+            <div class="impact-item">
+                <div class="impact-icon">
+                    <div class="icon-time">
+                        <div class="time-circle"></div>
+                        <div class="time-hand"></div>
+                        <div class="time-dot"></div>
+                    </div>
+                </div>
+                <span class="impact-text">18 Months Active</span>
+            </div>
+            <div class="impact-item">
+                <div class="impact-icon">
+                    <div class="icon-verified">
+                        <div class="check-circle"></div>
+                        <div class="check-mark"></div>
+                    </div>
+                </div>
+                <span class="impact-text">100% Verified Data</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 4: Projects Section -->
+    <section class="slide projects-section">
+        <div id="particles-js-4" class="particles-container"></div>
+        <h2 class="section-title">Live Projects</h2>
+        <p class="section-subtitle">Real impact, verified data</p>
+        <div class="projects-grid">
+            <div class="project-card">
+                <h3 class="project-name">Makueni Sand Dams</h3>
+                <div class="project-location">Kenya</div>
+                <p class="project-description">Providing drought resilience to 5,000 Kenyans.</p>
+                <div class="project-metrics">
+                    <div class="metric">
+                        <span class="metric-value">5,000</span>
+                        <div class="metric-label">People Served</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">85%</span>
+                        <div class="metric-label">Water Retention</div>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <h3 class="project-name">Niger Delta Mangrove Restoration</h3>
+                <div class="project-location">Nigeria</div>
+                <p class="project-description">Protecting coastal communities while storing carbon.</p>
+                <div class="project-metrics">
+                    <div class="metric">
+                        <span class="metric-value">2,500</span>
+                        <div class="metric-label">Hectares Restored</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">12,000</span>
+                        <div class="metric-label">CO2 Tons Stored</div>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <h3 class="project-name">Okavango Water Management</h3>
+                <div class="project-location">Botswana</div>
+                <p class="project-description">Smarter irrigation for farming communities.</p>
+                <div class="project-metrics">
+                    <div class="metric">
+                        <span class="metric-value">3,200</span>
+                        <div class="metric-label">Farmers Impacted</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">40%</span>
+                        <div class="metric-label">Water Efficiency</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 5: Problem Section -->
+    <section class="slide problem-section">
+        <div id="particles-js-5" class="particles-container"></div>
+        <div class="problem-content">
+            <h2 class="section-title">The Problem</h2>
+            <p class="problem-text">Climate finance is broken. Billions are pledged to Africa, but most projects lack transparent verification. Communities miss out, and investors can't trust the data.</p>
+        </div>
+    </section>
+
+    <!-- Slide 6: Solution Section -->
+    <section class="slide solution-section">
+        <div id="particles-js-6" class="particles-container"></div>
+        <div class="solution-content">
+            <h2 class="section-title">Our Solution</h2>
+            <p class="solution-text">ORUN.IO verifies real climate impact using a 4-layer system: Satellite Analytics, AI Modeling, Community Data, and Blockchain Verification.</p>
+            <div class="solution-highlights">
+                <div class="highlight-item">
+                    <span class="highlight-icon">🛰️</span>
+                    <h3>Satellite Analytics</h3>
+                    <p>High-resolution imaging of African landscapes with daily revisit frequency for real-time monitoring.</p>
+                </div>
+                <div class="highlight-item">
+                    <span class="highlight-icon">🤖</span>
+                    <h3>AI Modeling</h3>
+                    <p>AI models detect deforestation, drought, and crop stress. Automated analysis reduces verification time from months to days.</p>
+                </div>
+                <div class="highlight-item">
+                    <span class="highlight-icon">👥</span>
+                    <h3>Community Data</h3>
+                    <p>On-the-ground validation from local communities. Mobile-first data collection ensures trustworthiness.</p>
+                </div>
+                <div class="highlight-item">
+                    <span class="highlight-icon">⛓️</span>
+                    <h3>Blockchain Verification</h3>
+                    <p>Immutable record of climate impact. Transparency investors can trust.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 7: Satellite Analytics -->
+    <section class="slide satellite-slide">
+        <div id="particles-js-7" class="particles-container"></div>
+        <div class="slide-content">
+            <h2 class="slide-title">Satellite Analytics</h2>
+            <div class="slide-bullets">
+                <div class="bullet-point">High-resolution imaging of African landscapes</div>
+                <div class="bullet-point">Daily revisit frequency for real-time monitoring</div>
+                <div class="bullet-point">Seamless integration with AI for impact verification</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 8: AI Insights -->
+    <section class="slide ai-slide">
+        <div id="particles-js-8" class="particles-container"></div>
+        <div class="slide-content">
+            <h2 class="slide-title">AI Insights</h2>
+            <div class="slide-bullets">
+                <div class="bullet-point">AI models detect deforestation, drought, and crop stress</div>
+                <div class="bullet-point">Automated analysis reduces verification time from months to days</div>
+                <div class="bullet-point">Machine learning algorithms improve accuracy over time</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 9: Community Engagement -->
+    <section class="slide community-slide">
+        <div id="particles-js-9" class="particles-container"></div>
+        <div class="slide-content">
+            <h2 class="slide-title">Community Engagement</h2>
+            <div class="slide-bullets">
+                <div class="bullet-point">On-the-ground validation from local communities</div>
+                <div class="bullet-point">Mobile-first data collection ensures trustworthiness</div>
+                <div class="bullet-point">Real-time feedback and impact measurement</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 10: Blockchain Verification -->
+    <section class="slide blockchain-slide">
+        <div id="particles-js-10" class="particles-container"></div>
+        <div class="slide-content">
+            <h2 class="slide-title">Blockchain Verification</h2>
+            <div class="slide-bullets">
+                <div class="bullet-point">Immutable record of climate impact</div>
+                <div class="bullet-point">Transparency investors can trust</div>
+                <div class="bullet-point">Smart contracts automate verification processes</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 11: CTA Section -->
+    <section class="slide cta-section">
+        <div id="particles-js-11" class="particles-container"></div>
+        <div class="cta-content">
+            <h2 class="cta-title">Join Us in Building Africa's Verified Climate Future</h2>
+            <p class="cta-subtitle">Be part of the solution that's transforming climate finance in Africa</p>
+            <div class="cta-buttons">
+                <a href="#demo" class="btn btn-primary">Book a Demo</a>
+                <a href="#partnership" class="btn btn-secondary">Partner With Us</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Navigation Dots -->
+    <div class="nav-dots">
+        <div class="nav-dot active" data-slide="0"></div>
+        <div class="nav-dot" data-slide="1"></div>
+        <div class="nav-dot" data-slide="2"></div>
+        <div class="nav-dot" data-slide="3"></div>
+        <div class="nav-dot" data-slide="4"></div>
+        <div class="nav-dot" data-slide="5"></div>
+        <div class="nav-dot" data-slide="6"></div>
+        <div class="nav-dot" data-slide="7"></div>
+        <div class="nav-dot" data-slide="8"></div>
+        <div class="nav-dot" data-slide="9"></div>
+        <div class="nav-dot" data-slide="10"></div>
+    </div>
+
+    <!-- Slide Counter -->
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">11</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-logo">ORUN.IO</div>
+        <p class="footer-text">Verified Climate Impact in Africa</p>
+        <p class="footer-partners">Backed by [insert partners/logos when available]</p>
+        <div class="footer-links">
+            <a href="mailto:hello@orun.io">Contact</a>
+            <a href="#privacy">Privacy</a>
+            <a href="#terms">Terms</a>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="js/main.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/simple-globe.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/loading-globe.js"></script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Dashboard - ORUN.IO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Enhanced Styles -->
+    <link rel="stylesheet" href="enhanced_styles.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2a2a2a 100%);
+            color: #f8fafc;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .feature-section {
+            background: rgba(15, 15, 15, 0.8);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+        }
+
+        .nav-bar {
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            padding: 16px 0;
+            margin-bottom: 20px;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #00d4ff;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-content {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-bar">
+        <div class="nav-content">
+            <div class="logo">ORUN.IO</div>
+            <div class="nav-links">
+                <a href="pages/index.html">HOME</a>
+                <a href="enhanced_dashboard.html" class="active">ENHANCED DASHBOARD</a>
+                <a href="pages/projects.html">PROJECTS</a>
+                <a href="pages/analytics.html">ANALYTICS</a>
+                <a href="pages/about.html">ABOUT</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 16px; background: linear-gradient(135deg, #00d4ff, #ffd700); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                🚀 Enhanced Climate Intelligence Dashboard
+            </h1>
+            <p style="font-size: 1.2rem; color: #cbd5e1; max-width: 800px; margin: 0 auto;">
+                Next-generation climate impact verification powered by AI, satellite analytics, and blockchain technology
+            </p>
+        </div>
+
+        <!-- Enhanced Features Grid -->
+        <div class="dashboard-grid">
+            <!-- AI Climate Intelligence Panel -->
+            <div class="feature-section">
+                <div id="ai-insights"></div>
+            </div>
+
+            <!-- Climate Alert System -->
+            <div class="feature-section">
+                <div id="climate-alerts"></div>
+            </div>
+
+            <!-- Impact Calculator -->
+            <div class="feature-section full-width">
+                <div id="impact-calculator"></div>
+            </div>
+
+            <!-- Carbon Credit Tracker -->
+            <div class="feature-section">
+                <div id="carbon-tracker"></div>
+            </div>
+
+            <!-- Satellite Time-lapse Viewer -->
+            <div class="feature-section">
+                <div id="satellite-timelapse"></div>
+            </div>
+
+            <!-- Traditional Dashboard Metrics -->
+            <div class="feature-section full-width">
+                <h3 style="color: #00d4ff; font-size: 1.4rem; font-weight: 600; margin-bottom: 20px; text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);">
+                    📊 Real-Time Project Metrics
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 20px; text-align: center;">
+                        <h4 style="color: white; font-size: 0.9rem; margin-bottom: 8px;">Active Projects</h4>
+                        <span style="color: white; font-size: 2rem; font-weight: 700;">24</span>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 12px; padding: 20px; text-align: center;">
+                        <h4 style="color: white; font-size: 0.9rem; margin-bottom: 8px;">Countries</h4>
+                        <span style="color: white; font-size: 2rem; font-weight: 700;">12</span>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 12px; padding: 20px; text-align: center;">
+                        <h4 style="color: white; font-size: 0.9rem; margin-bottom: 8px;">Success Rate</h4>
+                        <span style="color: white; font-size: 2rem; font-weight: 700;">89%</span>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border-radius: 12px; padding: 20px; text-align: center;">
+                        <h4 style="color: white; font-size: 0.9rem; margin-bottom: 8px;">Communities</h4>
+                        <span style="color: white; font-size: 2rem; font-weight: 700;">200+</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Map -->
+            <div class="feature-section full-width">
+                <h3 style="color: #00d4ff; font-size: 1.4rem; font-weight: 600; margin-bottom: 20px; text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);">
+                    🗺️ Live Project Monitoring
+                </h3>
+                <div id="map" style="height: 400px; border-radius: 12px; overflow: hidden;"></div>
+            </div>
+
+            <!-- Innovation Showcase -->
+            <div class="feature-section full-width">
+                <h3 style="color: #ffd700; font-size: 1.4rem; font-weight: 600; margin-bottom: 20px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);">
+                    🌟 Innovation Highlights
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; border-left: 4px solid #00d4ff;">
+                        <h4 style="color: #00d4ff; font-size: 1.1rem; margin-bottom: 8px;">🤖 AI-Powered Analytics</h4>
+                        <p style="color: #cbd5e1; line-height: 1.5;">Real-time satellite data analysis with 95% accuracy in anomaly detection and predictive modeling.</p>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; border-left: 4px solid #ffd700;">
+                        <h4 style="color: #ffd700; font-size: 1.1rem; margin-bottom: 8px;">⛓️ Blockchain Verification</h4>
+                        <p style="color: #cbd5e1; line-height: 1.5;">Immutable impact records and automated carbon credit generation through smart contracts.</p>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; border-left: 4px solid #00ff88;">
+                        <h4 style="color: #00ff88; font-size: 1.1rem; margin-bottom: 8px;">📱 Mobile Integration</h4>
+                        <p style="color: #cbd5e1; line-height: 1.5;">Community engagement through mobile money incentives and real-time data collection.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; padding: 40px 0; color: #64748b;">
+            <p>🌍 Powered by NEXUS NEURAL • Revolutionizing Climate Finance in Africa</p>
+            <p style="font-size: 0.9rem; margin-top: 8px;">Real-time data • AI-driven insights • Blockchain verified</p>
+        </div>
+    </div>
+
+    <!-- Enhanced Features JavaScript -->
+    <script src="enhanced_features.js"></script>
+
+    <!-- Map Initialization -->
+    <script>
+        // Initialize Leaflet map
+        document.addEventListener('DOMContentLoaded', function() {
+            const map = L.map('map').setView([-1.0, 20.0], 4);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Add project markers
+            const projects = [
+                { name: 'Makueni Sand Dams', lat: -1.8, lng: 37.6, status: 'active', impact: '+0.13 NDVI' },
+                { name: 'Niger Delta Mangroves', lat: 4.5, lng: 6.0, status: 'active', impact: '+0.18 NDVI' },
+                { name: 'Okavango Water Mgmt', lat: -19.5, lng: 22.5, status: 'active', impact: '+0.11 NDWI' }
+            ];
+
+            projects.forEach(project => {
+                const marker = L.marker([project.lat, project.lng]).addTo(map);
+                marker.bindPopup(`
+                    <div style="font-family: Inter, sans-serif;">
+                        <h4 style="margin: 0 0 8px 0; color: #1f2937;">${project.name}</h4>
+                        <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Status: ${project.status}</p>
+                        <p style="margin: 4px 0 0 0; color: #059669; font-weight: 600;">${project.impact}</p>
+                    </div>
+                `);
+            });
+        });
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate feature sections on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.feature-section').forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'all 0.6s ease';
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
+

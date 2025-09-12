@@ -1,0 +1,203 @@
+/* ORUN.IO MVP Styles */
+.app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2a2a2a 100%);
+  color: #f8fafc;
+}
+
+.header {
+  background: rgba(15, 15, 15, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+  padding: 20px 0;
+  margin-bottom: 30px;
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.logo {
+  color: #00d4ff !important;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+  margin-bottom: 8px !important;
+  font-size: 2.5rem !important;
+  font-weight: 700 !important;
+}
+
+.tagline {
+  color: #cbd5e1;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.stat-card {
+  background: rgba(15, 15, 15, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(20px);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(0, 212, 255, 0.1);
+  border-color: rgba(0, 212, 255, 0.3) !important;
+}
+
+.main-card {
+  background: rgba(15, 15, 15, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(20px);
+}
+
+.main-card .ant-card-head {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.main-card .ant-card-head-title {
+  color: #f8fafc !important;
+  font-weight: 600;
+}
+
+.main-card .ant-card-body {
+  color: #cbd5e1;
+}
+
+/* Table Styles */
+.ant-table {
+  background: transparent !important;
+}
+
+.ant-table-thead > tr > th {
+  background: rgba(0, 212, 255, 0.1) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #f8fafc !important;
+  font-weight: 600;
+}
+
+.ant-table-tbody > tr > td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #cbd5e1 !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: rgba(0, 212, 255, 0.05) !important;
+}
+
+/* Button Styles */
+.ant-btn-link {
+  color: #00d4ff !important;
+  padding: 0 !important;
+  height: auto !important;
+}
+
+.ant-btn-link:hover {
+  color: #40a9ff !important;
+}
+
+/* Statistic Styles */
+.ant-statistic-title {
+  color: #cbd5e1 !important;
+  font-weight: 500;
+}
+
+.ant-statistic-content {
+  color: #f8fafc !important;
+}
+
+/* Typography Styles */
+.ant-typography {
+  color: #f8fafc !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .logo {
+    font-size: 2rem !important;
+  }
+  
+  .tagline {
+    font-size: 1rem;
+  }
+  
+  .container {
+    padding: 0 16px;
+  }
+  
+  .header-content {
+    padding: 0 16px;
+  }
+}
+
+/* Loading Spinner */
+.ant-spin-dot-item {
+  background-color: #00d4ff !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 15, 15, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 255, 0.5);
+}
+
+/* Animation Classes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-card,
+.main-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Status Indicators */
+.status-active {
+  color: #52c41a !important;
+}
+
+.status-inactive {
+  color: #ff4d4f !important;
+}
+
+/* Data Visualization Colors */
+.ndvi-high {
+  color: #52c41a;
+}
+
+.ndvi-medium {
+  color: #faad14;
+}
+
+.ndvi-low {
+  color: #ff4d4f;
+}

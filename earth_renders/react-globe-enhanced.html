@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Globe.gl Enhanced - Professional Data Visualization</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+        
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #globe-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            backdrop-filter: blur(10px);
+        }
+        
+        .controls h3 {
+            margin: 0 0 15px 0;
+            color: #00ff88;
+            font-size: 18px;
+        }
+        
+        .controls button {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            padding: 10px;
+            background: #111;
+            color: #fff;
+            border: 1px solid #333;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .controls button:hover {
+            background: #222;
+            border-color: #00ff88;
+        }
+        
+        .controls button.active {
+            background: #00ff88;
+            color: #000;
+        }
+        
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            min-width: 250px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .info-panel h4 {
+            margin: 0 0 10px 0;
+            color: #00ff88;
+        }
+        
+        .info-panel .stat {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            text-align: center;
+        }
+        
+        .loading h2 {
+            color: #00ff88;
+            margin-bottom: 20px;
+        }
+        
+        .loading .progress {
+            width: 400px;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .loading .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #0088ff);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .performance-stats {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            font-size: 12px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .data-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            min-width: 200px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .data-panel h4 {
+            margin: 0 0 10px 0;
+            color: #00ff88;
+        }
+        
+        .data-panel .data-item {
+            margin: 5px 0;
+            font-size: 12px;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="globe-container"></div>
+        
+        <div class="loading" id="loading">
+            <h2>Loading React Globe.gl Enhanced</h2>
+            <div class="progress">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div id="loading-text">Loading...</div>
+        </div>
+        
+        <div class="controls" id="controls" style="display: none;">
+            <h3>React Globe.gl Controls</h3>
+            <button onclick="toggleAutoRotate()" id="rotate-btn">Auto Rotate</button>
+            <button onclick="togglePoints()" id="points-btn">Show Data Points</button>
+            <button onclick="toggleArcs()" id="arcs-btn">Show Arcs</button>
+            <button onclick="toggleHeatmap()" id="heatmap-btn">Heatmap</button>
+            <button onclick="toggleLabels()" id="labels-btn">Labels</button>
+            <button onclick="changeMapStyle()">Change Map Style</button>
+            <button onclick="resetView()">Reset View</button>
+        </div>
+        
+        <div class="info-panel" id="info-panel" style="display: none;">
+            <h4>Globe Statistics</h4>
+            <div class="stat">Library: <span id="library">React Globe.gl</span></div>
+            <div class="stat">Data Points: <span id="data-points">0</span></div>
+            <div class="stat">Arcs: <span id="arcs-count">0</span></div>
+            <div class="stat">FPS: <span id="fps">0</span></div>
+            <div class="stat">Render Mode: <span id="render-mode">Enhanced</span></div>
+        </div>
+        
+        <div class="data-panel" id="data-panel">
+            <h4>Data Visualization</h4>
+            <div class="data-item">Population: <span id="population">-</span></div>
+            <div class="data-item">GDP: <span id="gdp">-</span></div>
+            <div class="data-item">Connections: <span id="connections">-</span></div>
+            <div class="data-item">Active Layer: <span id="active-layer">Globe</span></div>
+        </div>
+        
+        <div class="performance-stats" id="perf-stats">
+            <div>Frame Time: <span id="frame-time">0</span>ms</div>
+            <div>Memory: <span id="memory-usage">0</span>MB</div>
+            <div>WebGL: <span id="webgl-info">Enabled</span></div>
+        </div>
+    </div>
+
+    <!-- React and React Globe.gl -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react-globe.gl@2.28.0/dist/react-globe.gl.js"></script>
+    
+    <script>
+        // Global variables
+        let globeRef;
+        let autoRotate = false;
+        let showPoints = true;
+        let showArcs = true;
+        let showHeatmap = false;
+        let showLabels = false;
+        let currentMapStyle = 0;
+        
+        // Performance tracking
+        let frameCount = 0;
+        let lastTime = 0;
+        let fps = 0;
+        
+        // Sample data for visualization
+        const sampleData = {
+            points: [
+                { lat: 40.7128, lng: -74.0060, size: 0.5, color: 'red', name: 'New York' },
+                { lat: 51.5074, lng: -0.1278, size: 0.5, color: 'blue', name: 'London' },
+                { lat: 35.6762, lng: 139.6503, size: 0.5, color: 'green', name: 'Tokyo' },
+                { lat: -33.8688, lng: 151.2093, size: 0.5, color: 'yellow', name: 'Sydney' },
+                { lat: -22.9068, lng: -43.1729, size: 0.5, color: 'purple', name: 'Rio de Janeiro' },
+                { lat: 55.7558, lng: 37.6176, size: 0.5, color: 'orange', name: 'Moscow' },
+                { lat: 19.0760, lng: 72.8777, size: 0.5, color: 'cyan', name: 'Mumbai' },
+                { lat: -26.2041, lng: 28.0473, size: 0.5, color: 'magenta', name: 'Johannesburg' }
+            ],
+            arcs: [
+                { startLat: 40.7128, startLng: -74.0060, endLat: 51.5074, endLng: -0.1278, color: 'red' },
+                { startLat: 51.5074, startLng: -0.1278, endLat: 35.6762, endLng: 139.6503, color: 'blue' },
+                { startLat: 35.6762, endLng: 139.6503, startLat: -33.8688, endLng: 151.2093, color: 'green' },
+                { startLat: -33.8688, startLng: 151.2093, endLat: -22.9068, endLng: -43.1729, color: 'yellow' },
+                { startLat: -22.9068, startLng: -43.1729, endLat: 55.7558, endLng: 37.6176, color: 'purple' },
+                { startLat: 55.7558, startLng: 37.6176, endLat: 19.0760, endLng: 72.8777, color: 'orange' },
+                { startLat: 19.0760, startLng: 72.8777, endLat: -26.2041, endLng: 28.0473, color: 'cyan' },
+                { startLat: -26.2041, startLng: 28.0473, endLat: 40.7128, endLng: -74.0060, color: 'magenta' }
+            ],
+            labels: [
+                { lat: 40.7128, lng: -74.0060, text: 'New York', size: 1, color: 'white' },
+                { lat: 51.5074, lng: -0.1278, text: 'London', size: 1, color: 'white' },
+                { lat: 35.6762, lng: 139.6503, text: 'Tokyo', size: 1, color: 'white' },
+                { lat: -33.8688, lng: 151.2093, text: 'Sydney', size: 1, color: 'white' }
+            ]
+        };
+        
+        // Map styles
+        const MAP_STYLES = [
+            {
+                name: "NASA Topography",
+                url: "world-map-4k.jpg",
+                description: "NASA Earth Observatory topographic map"
+            },
+            {
+                name: "NASA Blue Marble",
+                url: "world-map-8k.jpg",
+                description: "NASA Blue Marble night lights"
+            },
+            {
+                name: "Political Map",
+                url: "world-map-political.png",
+                description: "Political world map with country borders"
+            }
+        ];
+        
+        // React Globe component
+        const GlobeComponent = () => {
+            const [globeData, setGlobeData] = React.useState({
+                points: sampleData.points,
+                arcs: sampleData.arcs,
+                labels: sampleData.labels
+            });
+            
+            React.useEffect(() => {
+                updateProgress(50, "Initializing React Globe.gl...");
+                
+                // Update statistics
+                document.getElementById('data-points').textContent = globeData.points.length;
+                document.getElementById('arcs-count').textContent = globeData.arcs.length;
+                
+                updateProgress(100, "React Globe.gl ready!");
+                
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('controls').style.display = 'block';
+                    document.getElementById('info-panel').style.display = 'block';
+                }, 500);
+            }, []);
+            
+            return React.createElement('div', {
+                style: { width: '100%', height: '100%' }
+            }, React.createElement(window.ReactGlobeGl, {
+                ref: (ref) => { globeRef = ref; },
+                width: window.innerWidth,
+                height: window.innerHeight,
+                backgroundColor: '#000011',
+                globeImageUrl: MAP_STYLES[currentMapStyle].url,
+                pointsData: showPoints ? globeData.points : [],
+                arcsData: showArcs ? globeData.arcs : [],
+                labelsData: showLabels ? globeData.labels : [],
+                onGlobeReady: () => {
+                    console.log('React Globe.gl ready!');
+                    updateProgress(80, "Globe ready, adding data layers...");
+                },
+                onPointClick: (point) => {
+                    console.log('Point clicked:', point);
+                    updateDataPanel(point);
+                },
+                onArcClick: (arc) => {
+                    console.log('Arc clicked:', arc);
+                },
+                pointColor: 'color',
+                pointAltitude: 0.01,
+                pointRadius: 0.5,
+                arcColor: 'color',
+                arcDashLength: 0.4,
+                arcDashGap: 0.2,
+                arcDashAnimateTime: 2000,
+                labelText: 'text',
+                labelSize: 1,
+                labelColor: 'color',
+                labelAltitude: 0.02,
+                enablePointerInteraction: true,
+                animateIn: true
+            }));
+        };
+        
+        // Initialize the application
+        function init() {
+            updateProgress(10, "Loading React Globe.gl library...");
+            
+            // Check if React Globe.gl is loaded
+            if (typeof window.ReactGlobeGl === 'undefined') {
+                updateProgress(20, "Loading React Globe.gl from CDN...");
+                setTimeout(() => {
+                    if (typeof window.ReactGlobeGl === 'undefined') {
+                        showError('Failed to load React Globe.gl library. Please check your internet connection.');
+                        return;
+                    }
+                    renderGlobe();
+                }, 2000);
+            } else {
+                renderGlobe();
+            }
+        }
+        
+        // Render the globe
+        function renderGlobe() {
+            updateProgress(30, "Rendering React Globe.gl component...");
+            
+            const root = ReactDOM.createRoot(document.getElementById('globe-container'));
+            root.render(React.createElement(GlobeComponent));
+            
+            // Start performance monitoring
+            startPerformanceMonitoring();
+        }
+        
+        // Start performance monitoring
+        function startPerformanceMonitoring() {
+            function monitorPerformance() {
+                const currentTime = performance.now();
+                const deltaTime = currentTime - lastTime;
+                lastTime = currentTime;
+                
+                frameCount++;
+                if (frameCount % 60 === 0) {
+                    fps = Math.round(1000 / deltaTime);
+                    document.getElementById('fps').textContent = fps;
+                }
+                
+                updatePerformanceStats(deltaTime);
+                requestAnimationFrame(monitorPerformance);
+            }
+            
+            requestAnimationFrame(monitorPerformance);
+        }
+        
+        // Update progress bar
+        function updateProgress(percent, text) {
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('loading-text').textContent = text;
+        }
+        
+        // Update performance statistics
+        function updatePerformanceStats(frameTime) {
+            document.getElementById('frame-time').textContent = frameTime.toFixed(1);
+            
+            // Mock memory usage
+            const memoryUsage = 60 + Math.random() * 20;
+            document.getElementById('memory-usage').textContent = memoryUsage.toFixed(1);
+        }
+        
+        // Update data panel
+        function updateDataPanel(data) {
+            document.getElementById('population').textContent = Math.floor(Math.random() * 10000000).toLocaleString();
+            document.getElementById('gdp').textContent = '$' + Math.floor(Math.random() * 1000000000000).toLocaleString();
+            document.getElementById('connections').textContent = Math.floor(Math.random() * 100);
+            document.getElementById('active-layer').textContent = data.name || 'Unknown';
+        }
+        
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 1000;
+                text-align: center;
+                background: rgba(255, 0, 0, 0.9);
+                padding: 20px;
+                border-radius: 10px;
+                border: 1px solid #ff0000;
+            `;
+            errorDiv.innerHTML = `
+                <h3>Error</h3>
+                <p>${message}</p>
+                <button onclick="location.reload()">Retry</button>
+            `;
+            document.getElementById('container').appendChild(errorDiv);
+        }
+        
+        // Control functions
+        function toggleAutoRotate() {
+            autoRotate = !autoRotate;
+            if (globeRef) {
+                // React Globe.gl auto-rotation would be handled here
+                console.log('Auto rotate:', autoRotate);
+            }
+            document.getElementById('rotate-btn').classList.toggle('active', autoRotate);
+        }
+        
+        function togglePoints() {
+            showPoints = !showPoints;
+            document.getElementById('points-btn').classList.toggle('active', showPoints);
+            // Re-render with updated data
+            if (globeRef) {
+                globeRef.pointsData(showPoints ? sampleData.points : []);
+            }
+        }
+        
+        function toggleArcs() {
+            showArcs = !showArcs;
+            document.getElementById('arcs-btn').classList.toggle('active', showArcs);
+            // Re-render with updated data
+            if (globeRef) {
+                globeRef.arcsData(showArcs ? sampleData.arcs : []);
+            }
+        }
+        
+        function toggleHeatmap() {
+            showHeatmap = !showHeatmap;
+            document.getElementById('heatmap-btn').classList.toggle('active', showHeatmap);
+            console.log('Heatmap:', showHeatmap);
+        }
+        
+        function toggleLabels() {
+            showLabels = !showLabels;
+            document.getElementById('labels-btn').classList.toggle('active', showLabels);
+            // Re-render with updated data
+            if (globeRef) {
+                globeRef.labelsData(showLabels ? sampleData.labels : []);
+            }
+        }
+        
+        function changeMapStyle() {
+            currentMapStyle = (currentMapStyle + 1) % MAP_STYLES.length;
+            const newMap = MAP_STYLES[currentMapStyle];
+            
+            if (globeRef) {
+                globeRef.globeImageUrl(newMap.url);
+                console.log(`Switched to ${newMap.name}`);
+            }
+        }
+        
+        function resetView() {
+            if (globeRef) {
+                globeRef.pointOfView({ lat: 0, lng: 0, altitude: 2.5 });
+            }
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (globeRef) {
+                globeRef.width(window.innerWidth);
+                globeRef.height(window.innerHeight);
+            }
+        });
+        
+        // Initialize when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
+

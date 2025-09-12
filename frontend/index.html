@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORUN.IO - Verifying Climate Impact in Africa</title>
+    <meta name="description" content="We verify real climate impact in Africa using satellites, AI, and blockchain technology.">
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- Three.js for Simple Globe -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- Vanta.js Effects -->
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.dots.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.clouds.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.birds.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.fog.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.cells.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.rings.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.trunk.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.stars.min.js"></script>
+    
+    <!-- Anime.js for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-text">ORUN.IO</div>
+            <div class="loading-subtitle">Verifying Climate Impact in Africa</div>
+            
+            <!-- 3D Globe Loading Animation -->
+            <div class="globe-loader-container">
+                <canvas id="loadingGlobe" class="loading-globe"></canvas>
+            </div>
+            
+            <div class="loading-status">
+                <div class="status-text">Initializing satellite networks...</div>
+                <div class="loading-dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Dots -->
+    <div class="navigation-dots">
+        <div class="nav-dot active" data-slide="0"></div>
+        <div class="nav-dot" data-slide="1"></div>
+        <div class="nav-dot" data-slide="2"></div>
+        <div class="nav-dot" data-slide="3"></div>
+        <div class="nav-dot" data-slide="4"></div>
+        <div class="nav-dot" data-slide="5"></div>
+        <div class="nav-dot" data-slide="6"></div>
+        <div class="nav-dot" data-slide="7"></div>
+        <div class="nav-dot" data-slide="8"></div>
+        <div class="nav-dot" data-slide="9"></div>
+        <div class="nav-dot" data-slide="10"></div>
+    </div>
+
+    <!-- Slide Counter -->
+    <div class="slide-counter">1/11</div>
+
+    <!-- Slide 1: Hero Section -->
+    <section class="slide hero active">
+        <div class="vanta-container" id="vanta-hero"></div>
+        <div class="neural-network"></div>
+        <div id="particles-js"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">ORUN.IO</h1>
+            <p class="hero-subtitle">We verify real climate impact in Africa using satellites, AI, and blockchain.</p>
+            <p class="hero-subtitle-secondary">Communities need climate funds. We prove results with real data — unlocking finance for resilience projects.</p>
+            <div class="hero-cta">
+                <a href="#contact" class="btn btn-primary">Book a Demo</a>
+                <a href="#partnership" class="btn btn-secondary">Partner With Us</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 2: 3D Earth -->
+    <section class="slide earth-section">
+        <div class="vanta-container" id="vanta-earth"></div>
+        <div class="neural-network"></div>
+        <div id="particles-js-2" class="particles-container"></div>
+        <div id="earth-container">
+            <!-- 3D Globe will be loaded here -->
+        </div>
+        <div class="earth-overlay">
+            <div class="overlay-header">
+                <h2 class="earth-title">Real-Time Climate Monitoring</h2>
+                <p class="earth-subtitle">Multi-spectral satellite data from across Africa</p>
+                <div class="status-indicator">
+                    <div class="status-dot active"></div>
+                    <span class="status-text">Live Data Stream</span>
+                </div>
+            </div>
+            
+            <div class="climate-stats">
+                <div class="stat-item">
+                    <div class="stat-icon">🌡️</div>
+                    <div class="stat-info">
+                        <div class="stat-value">+2.1°C</div>
+                        <div class="stat-label">Temperature</div>
+                        <div class="stat-trend">+0.3°C this week</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🌧️</div>
+                    <div class="stat-info">
+                        <div class="stat-value">-15%</div>
+                        <div class="stat-label">Rainfall</div>
+                        <div class="stat-trend">-2% this month</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🌱</div>
+                    <div class="stat-info">
+                        <div class="stat-value">+8%</div>
+                        <div class="stat-label">Vegetation</div>
+                        <div class="stat-trend">+1.2% this month</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="monitoring-features">
+                <h3 class="features-title">Active Monitoring</h3>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">🛰️</div>
+                        <div class="feature-content">
+                            <div class="feature-name">Satellite Coverage</div>
+                            <div class="feature-detail">12 satellites active</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📡</div>
+                        <div class="feature-content">
+                            <div class="feature-name">Data Refresh</div>
+                            <div class="feature-detail">Every 6 hours</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-content">
+                            <div class="feature-name">Accuracy</div>
+                            <div class="feature-detail">99.2% verified</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="climate-actions">
+                <button class="action-item" tabindex="0" aria-label="View Live Satellite Feed">
+                    <div class="action-icon">🛰️</div>
+                    <div class="action-text">Live Satellite Feed</div>
+                </button>
+                <button class="action-item" tabindex="0" aria-label="Access Real-time Analytics">
+                    <div class="action-icon">📊</div>
+                    <div class="action-text">Real-time Analytics</div>
+                </button>
+                <button class="action-item" tabindex="0" aria-label="View Impact Verification">
+                    <div class="action-icon">🔍</div>
+                    <div class="action-text">Impact Verification</div>
+                </button>
+            </div>
+            
+            <div class="data-source-info">
+                <div class="source-item">
+                    <span class="source-label">Last Updated:</span>
+                    <span class="source-value">2 minutes ago</span>
+                </div>
+                <div class="source-item">
+                    <span class="source-label">Data Points:</span>
+                    <span class="source-value">1.2M collected</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 3: Stats Section -->
+    <section class="slide stats-section">
+        <div class="vanta-container" id="vanta-stats"></div>
+        <div class="neural-network"></div>
+        <div id="particles-js-3" class="particles-container"></div>
+        <div class="stats-content">
+            <div class="stats-header">
+                <h2 class="stats-title">Impact by Numbers</h2>
+                <p class="stats-subtitle">Real-time data from verified climate projects across Africa</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-icon-wrapper">
+                        <div class="stat-icon icon-projects">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                        </div>
+                        <div class="icon-pulse"></div>
+                    </div>
+                    <div class="stat-number" data-target="150">0</div>
+                    <div class="stat-label">Active Projects</div>
+                    <div class="stat-trend">
+                        <span class="trend-icon">📈</span>
+                        <span class="trend-text">+12% this month</span>
+                    </div>
+                    <div class="stat-chart">
+                        <div class="chart-bar" style="height: 60%"></div>
+                        <div class="chart-bar" style="height: 80%"></div>
+                        <div class="chart-bar" style="height: 45%"></div>
+                        <div class="chart-bar" style="height: 90%"></div>
+                        <div class="chart-bar" style="height: 70%"></div>
+                    </div>
+                </div>
+                
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-icon-wrapper">
+                        <div class="stat-icon icon-people">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01.99L14 10.5 12.01 8.99A2.5 2.5 0 0 0 10 8H8.46c-.8 0-1.54.37-2.01.99L4 10.5V22h2v-6h2.5l2.5 6h2l-2.5-6H14v6h2z"/>
+                            </svg>
+                        </div>
+                        <div class="icon-pulse"></div>
+                    </div>
+                    <div class="stat-number" data-target="50000">0</div>
+                    <div class="stat-label">People Impacted</div>
+                    <div class="stat-trend">
+                        <span class="trend-icon">📈</span>
+                        <span class="trend-text">+8% this month</span>
+                    </div>
+                    <div class="stat-chart">
+                        <div class="chart-bar" style="height: 70%"></div>
+                        <div class="chart-bar" style="height: 85%"></div>
+                        <div class="chart-bar" style="height: 60%"></div>
+                        <div class="chart-bar" style="height: 95%"></div>
+                        <div class="chart-bar" style="height: 75%"></div>
+                    </div>
+                </div>
+                
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-icon-wrapper">
+                        <div class="stat-icon icon-investment">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+                            </svg>
+                        </div>
+                        <div class="icon-pulse"></div>
+                    </div>
+                    <div class="stat-number" data-target="25">0</div>
+                    <div class="stat-label">Million USD Invested</div>
+                    <div class="stat-trend">
+                        <span class="trend-icon">📈</span>
+                        <span class="trend-text">+15% this month</span>
+                    </div>
+                    <div class="stat-chart">
+                        <div class="chart-bar" style="height: 50%"></div>
+                        <div class="chart-bar" style="height: 75%"></div>
+                        <div class="chart-bar" style="height: 65%"></div>
+                        <div class="chart-bar" style="height: 85%"></div>
+                        <div class="chart-bar" style="height: 90%"></div>
+                    </div>
+                </div>
+                
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="stat-icon-wrapper">
+                        <div class="stat-icon icon-resilience">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        </div>
+                        <div class="icon-pulse"></div>
+                    </div>
+                    <div class="stat-number" data-target="85">0</div>
+                    <div class="stat-label">% Resilience Increase</div>
+                    <div class="stat-trend">
+                        <span class="trend-icon">📈</span>
+                        <span class="trend-text">+5% this month</span>
+                    </div>
+                    <div class="stat-chart">
+                        <div class="chart-bar" style="height: 80%"></div>
+                        <div class="chart-bar" style="height: 90%"></div>
+                        <div class="chart-bar" style="height: 75%"></div>
+                        <div class="chart-bar" style="height: 95%"></div>
+                        <div class="chart-bar" style="height: 85%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-footer">
+                <div class="data-source">
+                    <span class="source-icon">🛰️</span>
+                    <span class="source-text">Data updated every 24 hours via satellite monitoring</span>
+                </div>
+                <button class="view-details-btn">
+                    <span>View Detailed Analytics</span>
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 4: Projects Section -->
+    <section class="slide projects-section">
+        <div class="vanta-container" id="vanta-projects"></div>
+        <div class="neural-network"></div>
+        <div id="particles-js-4" class="particles-container"></div>
+        <div class="projects-content">
+            <h2 class="projects-title">Featured Projects</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <div class="project-image">
+                        <div class="project-placeholder">🌱</div>
+                    </div>
+                    <div class="project-info">
+                        <h3>Reforestation Initiative</h3>
+                        <p>Planting 1M trees across 5 countries</p>
+                        <div class="project-stats">
+                            <span>📍 Kenya, Tanzania, Uganda</span>
+                            <span>💰 $2.5M Funding</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <div class="project-image">
+                        <div class="project-placeholder">💧</div>
+                    </div>
+                    <div class="project-info">
+                        <h3>Water Access Program</h3>
+                        <p>Clean water for 10,000 families</p>
+                        <div class="project-stats">
+                            <span>📍 Nigeria, Ghana</span>
+                            <span>💰 $1.8M Funding</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <div class="project-image">
+                        <div class="project-placeholder">🌾</div>
+                    </div>
+                    <div class="project-info">
+                        <h3>Sustainable Agriculture</h3>
+                        <p>Climate-smart farming techniques</p>
+                        <div class="project-stats">
+                            <span>📍 Ethiopia, Rwanda</span>
+                            <span>💰 $3.2M Funding</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 5: Problem Section -->
+    <section class="slide problem-section">
+        <div class="vanta-container" id="vanta-tech"></div>
+        <div id="particles-js-5" class="particles-container"></div>
+        <div class="problem-content">
+            <h2 class="problem-title">The Climate Finance Gap</h2>
+            <div class="problem-stats">
+                <div class="problem-item">
+                    <div class="problem-number">$100B</div>
+                    <div class="problem-label">Annual Climate Finance Needed</div>
+                </div>
+                <div class="problem-item">
+                    <div class="problem-number">$20B</div>
+                    <div class="problem-label">Currently Available</div>
+                </div>
+                <div class="problem-item">
+                    <div class="problem-number">80%</div>
+                    <div class="problem-label">Funding Gap</div>
+                </div>
+            </div>
+            <div class="problem-description">
+                <p>African communities face the worst impacts of climate change but receive the least funding. Traditional verification methods are slow, expensive, and unreliable.</p>
+                <div class="problem-challenges">
+                    <div class="challenge">❌ Manual verification takes months</div>
+                    <div class="challenge">❌ High costs for small projects</div>
+                    <div class="challenge">❌ Lack of transparency</div>
+                    <div class="challenge">❌ Limited access to funding</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 6: Solution Section -->
+    <section class="slide solution-section">
+        <div class="vanta-container" id="vanta-impact"></div>
+        <div id="particles-js-6" class="particles-container"></div>
+        <div class="solution-content">
+            <h2 class="solution-title">Our Solution</h2>
+            <div class="solution-grid">
+                <div class="solution-item">
+                    <div class="solution-icon">🛰️</div>
+                    <h3>Satellite Monitoring</h3>
+                    <p>Real-time data from multiple satellite constellations</p>
+                </div>
+                <div class="solution-item">
+                    <div class="solution-icon">🤖</div>
+                    <h3>AI Analysis</h3>
+                    <p>Machine learning models for impact verification</p>
+                </div>
+                <div class="solution-item">
+                    <div class="solution-icon">⛓️</div>
+                    <h3>Blockchain Records</h3>
+                    <p>Immutable, transparent impact records</p>
+                </div>
+            </div>
+            <div class="solution-benefits">
+                <div class="benefit">✅ Instant verification</div>
+                <div class="benefit">✅ 90% cost reduction</div>
+                <div class="benefit">✅ Full transparency</div>
+                <div class="benefit">✅ Accessible to all</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 7: Satellite Section -->
+    <section class="slide satellite-slide">
+        <div id="particles-js-7" class="particles-container"></div>
+        <div class="satellite-content">
+            <h2 class="satellite-title">Satellite Technology</h2>
+            <div class="satellite-grid">
+                <div class="satellite-item">
+                    <div class="satellite-icon">🛰️</div>
+                    <h3>Landsat 8/9</h3>
+                    <p>30m resolution multispectral imagery</p>
+                </div>
+                <div class="satellite-item">
+                    <div class="satellite-icon">🛰️</div>
+                    <h3>Sentinel-2</h3>
+                    <p>10m resolution for detailed analysis</p>
+                </div>
+                <div class="satellite-item">
+                    <div class="satellite-icon">🛰️</div>
+                    <h3>MODIS</h3>
+                    <p>Daily global coverage</p>
+                </div>
+            </div>
+            <div class="satellite-features">
+                <div class="feature">🌡️ Temperature monitoring</div>
+                <div class="feature">🌧️ Rainfall tracking</div>
+                <div class="feature">🌱 Vegetation analysis</div>
+                <div class="feature">💧 Water body detection</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 8: AI Section -->
+    <section class="slide ai-slide">
+        <div id="particles-js-8" class="particles-container"></div>
+        <div class="ai-content">
+            <h2 class="ai-title">AI-Powered Analysis</h2>
+            <div class="ai-grid">
+                <div class="ai-item">
+                    <div class="ai-icon">🧠</div>
+                    <h3>Computer Vision</h3>
+                    <p>Automated image analysis and change detection</p>
+                </div>
+                <div class="ai-item">
+                    <div class="ai-icon">📊</div>
+                    <h3>Predictive Models</h3>
+                    <p>Climate impact forecasting and risk assessment</p>
+                </div>
+                <div class="ai-item">
+                    <div class="ai-icon">🔍</div>
+                    <h3>Pattern Recognition</h3>
+                    <p>Identifying trends and anomalies in data</p>
+                </div>
+            </div>
+            <div class="ai-metrics">
+                <div class="metric">95% Accuracy</div>
+                <div class="metric">Real-time Processing</div>
+                <div class="metric">Scalable Analysis</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 9: Community Section -->
+    <section class="slide community-slide">
+        <div id="particles-js-9" class="particles-container"></div>
+        <div class="community-content">
+            <h2 class="community-title">Community Impact</h2>
+            <div class="community-stats">
+                <div class="community-item">
+                    <div class="community-number">50K+</div>
+                    <div class="community-label">Families Helped</div>
+                </div>
+                <div class="community-item">
+                    <div class="community-number">150</div>
+                    <div class="community-label">Projects Verified</div>
+                </div>
+                <div class="community-item">
+                    <div class="community-number">25M</div>
+                    <div class="community-label">USD Unlocked</div>
+                </div>
+            </div>
+            <div class="community-testimonials">
+                <div class="testimonial">
+                    <p>"ORUN.IO helped us secure funding for our reforestation project. The verification was fast and transparent."</p>
+                    <span>- Sarah, Project Manager, Kenya</span>
+                </div>
+                <div class="testimonial">
+                    <p>"Finally, a way to prove our impact and access climate finance. Game changer for our community."</p>
+                    <span>- Ahmed, Community Leader, Nigeria</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 10: Blockchain Section -->
+    <section class="slide blockchain-slide">
+        <div id="particles-js-10" class="particles-container"></div>
+        <div class="blockchain-content">
+            <h2 class="blockchain-title">Blockchain Transparency</h2>
+            <div class="blockchain-grid">
+                <div class="blockchain-item">
+                    <div class="blockchain-icon">⛓️</div>
+                    <h3>Immutable Records</h3>
+                    <p>All impact data stored on blockchain</p>
+                </div>
+                <div class="blockchain-item">
+                    <div class="blockchain-icon">🔍</div>
+                    <h3>Public Verification</h3>
+                    <p>Anyone can verify project claims</p>
+                </div>
+                <div class="blockchain-item">
+                    <div class="blockchain-icon">💰</div>
+                    <h3>Smart Contracts</h3>
+                    <p>Automated funding based on verified impact</p>
+                </div>
+            </div>
+            <div class="blockchain-benefits">
+                <div class="benefit">🔒 Tamper-proof records</div>
+                <div class="benefit">🌐 Global accessibility</div>
+                <div class="benefit">⚡ Instant verification</div>
+                <div class="benefit">💎 Reduced fraud</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 11: CTA Section -->
+    <section class="slide cta-section">
+        <div id="particles-js-11" class="particles-container"></div>
+        <div class="cta-content">
+            <h2 class="cta-title">Ready to Make an Impact?</h2>
+            <p class="cta-subtitle">Join us in revolutionizing climate finance in Africa</p>
+            <div class="cta-buttons">
+                <a href="#contact" class="btn btn-primary">Get Started</a>
+                <a href="#demo" class="btn btn-secondary">Watch Demo</a>
+            </div>
+            <div class="cta-contact">
+                <p>Contact us: <a href="mailto:hello@orun.io">hello@orun.io</a></p>
+                <p>Follow us: <a href="#">@orun_io</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#privacy">Privacy</a>
+                <a href="#terms">Terms</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="js/slide-system.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/neural-network.js"></script>
+    <script src="js/vanta-effects.js"></script>
+    <script src="js/climate-effects.js"></script>
+    <script src="js/simple-globe.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/loading-globe.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

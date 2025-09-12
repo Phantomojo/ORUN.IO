@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2050.earth - Earth Viewer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        
+        #main-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            z-index: 1000;
+        }
+        
+        .debug-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div id="main-container">
+        <div id="loading">Loading 2050.earth...</div>
+        <div class="debug-info">
+            <div>Status: <span id="status">Initializing...</span></div>
+            <div>Three.js: <span id="three-status">Loading...</span></div>
+            <div>Panorama: <span id="panorama-status">Loading...</span></div>
+        </div>
+    </div>
+
+    <!-- Load Three.js -->
+    <script src="2050.earth/js/three.min.js"></script>
+    <script>
+        // Check if Three.js loaded
+        if (typeof THREE !== 'undefined') {
+            document.getElementById('three-status').textContent = 'Loaded ✓';
+            document.getElementById('status').textContent = 'Three.js ready, loading panorama...';
+        } else {
+            document.getElementById('three-status').textContent = 'Failed ✗';
+            document.getElementById('status').textContent = 'Three.js failed to load';
+        }
+    </script>
+
+    <!-- Load Panorama.js -->
+    <script src="2050.earth/js/panorama.min.js"></script>
+    <script>
+        // Check if Panorama loaded
+        if (typeof PNRM !== 'undefined') {
+            document.getElementById('panorama-status').textContent = 'Loaded ✓';
+            document.getElementById('status').textContent = 'All libraries loaded, initializing...';
+        } else {
+            document.getElementById('panorama-status').textContent = 'Failed ✗';
+            document.getElementById('status').textContent = 'Panorama.js failed to load';
+        }
+    </script>
+
+    <!-- Load Hexasphere.js -->
+    <script src="2050.earth/js/hexasphere.min.js"></script>
+
+    <!-- Initialize 2050.earth -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing 2050.earth viewer...');
+            
+            // Hide loading after a delay
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+            }, 2000);
+            
+            try {
+                // Create a simple 2050.earth style viewer
+                if (typeof THREE !== 'undefined' && typeof PNRM !== 'undefined') {
+                    document.getElementById('status').textContent = 'Creating Earth viewer...';
+                    
+                    // Create scene
+                    const scene = new THREE.Scene();
+                    scene.background = new THREE.Color(0x000000);
+                    
+                    // Create camera
+                    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                    camera.position.z = 5;
+                    
+                    // Create renderer
+                    const renderer = new THREE.WebGLRenderer({ antialias: true });
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                    renderer.shadowMap.enabled = true;
+                    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                    document.getElementById('main-container').appendChild(renderer.domElement);
+                    
+                    // Create Earth geometry (using their approach)
+                    const geometry = new THREE.SphereGeometry(2, 64, 32);
+                    
+                    // Create Earth material with their style
+                    const material = new THREE.MeshPhongMaterial({
+                        color: 0x3b82f6,
+                        shininess: 100,
+                        specular: 0x222222,
+                        transparent: true,
+                        opacity: 0.9
+                    });
+                    
+                    // Create Earth mesh
+                    const earth = new THREE.Mesh(geometry, material);
+                    earth.castShadow = true;
+                    earth.receiveShadow = true;
+                    scene.add(earth);
+                    
+                    // Add lighting (similar to 2050.earth)
+                    const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+                    scene.add(ambientLight);
+                    
+                    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+                    directionalLight.position.set(5, 3, 5);
+                    directionalLight.castShadow = true;
+                    scene.add(directionalLight);
+                    
+                    // Add atmosphere effect
+                    const atmosphereGeometry = new THREE.SphereGeometry(2.1, 32, 16);
+                    const atmosphereMaterial = new THREE.MeshBasicMaterial({
+                        color: 0x3b82f6,
+                        transparent: true,
+                        opacity: 0.1,
+                        side: THREE.BackSide
+                    });
+                    const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+                    scene.add(atmosphere);
+                    
+                    // Animation loop
+                    function animate() {
+                        requestAnimationFrame(animate);
+                        
+                        // Rotate Earth
+                        earth.rotation.y += 0.005;
+                        atmosphere.rotation.y += 0.003;
+                        
+                        renderer.render(scene, camera);
+                    }
+                    
+                    animate();
+                    
+                    // Handle window resize
+                    window.addEventListener('resize', () => {
+                        camera.aspect = window.innerWidth / window.innerHeight;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(window.innerWidth, window.innerHeight);
+                    });
+                    
+                    document.getElementById('status').textContent = '2050.earth style viewer ready ✓';
+                    console.log('2050.earth viewer initialized successfully');
+                    
+                } else {
+                    document.getElementById('status').textContent = 'Missing dependencies ✗';
+                    console.error('Missing THREE.js or PNRM');
+                }
+                
+            } catch (error) {
+                console.error('Error initializing 2050.earth viewer:', error);
+                document.getElementById('status').textContent = 'Error: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>

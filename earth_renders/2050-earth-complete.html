@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>2050.earth - Complete Dependencies</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        
+        .main-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00ff00;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #00ff00;
+            font-size: 18px;
+            z-index: 1000;
+        }
+        
+        .error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff0000;
+            font-size: 16px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ff0000;
+            max-width: 80%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="loading" id="loading">Loading 2050.earth dependencies...</div>
+        
+        <div class="info" style="display: none;" id="info">
+            <h3>EARTH 2050 - COMPLETE DEPENDENCIES</h3>
+            <p>Loading their exact dependencies and initialization</p>
+        </div>
+    </div>
+
+    <!-- Load dependencies in the exact order they use -->
+    <script>
+        // Set up required global variables first
+        window.dataLayer = [];
+        window.kaspersky = window.kaspersky || {};
+        window.kaspersky.businessType = 'b2c';
+        window.kaspersky.isStaging = 0;
+        window.kaspersky.pageName = '2050.earth > Home';
+        window.kaspersky.pageType = 'special project';
+        window.kaspersky.platformName = 'Micro Site';
+        window.kaspersky.siteLocale = 'en-global';
+        
+        // Add other required globals
+        window.langUrl = '/';
+        window.authUser = 0;
+        window.userLang = 'en';
+        
+        console.log('Global variables set up');
+    </script>
+    
+    <!-- Load their libs.js (contains Stats and Detector) -->
+    <script src="2050.earth/js/libs.js?id=7e1ba8b0470fbf13be96"></script>
+    
+    <!-- Load Three.js -->
+    <script src="2050.earth/js/three.min.js?id=136ca995557c5ab59b9d"></script>
+    
+    <!-- Load their assets.min.js -->
+    <script src="2050.earth/js/assets.min.js?id=8d4994b94da8ada7e868"></script>
+    
+    <!-- Load panorama.min.js -->
+    <script type="module" src="2050.earth/js/panorama.min.js?id=47ad2b524296ede6d86d"></script>
+    
+    <!-- Load hexasphere.min.js -->
+    <script type="module" src="2050.earth/js/hexasphere.min.js?id=a1dbcac122dff91a3d56"></script>
+    
+    <!-- Load Kaspersky.min.js -->
+    <script src="2050.earth/js/Kaspersky.min.js?id=5e4cf66dd1b2243eb2d0"></script>
+    
+    <!-- Load ws-client.js -->
+    <script src="2050.earth/js/ws-client.js?id=c5529a673432b495a605"></script>
+    
+    <!-- Load switchToArtwork.js -->
+    <script src="2050.earth/js/switchToArtwork.js?id=cf5a922316903aa5f111"></script>
+    
+    <!-- Initialize their system -->
+    <script>
+        let loadingElement = document.getElementById('loading');
+        let infoElement = document.getElementById('info');
+        let errorElement = document.getElementById('error');
+        
+        // Wait for all scripts to load
+        window.addEventListener('load', function() {
+            console.log('All scripts loaded, attempting initialization...');
+            
+            setTimeout(() => {
+                try {
+                    // Check if required objects are available
+                    if (typeof THREE === 'undefined') {
+                        throw new Error('THREE.js not loaded');
+                    }
+                    
+                    if (typeof Detector === 'undefined') {
+                        throw new Error('Detector not loaded');
+                    }
+                    
+                    if (typeof Stats === 'undefined') {
+                        throw new Error('Stats not loaded');
+                    }
+                    
+                    console.log('All dependencies loaded successfully');
+                    
+                    // Try to initialize their planet system
+                    if (typeof Planet !== 'undefined') {
+                        console.log('Planet class found, attempting initialization...');
+                        
+                        // Create a mock container for their system
+                        const container = document.createElement('div');
+                        container.className = 'main-container';
+                        container.style.width = '100vw';
+                        container.style.height = '100vh';
+                        container.style.position = 'relative';
+                        document.body.appendChild(container);
+                        
+                        // Try to initialize their planet
+                        const planet = new Planet(container, {}, function() {
+                            console.log('Planet initialization callback');
+                        });
+                        
+                        console.log('Planet initialized successfully');
+                        
+                        // Hide loading and show info
+                        loadingElement.style.display = 'none';
+                        infoElement.style.display = 'block';
+                        
+                    } else {
+                        throw new Error('Planet class not found');
+                    }
+                    
+                } catch (error) {
+                    console.error('Initialization error:', error);
+                    
+                    // Show error message
+                    loadingElement.style.display = 'none';
+                    
+                    if (!errorElement) {
+                        errorElement = document.createElement('div');
+                        errorElement.className = 'error';
+                        errorElement.id = 'error';
+                        document.body.appendChild(errorElement);
+                    }
+                    
+                    errorElement.innerHTML = `
+                        <h3>Initialization Error</h3>
+                        <p>${error.message}</p>
+                        <p>Check console for more details</p>
+                    `;
+                    errorElement.style.display = 'block';
+                }
+            }, 2000); // Wait 2 seconds for all scripts to initialize
+        });
+        
+        // Handle script loading errors
+        window.addEventListener('error', function(e) {
+            console.error('Script loading error:', e);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>2050.earth - Panorama Earth</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        
+        .main-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #00ff00;
+            font-size: 18px;
+            z-index: 1000;
+        }
+        
+        .info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00ff00;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="loading" id="loading">Loading 2050.earth Panorama...</div>
+        <div class="info">
+            <h3>EARTH 2050</h3>
+            <p>Using their actual Panorama code</p>
+        </div>
+    </div>
+
+    <!-- Load jQuery first (required by their scripts) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Load their core files -->
+    <script src="2050.earth/js/three.min.js"></script>
+    
+    <!-- Add required global variables -->
+    <script>
+        // Add kaspersky global variable
+        window.kaspersky = window.kaspersky || {};
+        window.kaspersky.businessType = 'b2c';
+        window.kaspersky.isStaging = 0;
+        window.kaspersky.pageName = '2050.earth > Home';
+        window.kaspersky.pageType = 'special project';
+        window.kaspersky.platformName = 'Micro Site';
+        window.kaspersky.siteLocale = 'en-global';
+        
+        // Add Detector for Three.js (global variable)
+        window.Detector = {
+            webgl: true,
+            webgl2: true,
+            workers: true,
+            fileapi: true
+        };
+        
+        // Also add to THREE namespace
+        if (typeof THREE !== 'undefined') {
+            THREE.Detector = window.Detector;
+        }
+        
+        // Add other required globals
+        window.langUrl = '/';
+        window.authUser = 0;
+        window.userLang = 'en';
+    </script>
+    
+    <script src="2050.earth/js/panorama.min.js"></script>
+    <script src="2050.earth/js/hexasphere.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing 2050.earth panorama version...');
+            
+            // Wait for scripts to load
+            setTimeout(() => {
+                if (typeof THREE !== 'undefined' && typeof PNRM !== 'undefined') {
+                    console.log('THREE.js and PNRM loaded successfully');
+                    initPanorama();
+                } else {
+                    console.error('Required libraries not loaded');
+                    document.getElementById('loading').textContent = 'Failed to load libraries';
+                }
+            }, 2000);
+        });
+        
+        function initPanorama() {
+            try {
+                console.log('Initializing PNRM.Player...');
+                
+                // Create their panorama player
+                const container = document.querySelector('.main-container');
+                if (container) {
+                    // Initialize their panorama system
+                    const player = new PNRM.Player(container, null, false);
+                    
+                    console.log('PNRM.Player created:', player);
+                    
+                    // Create a simple panorama data
+                    const panoramaData = {
+                        image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+                        type: 'sphere',
+                        points: []
+                    };
+                    
+                    // Create panorama
+                    player.createPanorama(panoramaData, function() {
+                        console.log('Panorama created successfully');
+                        document.getElementById('loading').style.display = 'none';
+                    });
+                    
+                } else {
+                    console.error('Container not found');
+                }
+                
+            } catch (error) {
+                console.error('Error initializing panorama:', error);
+                document.getElementById('loading').textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

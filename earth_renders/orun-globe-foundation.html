@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORUN Globe - Foundation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        
+        #container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00ff00;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            font-size: 14px;
+        }
+        
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #00ff00;
+            font-size: 18px;
+            z-index: 1000;
+        }
+        
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #00ff00;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        
+        .controls button {
+            background: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 8px 16px;
+            margin: 4px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .controls button:hover {
+            background: #00ff00;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="loading">Loading ORUN Globe...</div>
+        <div id="info" style="display: none;">
+            <h3>ORUN GLOBE - FOUNDATION</h3>
+            <p>High-quality Earth visualization</p>
+            <p>FPS: <span id="fps">0</span></p>
+            <p>Vertices: <span id="vertices">0</span></p>
+        </div>
+        <div class="controls" style="display: none;">
+            <button onclick="toggleWireframe()">Toggle Wireframe</button>
+            <button onclick="toggleAtmosphere()">Toggle Atmosphere</button>
+            <button onclick="toggleStripeStyle()">Toggle Stripe Style</button>
+            <button onclick="resetCamera()">Reset Camera</button>
+        </div>
+    </div>
+
+    <!-- Three.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <script>
+        // Global variables
+        let scene, camera, renderer, controls;
+        let earth, atmosphere, clouds;
+        let wireframe = false;
+        let atmosphereVisible = true;
+        let stats = { fps: 0, vertices: 0 };
+        
+        // Initialize the application
+        function init() {
+            console.log('Initializing ORUN Globe Foundation...');
+            
+            // Create scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+            
+            // Create camera
+            camera = new THREE.PerspectiveCamera(
+                60, 
+                window.innerWidth / window.innerHeight, 
+                0.1, 
+                1000
+            );
+            camera.position.set(0, 0, 15);
+            
+            // Create renderer
+            renderer = new THREE.WebGLRenderer({ 
+                antialias: true,
+                alpha: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.getElementById('container').appendChild(renderer.domElement);
+            
+            // Create controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.5;
+            controls.minDistance = 8;
+            controls.maxDistance = 50;
+            controls.minPolarAngle = 0.1;
+            controls.maxPolarAngle = Math.PI - 0.1;
+            
+            // Add lighting
+            setupLighting();
+            
+            // Create Earth
+            createEarth();
+            
+            // Create atmosphere
+            createAtmosphere();
+            
+            // Create clouds (disabled for clean wireframe look)
+            // createClouds();
+            
+            // Add data points (disabled for clean wireframe look)
+            // createDataPoints();
+            
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize, false);
+            
+            // Start animation loop
+            animate();
+            
+            // Hide loading and show UI
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('info').style.display = 'block';
+            document.querySelector('.controls').style.display = 'block';
+            
+            console.log('ORUN Globe Foundation initialized successfully!');
+        }
+        
+        function setupLighting() {
+            // Ambient light
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+            scene.add(ambientLight);
+            
+            // Directional light (sun)
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 3, 5);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            scene.add(directionalLight);
+            
+            // Point light for additional illumination
+            const pointLight = new THREE.PointLight(0xffffff, 0.5, 100);
+            pointLight.position.set(-5, 0, 5);
+            scene.add(pointLight);
+        }
+        
+        function createEarth() {
+            // Create Earth geometry with minimal resolution to reduce wireframe visibility
+            const geometry = new THREE.SphereGeometry(5, 16, 16); // Further reduced to 16x16
+            
+            // Create completely invisible Earth material
+            const material = new THREE.MeshBasicMaterial({
+                color: 0x000000,
+                transparent: true,
+                opacity: 0.0, // Completely transparent
+                wireframe: false,
+                visible: false // Make it completely invisible
+            });
+            
+            // Create Earth mesh (completely invisible)
+            earth = new THREE.Mesh(geometry, material);
+            earth.castShadow = false;
+            earth.receiveShadow = false;
+            earth.visible = false; // Ensure it's not visible
+            scene.add(earth);
+            
+            // Disabled wireframe continents - dots only
+            // createWireframeContinents();
+            
+            // Create Stripe-style layered globe
+            createStripeStyleGlobe();
+            
+            console.log('Earth created with transparent material - only wireframe and dots visible');
+        }
+        
+        function createWireframeContinents() {
+            // Create wireframe continents using 2050.earth's exact approach
+            const geometry = new THREE.SphereGeometry(4.995, 64, 64, 0, Math.PI);
+            const material = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(3257463), // 2050.earth's exact green color
+                fog: false,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+                wireframe: true
+            });
+            
+            const wireframe = new THREE.Mesh(geometry, material);
+            wireframe.visible = true;
+            wireframe.matrixAutoUpdate = false;
+            wireframe.updateMatrix();
+            scene.add(wireframe);
+            
+            // Create second hemisphere (2050.earth technique)
+            const wireframe2 = wireframe.clone();
+            wireframe2.rotation.y = Math.PI;
+            wireframe2.updateMatrix();
+            scene.add(wireframe2);
+            
+            console.log('Wireframe continents created using 2050.earth technique');
+        }
+        
+        function createStripeStyleGlobe() {
+            // Create Stripe-style layered globe with twinkling dots (no ocean layer)
+            createTwinklingDotsLayer();
+            createAnimatedArcs();
+        }
+        
+        function createBaseOceanLayer() {
+            // Stripe's base layer: semi-transparent sphere for oceans
+            const oceanGeometry = new THREE.SphereGeometry(5.02, 64, 64);
+            const oceanMaterial = new THREE.MeshBasicMaterial({
+                color: 0x001122, // Deep ocean blue
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.BackSide
+            });
+            
+            const oceanLayer = new THREE.Mesh(oceanGeometry, oceanMaterial);
+            scene.add(oceanLayer);
+            
+            console.log('Stripe-style ocean layer created');
+        }
+        
+        function createTwinklingDotsLayer() {
+            // Enhanced dots using Fibonacci sphere distribution for perfect spacing
+            const dots = [];
+            const colors = [];
+            const sizes = [];
+            
+            // Fibonacci sphere distribution for optimal spacing
+            const numDots = 8000; // Increased significantly
+            const phi = Math.PI * (3 - Math.sqrt(5)); // Golden angle
+            
+            for (let i = 0; i < numDots; i++) {
+                const y = 1 - (i / (numDots - 1)) * 2; // y goes from 1 to -1
+                const radiusAtY = Math.sqrt(1 - y * y);
+                const theta = phi * i;
+                
+                const x = Math.cos(theta) * radiusAtY;
+                const z = Math.sin(theta) * radiusAtY;
+                
+                // Scale to Earth radius with slight variation
+                const scale = 5.05 + Math.random() * 0.1;
+                dots.push(x * scale, y * scale, z * scale);
+                
+                // Enhanced twinkling colors (blue to white with more variation)
+                const twinkle = Math.random();
+                const colorVariation = Math.random();
+                colors.push(
+                    0.1 + twinkle * 0.9, // Red component
+                    0.3 + twinkle * 0.7, // Green component  
+                    0.6 + twinkle * 0.4 + colorVariation * 0.2 // Blue component
+                );
+                sizes.push(0.01 + Math.random() * 0.02); // Smaller, more uniform sizes
+            }
+            
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(dots, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            geometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
+            
+            const material = new THREE.PointsMaterial({
+                size: 0.03, // Smaller for better density
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending,
+                sizeAttenuation: true
+            });
+            
+            const twinklingDots = new THREE.Points(geometry, material);
+            scene.add(twinklingDots);
+            
+            // Store reference for animation
+            window.twinklingDots = twinklingDots;
+            
+            console.log('Enhanced twinkling dots layer created with', numDots, 'dots using Fibonacci sphere distribution');
+        }
+        
+        function createAnimatedArcs() {
+            // Create continent outlines by connecting dots on landmasses
+            createContinentDotConnections();
+            console.log('Continent dot connections created');
+        }
+        
+        function createContinentDotConnections() {
+            // Get all dot positions from the twinkling dots
+            if (!window.twinklingDots) {
+                console.log('No twinkling dots found');
+                return;
+            }
+            
+            const positions = window.twinklingDots.geometry.attributes.position.array;
+            const dotsOnLand = [];
+            
+            // Filter dots that are on landmasses
+            for (let i = 0; i < positions.length; i += 3) {
+                const x = positions[i];
+                const y = positions[i + 1];
+                const z = positions[i + 2];
+                
+                // Convert 3D position back to lat/lon
+                const lat = Math.asin(y / 5.05) * (180 / Math.PI);
+                const lon = Math.atan2(z, x) * (180 / Math.PI);
+                
+                // Check if this dot is on land (simplified continent detection)
+                if (isOnLand(lat, lon)) {
+                    dotsOnLand.push(new THREE.Vector3(x, y, z));
+                }
+            }
+            
+            console.log(`Found ${dotsOnLand.length} dots on landmasses`);
+            
+            // Create continent outlines by connecting nearby land dots
+            createContinentOutlines(dotsOnLand);
+        }
+        
+        function isOnLand(lat, lon) {
+            // Simplified land detection based on major continent boundaries
+            // North America
+            if (lat > 15 && lat < 70 && lon > -170 && lon < -50) return true;
+            // South America
+            if (lat > -60 && lat < 15 && lon > -85 && lon < -30) return true;
+            // Europe
+            if (lat > 35 && lat < 70 && lon > -25 && lon < 40) return true;
+            // Africa
+            if (lat > -35 && lat < 35 && lon > -20 && lon < 55) return true;
+            // Asia
+            if (lat > 10 && lat < 70 && lon > 40 && lon < 180) return true;
+            // Australia
+            if (lat > -45 && lat < -10 && lon > 110 && lon < 155) return true;
+            
+            return false;
+        }
+        
+        function createContinentOutlines(landDots) {
+            // Group dots by continent and create outlines
+            const continentGroups = groupDotsByContinent(landDots);
+            
+            Object.keys(continentGroups).forEach(continentName => {
+                const dots = continentGroups[continentName];
+                if (dots.length > 10) { // Only create outlines for continents with enough dots
+                    createContinentOutline(dots, continentName);
+                }
+            });
+        }
+        
+        function groupDotsByContinent(landDots) {
+            const groups = {
+                northAmerica: [],
+                southAmerica: [],
+                europe: [],
+                africa: [],
+                asia: [],
+                australia: []
+            };
+            
+            landDots.forEach(dot => {
+                // Ensure dot is a valid THREE.Vector3
+                if (dot && dot.x !== undefined && dot.y !== undefined && dot.z !== undefined) {
+                    const lat = Math.asin(dot.y / 5.05) * (180 / Math.PI);
+                    const lon = Math.atan2(dot.z, dot.x) * (180 / Math.PI);
+                    
+                    if (lat > 15 && lat < 70 && lon > -170 && lon < -50) {
+                        groups.northAmerica.push(dot);
+                    } else if (lat > -60 && lat < 15 && lon > -85 && lon < -30) {
+                        groups.southAmerica.push(dot);
+                    } else if (lat > 35 && lat < 70 && lon > -25 && lon < 40) {
+                        groups.europe.push(dot);
+                    } else if (lat > -35 && lat < 35 && lon > -20 && lon < 55) {
+                        groups.africa.push(dot);
+                    } else if (lat > 10 && lat < 70 && lon > 40 && lon < 180) {
+                        groups.asia.push(dot);
+                    } else if (lat > -45 && lat < -10 && lon > 110 && lon < 155) {
+                        groups.australia.push(dot);
+                    }
+                }
+            });
+            
+            return groups;
+        }
+        
+        function createContinentOutline(dots, continentName) {
+            if (dots.length < 3) return;
+            
+            // Create a convex hull or simplified outline
+            const outlinePoints = createSimplifiedOutline(dots);
+            
+            if (outlinePoints.length < 2) return;
+            
+            const geometry = new THREE.BufferGeometry().setFromPoints(outlinePoints);
+            const material = new THREE.LineBasicMaterial({
+                color: 0x00ff88, // Green color for continent outlines
+                transparent: true,
+                opacity: 0.7,
+                linewidth: 1
+            });
+            
+            const continentLine = new THREE.Line(geometry, material);
+            scene.add(continentLine);
+            
+            // Store reference for animation
+            if (!window.continentLines) window.continentLines = [];
+            window.continentLines.push(continentLine);
+            
+            console.log(`Created outline for ${continentName} with ${outlinePoints.length} points`);
+        }
+        
+        function createSimplifiedOutline(dots) {
+            // Create a simplified outline by finding boundary dots
+            const outlinePoints = [];
+            
+            if (dots.length < 3) return outlinePoints;
+            
+            // Sort dots by angle around the center of the continent
+            const center = new THREE.Vector3();
+            dots.forEach(dot => {
+                if (dot && dot.x !== undefined && dot.y !== undefined && dot.z !== undefined) {
+                    center.add(dot);
+                }
+            });
+            center.divideScalar(dots.length);
+            
+            // Find dots that form the boundary
+            const sortedDots = dots.filter(dot => 
+                dot && dot.x !== undefined && dot.y !== undefined && dot.z !== undefined
+            ).sort((a, b) => {
+                const angleA = Math.atan2(a.z - center.z, a.x - center.x);
+                const angleB = Math.atan2(b.z - center.z, b.x - center.x);
+                return angleA - angleB;
+            });
+            
+            // Take every nth dot to create a simplified outline
+            const step = Math.max(1, Math.floor(sortedDots.length / 20));
+            for (let i = 0; i < sortedDots.length; i += step) {
+                outlinePoints.push(sortedDots[i]);
+            }
+            
+            // Close the outline
+            if (outlinePoints.length > 0) {
+                outlinePoints.push(outlinePoints[0]);
+            }
+            
+            return outlinePoints;
+        }
+        
+        
+        
+        function createAnimatedArc(fromLatLng, toLatLng, index) {
+            // Convert lat/lng to 3D coordinates
+            const fromPos = latLngToVector3(fromLatLng[0], fromLatLng[1], 5.1);
+            const toPos = latLngToVector3(toLatLng[0], toLatLng[1], 5.1);
+            
+            // Create arc geometry
+            const points = [];
+            const numPoints = 50;
+            
+            for (let i = 0; i <= numPoints; i++) {
+                const t = i / numPoints;
+                const point = new THREE.Vector3().lerpVectors(fromPos, toPos, t);
+                
+                // Add arc height
+                const arcHeight = 0.5 * Math.sin(t * Math.PI);
+                point.normalize().multiplyScalar(5.1 + arcHeight);
+                
+                points.push(point);
+            }
+            
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.LineBasicMaterial({
+                color: new THREE.Color(0x00ffff), // Cyan color for arcs
+                transparent: true,
+                opacity: 0.6,
+                linewidth: 2
+            });
+            
+            const arc = new THREE.Line(geometry, material);
+            scene.add(arc);
+            
+            // Store reference for animation
+            if (!window.animatedArcs) window.animatedArcs = [];
+            window.animatedArcs.push({ arc, fromPos, toPos, index });
+        }
+        
+        function latLngToVector3(lat, lng, radius) {
+            const phi = (90 - lat) * (Math.PI / 180);
+            const theta = (lng + 180) * (Math.PI / 180);
+            
+            return new THREE.Vector3(
+                radius * Math.sin(phi) * Math.cos(theta),
+                radius * Math.cos(phi),
+                radius * Math.sin(phi) * Math.sin(theta)
+            );
+        }
+        
+        function createOceanBase(ctx, width, height) {
+            // Create ocean base with more contrast
+            const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width/2);
+            gradient.addColorStop(0, '#0c1220'); // Very deep ocean center
+            gradient.addColorStop(0.2, '#1e3a8a'); // Deep blue
+            gradient.addColorStop(0.4, '#2563eb'); // Ocean blue
+            gradient.addColorStop(0.6, '#3b82f6'); // Medium blue
+            gradient.addColorStop(0.8, '#60a5fa'); // Light blue
+            gradient.addColorStop(1, '#93c5fd'); // Shallow blue
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+            
+            // Add ocean depth variation with more contrast
+            for (let i = 0; i < 80; i++) {
+                const x = Math.random() * width;
+                const y = Math.random() * height;
+                const radius = Math.random() * 120 + 30;
+                const alpha = Math.random() * 0.4 + 0.2;
+                
+                ctx.fillStyle = `rgba(12, 18, 32, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+            
+            // Add some lighter ocean areas for variety
+            for (let i = 0; i < 30; i++) {
+                const x = Math.random() * width;
+                const y = Math.random() * height;
+                const radius = Math.random() * 80 + 20;
+                const alpha = Math.random() * 0.3 + 0.1;
+                
+                ctx.fillStyle = `rgba(96, 165, 250, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
+        
+        function addContinents2050Style(ctx, width, height) {
+            // Create continents using 2050.earth's approach with more realistic shapes
+            ctx.fillStyle = '#10b981'; // Bright green for land
+            
+            // North America - More detailed and realistic
+            ctx.beginPath();
+            // Main North America body
+            ctx.ellipse(width * 0.15, height * 0.25, width * 0.12, height * 0.08, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Alaska - More realistic shape
+            ctx.beginPath();
+            ctx.ellipse(width * 0.08, height * 0.15, width * 0.08, height * 0.05, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Greenland - Larger and more detailed
+            ctx.beginPath();
+            ctx.ellipse(width * 0.25, height * 0.12, width * 0.05, height * 0.1, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // South America - More realistic shape
+            ctx.beginPath();
+            // Main body
+            ctx.ellipse(width * 0.25, height * 0.65, width * 0.08, height * 0.12, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Northern part (Central America)
+            ctx.beginPath();
+            ctx.ellipse(width * 0.22, height * 0.55, width * 0.06, height * 0.06, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Europe - More detailed
+            ctx.beginPath();
+            ctx.ellipse(width * 0.48, height * 0.25, width * 0.08, height * 0.06, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Africa - More realistic shape
+            ctx.beginPath();
+            // Main Africa body
+            ctx.ellipse(width * 0.52, height * 0.45, width * 0.06, height * 0.12, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Northern Africa
+            ctx.beginPath();
+            ctx.ellipse(width * 0.5, height * 0.35, width * 0.08, height * 0.04, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Asia - More detailed
+            ctx.beginPath();
+            // Main Asia body
+            ctx.ellipse(width * 0.75, height * 0.2, width * 0.15, height * 0.1, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // China region
+            ctx.beginPath();
+            ctx.ellipse(width * 0.8, height * 0.25, width * 0.08, height * 0.06, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // India subcontinent
+            ctx.beginPath();
+            ctx.ellipse(width * 0.7, height * 0.35, width * 0.06, height * 0.05, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Australia - More detailed
+            ctx.beginPath();
+            ctx.ellipse(width * 0.7, height * 0.75, width * 0.06, height * 0.04, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // New Zealand
+            ctx.beginPath();
+            ctx.ellipse(width * 0.8, height * 0.8, width * 0.02, height * 0.03, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Antarctica - More realistic
+            ctx.fillStyle = '#6b7280';
+            ctx.beginPath();
+            ctx.ellipse(width * 0.5, height * 0.95, width * 0.3, height * 0.05, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Add some major islands
+            ctx.fillStyle = '#059669'; // Darker green for islands
+            // Japan
+            ctx.beginPath();
+            ctx.ellipse(width * 0.85, height * 0.22, width * 0.03, height * 0.02, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // British Isles
+            ctx.beginPath();
+            ctx.ellipse(width * 0.45, height * 0.22, width * 0.02, height * 0.02, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Madagascar
+            ctx.beginPath();
+            ctx.ellipse(width * 0.6, height * 0.65, width * 0.02, height * 0.04, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Random smaller islands
+            for (let i = 0; i < 15; i++) {
+                const x = Math.random() * width;
+                const y = Math.random() * height;
+                const radius = Math.random() * 6 + 2;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
+        
+        function addOceanDetails(ctx, width, height) {
+            // Add coastal details and shallow water
+            ctx.fillStyle = 'rgba(96, 165, 250, 0.3)';
+            for (let i = 0; i < 30; i++) {
+                const x = Math.random() * width;
+                const y = Math.random() * height;
+                const radius = Math.random() * 40 + 20;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+            
+            // Add some ocean currents (subtle)
+            ctx.strokeStyle = 'rgba(147, 197, 253, 0.2)';
+            ctx.lineWidth = 3;
+            for (let i = 0; i < 10; i++) {
+                ctx.beginPath();
+                ctx.moveTo(Math.random() * width, Math.random() * height);
+                ctx.quadraticCurveTo(
+                    Math.random() * width, Math.random() * height,
+                    Math.random() * width, Math.random() * height
+                );
+                ctx.stroke();
+            }
+        }
+        
+        function createAtmosphere() {
+            // Create atmosphere geometry (slightly larger than Earth)
+            const geometry = new THREE.SphereGeometry(5.1, 32, 32);
+            
+            // Create atmosphere material
+            const material = new THREE.MeshBasicMaterial({
+                color: 0x87ceeb,
+                transparent: true,
+                opacity: 0.1,
+                side: THREE.BackSide
+            });
+            
+            atmosphere = new THREE.Mesh(geometry, material);
+            scene.add(atmosphere);
+        }
+        
+        function createClouds() {
+            // Create cloud geometry
+            const geometry = new THREE.SphereGeometry(5.05, 32, 32);
+            
+            // Create cloud material
+            const material = new THREE.MeshPhongMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.3,
+                alphaMap: createCloudTexture()
+            });
+            
+            clouds = new THREE.Mesh(geometry, material);
+            scene.add(clouds);
+        }
+        
+        function createCloudTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            
+            // Create cloud pattern with more realistic distribution
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, 1024, 512);
+            
+            // Create cloud systems over continents
+            const cloudSystems = [
+                { x: 150, y: 200, size: 80, density: 0.8 }, // North America
+                { x: 500, y: 300, size: 100, density: 0.7 }, // Europe/Africa
+                { x: 750, y: 200, size: 120, density: 0.9 }, // Asia
+                { x: 250, y: 400, size: 60, density: 0.6 },  // South America
+                { x: 700, y: 400, size: 50, density: 0.5 }   // Australia
+            ];
+            
+            cloudSystems.forEach(system => {
+                ctx.fillStyle = '#ffffff';
+                for (let i = 0; i < 30 * system.density; i++) {
+                    const x = system.x + (Math.random() - 0.5) * system.size;
+                    const y = system.y + (Math.random() - 0.5) * system.size;
+                    const radius = Math.random() * 25 + 5;
+                    const alpha = Math.random() * 0.8 + 0.2;
+                    
+                    ctx.globalAlpha = alpha;
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            });
+            
+            // Add some scattered clouds
+            ctx.globalAlpha = 0.6;
+            for (let i = 0; i < 40; i++) {
+                const x = Math.random() * 1024;
+                const y = Math.random() * 512;
+                const radius = Math.random() * 20 + 5;
+                const alpha = Math.random() * 0.5 + 0.1;
+                
+                ctx.globalAlpha = alpha;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+            
+            ctx.globalAlpha = 1.0;
+            return new THREE.CanvasTexture(canvas);
+        }
+        
+        function createDataPoints() {
+            // Create data points on land areas only (more realistic)
+            const points = [];
+            const colors = [];
+            const sizes = [];
+            
+            // Major cities and data points on land using 2050.earth's exact color
+            const landPoints = [
+                // North America
+                { lat: 40.7128, lng: -74.0060, size: 0.15, color: [0.198, 0.345, 0.247] }, // New York - 2050.earth green
+                { lat: 34.0522, lng: -118.2437, size: 0.12, color: [0.198, 0.345, 0.247] }, // Los Angeles
+                { lat: 41.8781, lng: -87.6298, size: 0.12, color: [0.198, 0.345, 0.247] }, // Chicago
+                { lat: 29.7604, lng: -95.3698, size: 0.1, color: [0.198, 0.345, 0.247] }, // Houston
+                
+                // Europe/Africa
+                { lat: 51.5074, lng: -0.1278, size: 0.12, color: [0.198, 0.345, 0.247] }, // London
+                { lat: 48.8566, lng: 2.3522, size: 0.1, color: [0.198, 0.345, 0.247] }, // Paris
+                { lat: 52.5200, lng: 13.4050, size: 0.1, color: [0.198, 0.345, 0.247] }, // Berlin
+                { lat: 30.0444, lng: 31.2357, size: 0.1, color: [0.198, 0.345, 0.247] }, // Cairo
+                { lat: -26.2041, lng: 28.0473, size: 0.1, color: [0.198, 0.345, 0.247] }, // Johannesburg
+                
+                // Asia
+                { lat: 35.6762, lng: 139.6503, size: 0.15, color: [0.198, 0.345, 0.247] }, // Tokyo
+                { lat: 39.9042, lng: 116.4074, size: 0.12, color: [0.198, 0.345, 0.247] }, // Beijing
+                { lat: 19.0760, lng: 72.8777, size: 0.12, color: [0.198, 0.345, 0.247] }, // Mumbai
+                { lat: 1.3521, lng: 103.8198, size: 0.1, color: [0.198, 0.345, 0.247] }, // Singapore
+                { lat: 37.5665, lng: 126.9780, size: 0.1, color: [0.198, 0.345, 0.247] }, // Seoul
+                
+                // South America
+                { lat: -23.5505, lng: -46.6333, size: 0.12, color: [0.198, 0.345, 0.247] }, // São Paulo
+                { lat: -34.6118, lng: -58.3960, size: 0.1, color: [0.198, 0.345, 0.247] }, // Buenos Aires
+                { lat: -12.0464, lng: -77.0428, size: 0.1, color: [0.198, 0.345, 0.247] }, // Lima
+                
+                // Australia
+                { lat: -33.8688, lng: 151.2093, size: 0.1, color: [0.198, 0.345, 0.247] }, // Sydney
+                { lat: -37.8136, lng: 144.9631, size: 0.1, color: [0.198, 0.345, 0.247] } // Melbourne
+            ];
+            
+            landPoints.forEach(point => {
+                // Convert lat/lng to 3D coordinates
+                const phi = (90 - point.lat) * (Math.PI / 180);
+                const theta = (point.lng + 180) * (Math.PI / 180);
+                
+                const x = 5.1 * Math.sin(phi) * Math.cos(theta);
+                const y = 5.1 * Math.cos(phi);
+                const z = 5.1 * Math.sin(phi) * Math.sin(theta);
+                
+                points.push(x, y, z);
+                colors.push(...point.color);
+                sizes.push(point.size);
+            });
+            
+            // Add some random points on land areas
+            for (let i = 0; i < 50; i++) {
+                const lat = (Math.random() - 0.5) * 120; // Avoid polar regions
+                const lng = (Math.random() - 0.5) * 360;
+                
+                // Simple land detection (avoid oceans)
+                const isLand = Math.abs(lat) < 60 && (
+                    (lng > -150 && lng < -50) || // North America
+                    (lng > -20 && lng < 60) ||  // Europe/Africa
+                    (lng > 60 && lng < 180) ||  // Asia
+                    (lng > -80 && lng < -30 && lat > -60 && lat < 20) // South America
+                );
+                
+                if (isLand) {
+                    const phi = (90 - lat) * (Math.PI / 180);
+                    const theta = (lng + 180) * (Math.PI / 180);
+                    
+                    const x = 5.1 * Math.sin(phi) * Math.cos(theta);
+                    const y = 5.1 * Math.cos(phi);
+                    const z = 5.1 * Math.sin(phi) * Math.sin(theta);
+                    
+                    points.push(x, y, z);
+                    colors.push(0.198, 0.345, 0.247); // 2050.earth green for random points
+                    sizes.push(0.05);
+                }
+            }
+            
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            geometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
+            
+            const material = new THREE.PointsMaterial({
+                size: 0.1,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                sizeAttenuation: true
+            });
+            
+            const dataPoints = new THREE.Points(geometry, material);
+            scene.add(dataPoints);
+            
+            console.log('Data points created:', points.length / 3, 'on land areas');
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Update controls
+            controls.update();
+            
+            // Rotate Earth
+            if (earth) {
+                earth.rotation.y += 0.001;
+            }
+            
+            // Rotate clouds (disabled)
+            // if (clouds) {
+            //     clouds.rotation.y += 0.002;
+            // }
+            
+            // Animate Stripe-style twinkling dots
+            if (window.twinklingDots) {
+                window.twinklingDots.rotation.y += 0.001;
+                
+                // Animate dot colors for twinkling effect
+                const colors = window.twinklingDots.geometry.attributes.color.array;
+                const time = Date.now() * 0.001;
+                
+                for (let i = 0; i < colors.length; i += 3) {
+                    const twinkle = Math.sin(time + i * 0.1) * 0.5 + 0.5;
+                    colors[i] = 0.2 + twinkle * 0.8;     // R
+                    colors[i + 1] = 0.4 + twinkle * 0.6; // G
+                    colors[i + 2] = 0.8 + twinkle * 0.2; // B
+                }
+                window.twinklingDots.geometry.attributes.color.needsUpdate = true;
+            }
+            
+            // Animate Stripe-style arcs
+            if (window.animatedArcs) {
+                window.animatedArcs.forEach((arcData, index) => {
+                    const time = Date.now() * 0.001 + index * 0.5;
+                    const pulse = Math.sin(time) * 0.3 + 0.7;
+                    arcData.arc.material.opacity = pulse * 0.6;
+                });
+            }
+            
+            // Update stats
+            updateStats();
+            
+            // Render scene
+            renderer.render(scene, camera);
+        }
+        
+        function updateStats() {
+            stats.fps = Math.round(1000 / (performance.now() - (stats.lastTime || performance.now())));
+            stats.lastTime = performance.now();
+            
+            if (earth) {
+                stats.vertices = earth.geometry.attributes.position.count;
+            }
+            
+            document.getElementById('fps').textContent = stats.fps;
+            document.getElementById('vertices').textContent = stats.vertices;
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // Control functions
+        function toggleWireframe() {
+            wireframe = !wireframe;
+            if (earth) {
+                earth.material.wireframe = wireframe;
+            }
+        }
+        
+        function toggleAtmosphere() {
+            atmosphereVisible = !atmosphereVisible;
+            if (atmosphere) {
+                atmosphere.visible = atmosphereVisible;
+            }
+        }
+        
+        function resetCamera() {
+            camera.position.set(0, 0, 15);
+            controls.reset();
+        }
+        
+        function toggleStripeStyle() {
+            if (window.twinklingDots) {
+                window.twinklingDots.visible = !window.twinklingDots.visible;
+            }
+            if (window.animatedArcs) {
+                window.animatedArcs.forEach(arcData => {
+                    arcData.arc.visible = !arcData.arc.visible;
+                });
+            }
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

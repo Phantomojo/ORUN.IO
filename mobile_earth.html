@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ORUN.IO - Mobile Earth Visualization</title>
+    
+    <!-- Three.js - Lightweight 3D Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP for smooth animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #1a1a1a 100%);
+            color: #ffffff;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        
+        #earth-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Mobile-optimized UI */
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .ui-panel {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            pointer-events: auto;
+            transition: all 0.3s ease;
+            max-width: 90vw;
+        }
+        
+        .ui-panel:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+        
+        /* Mobile responsive panels */
+        .logo-panel {
+            top: 20px;
+            left: 20px;
+            right: 20px;
+        }
+        
+        .status-panel {
+            top: 100px;
+            right: 20px;
+        }
+        
+        .data-panel {
+            bottom: 100px;
+            left: 20px;
+        }
+        
+        .metrics-panel {
+            bottom: 20px;
+            right: 20px;
+        }
+        
+        .title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #00d4ff, #ffd700, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+        
+        .metric-value {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-weight: 700;
+            color: #00d4ff;
+            display: block;
+        }
+        
+        .metric-label {
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #00d4ff;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        .floating-text {
+            position: absolute;
+            color: rgba(0, 212, 255, 0.6);
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(0.6rem, 2vw, 0.8rem);
+            pointer-events: none;
+            animation: float 20s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #1a1a1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-content {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #00d4ff, #ffd700, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+        
+        .loading-subtitle {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+        }
+        
+        .loading-bar {
+            width: min(300px, 80vw);
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #ffd700);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        /* Touch controls */
+        .touch-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 1001;
+        }
+        
+        .touch-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00d4ff;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .touch-btn:active {
+            transform: scale(0.9);
+            background: rgba(0, 212, 255, 0.2);
+        }
+        
+        /* Mobile landscape adjustments */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .logo-panel {
+                top: 10px;
+                left: 10px;
+                right: auto;
+                width: 200px;
+            }
+            
+            .status-panel {
+                top: 10px;
+                right: 10px;
+            }
+            
+            .data-panel {
+                bottom: 10px;
+                left: 10px;
+            }
+            
+            .metrics-panel {
+                bottom: 10px;
+                right: 10px;
+            }
+            
+            .touch-controls {
+                bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <h1 class="loading-title">ORUN.IO</h1>
+            <p class="loading-subtitle">Loading Mobile Earth Visualization...</p>
+            <div class="loading-bar">
+                <div class="loading-progress" id="loadingProgress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Earth Container -->
+    <div id="earth-container"></div>
+    
+    <!-- UI Overlay -->
+    <div class="ui-overlay">
+        <!-- Logo Panel -->
+        <div class="ui-panel logo-panel">
+            <h1 class="title">ORUN.IO</h1>
+            <p class="subtitle">Climate Impact Verification Platform</p>
+        </div>
+        
+        <!-- Status Panel -->
+        <div class="ui-panel status-panel">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>Live</span>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot" style="background: #ffd700;"></div>
+                <span>Satellite</span>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot" style="background: #ff6b6b;"></div>
+                <span>Data</span>
+            </div>
+        </div>
+        
+        <!-- Data Panel -->
+        <div class="ui-panel data-panel">
+            <span class="metric-value">78.5%</span>
+            <span class="metric-label">Resilience</span>
+        </div>
+        
+        <!-- Metrics Panel -->
+        <div class="ui-panel metrics-panel">
+            <span class="metric-value">16K</span>
+            <span class="metric-label">Beneficiaries</span>
+        </div>
+        
+        <!-- Touch Controls -->
+        <div class="touch-controls">
+            <div class="touch-btn" id="zoomIn">+</div>
+            <div class="touch-btn" id="zoomOut">-</div>
+            <div class="touch-btn" id="resetView">⌂</div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let scene, camera, renderer, earth, satellites = [], beams = [];
+        let mouseX = 0, mouseY = 0;
+        let isMouseDown = false;
+        let rotationSpeed = 0.005;
+        let zoomLevel = 1;
+        
+        // Initialize the 3D scene
+        function init() {
+            const container = document.getElementById('earth-container');
+            
+            // Scene setup
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+            
+            // Camera setup
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            
+            // Renderer setup
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for performance
+            container.appendChild(renderer.domElement);
+            
+            // Create Earth
+            createEarth();
+            
+            // Create satellites
+            createSatellites();
+            
+            // Add lighting
+            addLighting();
+            
+            // Add stars
+            addStars();
+            
+            // Add event listeners
+            addEventListeners();
+            
+            // Start animation
+            animate();
+        }
+        
+        function createEarth() {
+            // Earth geometry
+            const earthGeometry = new THREE.SphereGeometry(1.5, 64, 64);
+            
+            // Create Earth texture
+            const earthTexture = createEarthTexture();
+            
+            // Earth material
+            const earthMaterial = new THREE.MeshPhongMaterial({
+                map: earthTexture,
+                transparent: true,
+                opacity: 0.9
+            });
+            
+            earth = new THREE.Mesh(earthGeometry, earthMaterial);
+            scene.add(earth);
+            
+            // Add atmosphere
+            const atmosphereGeometry = new THREE.SphereGeometry(1.6, 64, 64);
+            const atmosphereMaterial = new THREE.MeshPhongMaterial({
+                color: 0x4a90e2,
+                transparent: true,
+                opacity: 0.1
+            });
+            const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+            scene.add(atmosphere);
+            
+            // Add Africa highlight
+            const africaGeometry = new THREE.SphereGeometry(1.51, 32, 32);
+            const africaMaterial = new THREE.MeshPhongMaterial({
+                color: 0x00d4ff,
+                transparent: true,
+                opacity: 0.3
+            });
+            const africa = new THREE.Mesh(africaGeometry, africaMaterial);
+            scene.add(africa);
+        }
+        
+        function createEarthTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            
+            // Ocean gradient
+            const gradient = ctx.createRadialGradient(512, 256, 0, 512, 256, 512);
+            gradient.addColorStop(0, '#1e3a8a');
+            gradient.addColorStop(0.7, '#1e40af');
+            gradient.addColorStop(1, '#1e3a8a');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 1024, 512);
+            
+            // Add continents (simplified)
+            ctx.fillStyle = '#22c55e';
+            
+            // Africa
+            ctx.beginPath();
+            ctx.ellipse(512, 300, 80, 120, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Europe
+            ctx.beginPath();
+            ctx.ellipse(480, 200, 60, 40, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Asia
+            ctx.beginPath();
+            ctx.ellipse(600, 250, 100, 80, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // North America
+            ctx.beginPath();
+            ctx.ellipse(200, 200, 80, 100, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // South America
+            ctx.beginPath();
+            ctx.ellipse(250, 350, 50, 80, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Australia
+            ctx.beginPath();
+            ctx.ellipse(700, 400, 40, 30, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.ClampToEdgeWrapping;
+            return texture;
+        }
+        
+        function createSatellites() {
+            const satellitePositions = [
+                { x: 3, y: 0, z: 0, color: 0x00d4ff },
+                { x: -3, y: 0, z: 0, color: 0xffd700 },
+                { x: 0, y: 3, z: 0, color: 0xff6b6b }
+            ];
+            
+            satellitePositions.forEach((pos, index) => {
+                // Satellite
+                const satelliteGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+                const satelliteMaterial = new THREE.MeshBasicMaterial({ color: pos.color });
+                const satellite = new THREE.Mesh(satelliteGeometry, satelliteMaterial);
+                satellite.position.set(pos.x, pos.y, pos.z);
+                scene.add(satellite);
+                satellites.push({ mesh: satellite, originalPos: pos, index: index });
+                
+                // Scanning beam
+                const beamGeometry = new THREE.CylinderGeometry(0.05, 0.05, 2, 8);
+                const beamMaterial = new THREE.MeshBasicMaterial({ 
+                    color: pos.color, 
+                    transparent: true, 
+                    opacity: 0.3 
+                });
+                const beam = new THREE.Mesh(beamGeometry, beamMaterial);
+                beam.position.set(pos.x, pos.y, pos.z);
+                beam.rotation.x = Math.PI / 2;
+                scene.add(beam);
+                beams.push(beam);
+            });
+        }
+        
+        function addLighting() {
+            // Ambient light
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+            scene.add(ambientLight);
+            
+            // Directional light (sun)
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 5, 5);
+            scene.add(directionalLight);
+            
+            // Point light
+            const pointLight = new THREE.PointLight(0x00d4ff, 0.5, 100);
+            pointLight.position.set(0, 0, 5);
+            scene.add(pointLight);
+        }
+        
+        function addStars() {
+            const starGeometry = new THREE.BufferGeometry();
+            const starCount = 1000;
+            const positions = new Float32Array(starCount * 3);
+            
+            for (let i = 0; i < starCount * 3; i++) {
+                positions[i] = (Math.random() - 0.5) * 200;
+            }
+            
+            starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            
+            const starMaterial = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.5,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const stars = new THREE.Points(starGeometry, starMaterial);
+            scene.add(stars);
+        }
+        
+        function addEventListeners() {
+            // Mouse events
+            renderer.domElement.addEventListener('mousedown', onMouseDown);
+            renderer.domElement.addEventListener('mousemove', onMouseMove);
+            renderer.domElement.addEventListener('mouseup', onMouseUp);
+            
+            // Touch events
+            renderer.domElement.addEventListener('touchstart', onTouchStart);
+            renderer.domElement.addEventListener('touchmove', onTouchMove);
+            renderer.domElement.addEventListener('touchend', onTouchEnd);
+            
+            // Touch controls
+            document.getElementById('zoomIn').addEventListener('click', () => {
+                zoomLevel = Math.min(zoomLevel * 1.2, 3);
+                camera.position.z = 5 / zoomLevel;
+            });
+            
+            document.getElementById('zoomOut').addEventListener('click', () => {
+                zoomLevel = Math.max(zoomLevel / 1.2, 0.5);
+                camera.position.z = 5 / zoomLevel;
+            });
+            
+            document.getElementById('resetView').addEventListener('click', () => {
+                zoomLevel = 1;
+                camera.position.set(0, 0, 5);
+                camera.lookAt(0, 0, 0);
+            });
+            
+            // Window resize
+            window.addEventListener('resize', onWindowResize);
+        }
+        
+        function onMouseDown(event) {
+            isMouseDown = true;
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+        }
+        
+        function onMouseMove(event) {
+            if (!isMouseDown) return;
+            
+            const deltaX = event.clientX - mouseX;
+            const deltaY = event.clientY - mouseY;
+            
+            earth.rotation.y += deltaX * 0.01;
+            earth.rotation.x += deltaY * 0.01;
+            
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+        }
+        
+        function onMouseUp() {
+            isMouseDown = false;
+        }
+        
+        function onTouchStart(event) {
+            event.preventDefault();
+            if (event.touches.length === 1) {
+                mouseX = event.touches[0].clientX;
+                mouseY = event.touches[0].clientY;
+                isMouseDown = true;
+            }
+        }
+        
+        function onTouchMove(event) {
+            event.preventDefault();
+            if (event.touches.length === 1 && isMouseDown) {
+                const deltaX = event.touches[0].clientX - mouseX;
+                const deltaY = event.touches[0].clientY - mouseY;
+                
+                earth.rotation.y += deltaX * 0.01;
+                earth.rotation.x += deltaY * 0.01;
+                
+                mouseX = event.touches[0].clientX;
+                mouseY = event.touches[0].clientY;
+            }
+        }
+        
+        function onTouchEnd(event) {
+            event.preventDefault();
+            isMouseDown = false;
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Rotate Earth
+            earth.rotation.y += rotationSpeed;
+            
+            // Animate satellites
+            satellites.forEach((satellite, index) => {
+                const time = Date.now() * 0.001;
+                const radius = 3;
+                const angle = time * 0.5 + index * 2.0;
+                
+                satellite.mesh.position.x = Math.cos(angle) * radius;
+                satellite.mesh.position.z = Math.sin(angle) * radius;
+                satellite.mesh.position.y = Math.sin(angle * 0.5) * 0.5;
+                
+                // Make satellite look at Earth
+                satellite.mesh.lookAt(0, 0, 0);
+            });
+            
+            // Animate beams
+            beams.forEach((beam, index) => {
+                const time = Date.now() * 0.001;
+                const radius = 3;
+                const angle = time * 0.5 + index * 2.0;
+                
+                beam.position.x = Math.cos(angle) * radius;
+                beam.position.z = Math.sin(angle) * radius;
+                beam.position.y = Math.sin(angle * 0.5) * 0.5;
+                
+                // Pulsing beam effect
+                beam.material.opacity = 0.3 + Math.sin(time * 3) * 0.3;
+            });
+            
+            renderer.render(scene, camera);
+        }
+        
+        // Create floating text elements
+        function createFloatingText() {
+            const texts = [
+                '37.5°E, -2.0°N', '6.4°E, 5.5°N', '24.0°E, -20.0°S',
+                'Climate Resilience', 'AI Insights', 'Satellite Analytics',
+                'Carbon Credits', 'Impact Verification', 'Community Data'
+            ];
+            
+            texts.forEach((text, index) => {
+                const element = document.createElement('div');
+                element.className = 'floating-text';
+                element.textContent = text;
+                element.style.left = Math.random() * 100 + '%';
+                element.style.animationDelay = Math.random() * 20 + 's';
+                element.style.animationDuration = (15 + Math.random() * 10) + 's';
+                document.body.appendChild(element);
+                
+                setTimeout(() => {
+                    if (element.parentNode) {
+                        element.parentNode.removeChild(element);
+                    }
+                }, 25000);
+            });
+        }
+        
+        // Loading animation
+        let progress = 0;
+        const loadingInterval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(loadingInterval);
+                setTimeout(() => {
+                    document.getElementById('loadingScreen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loadingScreen').style.display = 'none';
+                        init(); // Initialize after loading
+                    }, 500);
+                }, 500);
+            }
+            document.getElementById('loadingProgress').style.width = progress + '%';
+        }, 100);
+        
+        // Initialize floating text
+        setTimeout(() => {
+            setInterval(createFloatingText, 3000);
+        }, 2000);
+        
+        // GSAP animations for UI
+        gsap.from('.ui-panel', {
+            opacity: 0,
+            y: 50,
+            duration: 1,
+            stagger: 0.2,
+            delay: 2
+        });
+        
+        gsap.to('.status-dot', {
+            scale: 1.2,
+            duration: 1,
+            repeat: -1,
+            yoyo: true,
+            stagger: 0.3
+        });
+    </script>
+</body>
+</html>

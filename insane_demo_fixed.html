@@ -1,0 +1,3882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORUN.IO - INSANE DEMO</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Anime.js for insane animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <!-- Three.js for 3D effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- GSAP for advanced animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+    
+    <!-- Particles.js for particle effects -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Lottie for complex animations -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    
+    <style>
+        :root {
+            --primary: #00D4FF;
+            --secondary: #2ECC71;
+            --accent: #E0A82E;
+            --highlight: #FF6B35;
+            --dark: #0D1B2A;
+            --darker: #1C1C1E;
+            --light: #F5F5F5;
+            --text-gray: #DADADA;
+            --gradient-cyan: linear-gradient(90deg, #00D4FF, #0D1B2A);
+            --gradient-ochre: linear-gradient(90deg, #E0A82E, #1C1C1E);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', 'Poppins', 'Montserrat', sans-serif;
+            background: #ffffff; /* clean white background */
+            color: #222; /* dark gray for readability */
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+
+        .cursor-follower {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.15s ease;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--darker);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .loading-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 3rem;
+            font-weight: 900;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: var(--gradient);
+            width: 0%;
+            border-radius: 2px;
+        }
+
+        /* Smooth scrolling for the entire page */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Full-Page Slides - Completely Isolated */
+        .slide {
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out;
+            z-index: 1;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 10;
+        }
+
+        /* Ensure body takes full height and disable scrolling */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* ===== SLIDE BACKGROUNDS ===== */
+        /* ODD NUMBERS = WHITE BACKGROUNDS */
+        .slide:nth-of-type(1) { background: #ffffff; color: #222; } /* Hero - White */
+        .slide:nth-of-type(3) { background: #ffffff; color: #222; } /* Stats - White */
+        .slide:nth-of-type(5) { background: #ffffff; color: #222; } /* Problem - White */
+        .slide:nth-of-type(7) { background: #ffffff; color: #222; } /* Satellite - White */
+        .slide:nth-of-type(9) { background: #ffffff; color: #222; } /* Community - White */
+        .slide:nth-of-type(11) { background: #ffffff; color: #222; } /* CTA - White */
+        
+        /* EVEN NUMBERS = DARK BACKGROUNDS */
+        .slide:nth-of-type(2) { background: #000000; color: #ffffff; } /* Earth - Black */
+        .slide:nth-of-type(4) { background: #000000; color: #ffffff; } /* Projects - Black */
+        .slide:nth-of-type(6) { background: #000000; color: #ffffff; } /* Solution - Black */
+        .slide:nth-of-type(8) { background: #000000; color: #ffffff; } /* AI - Black */
+        .slide:nth-of-type(10) { background: #000000; color: #ffffff; } /* Blockchain - Black */
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle Particle Background */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            background: transparent;
+        }
+
+        /* Subtle particle canvas styling */
+        #particles-js canvas {
+            border-radius: 0;
+            opacity: 0.4; /* very subtle background texture */
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(4rem, 15vw, 20rem);
+            font-weight: 900;
+            line-height: 0.8;
+            text-transform: uppercase;
+            color: var(--light);
+            margin-bottom: 2rem;
+            position: relative;
+            text-shadow: 0 0 20px var(--primary);
+            opacity: 1;
+            transform: scale(1);
+            display: block;
+            background: linear-gradient(45deg, 
+                var(--light) 0%, 
+                var(--primary) 25%, 
+                var(--light) 50%, 
+                var(--secondary) 75%, 
+                var(--light) 100%);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: textGradient 8s ease-in-out infinite;
+        }
+
+        /* Bottom underline now handled by tribal pattern styling */
+
+        /* Engraved Circuit Lines in Text */
+        .hero-title::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 10%;
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0.6;
+            animation: circuitFlow 4s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        /* African Tribal Pattern Elements - Now integrated into text */
+
+        /* Circuit Board Lines */
+        .circuit-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .circuit-line {
+            position: absolute;
+            background: var(--primary);
+            opacity: 0.3;
+            animation: circuitFlow 4s ease-in-out infinite;
+        }
+
+        .circuit-line.horizontal {
+            height: 1px;
+            width: 60px;
+        }
+
+        .circuit-line.vertical {
+            width: 1px;
+            height: 40px;
+        }
+
+        .circuit-line.diagonal {
+            width: 2px;
+            height: 30px;
+            transform: rotate(45deg);
+        }
+
+        /* Circuit Nodes */
+        .circuit-node {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--primary);
+            animation: nodePulse 2s ease-in-out infinite;
+        }
+
+        /* African Geometric Patterns */
+        .african-pattern {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--secondary);
+            opacity: 0.4;
+            animation: patternFloat 6s ease-in-out infinite;
+        }
+
+        .african-pattern.diamond {
+            transform: rotate(45deg);
+            border-radius: 4px;
+        }
+
+        .african-pattern.triangle {
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 26px solid var(--secondary);
+            border: none;
+            background: var(--secondary);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+
+        /* === Refined Color Palette for ORUN.IO === */
+        .hero-title {
+            font-size: 5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #003366, #0077cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0 0 1rem 0;
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ===== HERO TITLE COLORS ===== */
+        /* ODD NUMBERS = WHITE BACKGROUNDS = DARK TEXT */
+        .slide:nth-of-type(1) .hero-title,
+        .slide:nth-of-type(3) .hero-title,
+        .slide:nth-of-type(5) .hero-title,
+        .slide:nth-of-type(7) .hero-title,
+        .slide:nth-of-type(9) .hero-title,
+        .slide:nth-of-type(11) .hero-title {
+            background: linear-gradient(90deg, #003366, #0077cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* EVEN NUMBERS = DARK BACKGROUNDS = LIGHT TEXT */
+        .slide:nth-of-type(2) .hero-title,
+        .slide:nth-of-type(4) .hero-title,
+        .slide:nth-of-type(6) .hero-title,
+        .slide:nth-of-type(8) .hero-title,
+        .slide:nth-of-type(10) .hero-title {
+            background: linear-gradient(90deg, #00aaff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Clean light theme - no tribal patterns */
+
+        /* Engraved Circuit Nodes */
+        .hero-title .engraved-node {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 6px var(--primary);
+            animation: nodeEngrave 3s ease-in-out infinite;
+        }
+
+        /* Animations */
+        @keyframes textGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes circuitFlow {
+            0%, 100% { opacity: 0.3; transform: scaleX(1); }
+            50% { opacity: 0.8; transform: scaleX(1.1); }
+        }
+
+        @keyframes subtleTribalFlow {
+            0% { 
+                background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%;
+                opacity: 0.6;
+            }
+            50% { 
+                background-position: 30% 30%, 20% 20%, 25% 25%, 15% 15%;
+                opacity: 0.8;
+            }
+            100% { 
+                background-position: 60% 60%, 40% 40%, 50% 50%, 30% 30%;
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes subtleTribalRotate {
+            0% { 
+                background-position: 0% 0%;
+                opacity: 0.4;
+            }
+            50% { 
+                background-position: 50% 50%;
+                opacity: 0.6;
+            }
+            100% { 
+                background-position: 100% 100%;
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes underlineGlow {
+            0%, 100% { 
+                opacity: 0.6;
+                box-shadow: 
+                    0 0 5px rgba(59, 130, 246, 0.3),
+                    0 0 10px rgba(59, 130, 246, 0.2);
+            }
+            50% { 
+                opacity: 0.8;
+                box-shadow: 
+                    0 0 8px rgba(59, 130, 246, 0.4),
+                    0 0 15px rgba(59, 130, 246, 0.3);
+            }
+        }
+
+        @keyframes nodeEngrave {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 1rem auto;
+            color: #444; /* dark gray for readability */
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        /* ===== HERO SUBTITLE COLORS ===== */
+        /* ODD NUMBERS = WHITE BACKGROUNDS = DARK TEXT */
+        .slide:nth-of-type(1) .hero-subtitle,
+        .slide:nth-of-type(3) .hero-subtitle,
+        .slide:nth-of-type(5) .hero-subtitle,
+        .slide:nth-of-type(7) .hero-subtitle,
+        .slide:nth-of-type(9) .hero-subtitle,
+        .slide:nth-of-type(11) .hero-subtitle {
+            color: #333; /* Dark text on white background */
+        }
+
+        /* EVEN NUMBERS = DARK BACKGROUNDS = LIGHT TEXT */
+        .slide:nth-of-type(2) .hero-subtitle,
+        .slide:nth-of-type(4) .hero-subtitle,
+        .slide:nth-of-type(6) .hero-subtitle,
+        .slide:nth-of-type(8) .hero-subtitle,
+        .slide:nth-of-type(10) .hero-subtitle {
+            color: #ffffff; /* White text on black background */
+        }
+
+        .hero-subtitle-secondary {
+            font-size: 1rem;
+            max-width: 700px;
+            margin: 0 auto 2rem auto;
+            color: #666; /* slightly lighter gray */
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* ===== HERO SUBTITLE SECONDARY COLORS ===== */
+        /* ODD NUMBERS = WHITE BACKGROUNDS = DARK TEXT */
+        .slide:nth-of-type(1) .hero-subtitle-secondary,
+        .slide:nth-of-type(3) .hero-subtitle-secondary,
+        .slide:nth-of-type(5) .hero-subtitle-secondary,
+        .slide:nth-of-type(7) .hero-subtitle-secondary,
+        .slide:nth-of-type(9) .hero-subtitle-secondary,
+        .slide:nth-of-type(11) .hero-subtitle-secondary {
+            color: #555; /* Dark text on white background */
+        }
+
+        /* EVEN NUMBERS = DARK BACKGROUNDS = LIGHT TEXT */
+        .slide:nth-of-type(2) .hero-subtitle-secondary,
+        .slide:nth-of-type(4) .hero-subtitle-secondary,
+        .slide:nth-of-type(6) .hero-subtitle-secondary,
+        .slide:nth-of-type(8) .hero-subtitle-secondary,
+        .slide:nth-of-type(10) .hero-subtitle-secondary {
+            color: #cccccc; /* Light text on black background */
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.9rem 2rem;
+            margin: 0.5rem;
+            border: none;
+            border-radius: 999px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            display: inline-block;
+            transform: translateY(0);
+        }
+
+        /* Primary (orange accent) */
+        .btn-primary {
+            background: #ff5722;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #e64a19;
+        }
+
+        /* Secondary (teal) */
+        .btn-secondary {
+            background: #00bfa6;
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background: #00a693;
+        }
+
+        /* 3D Earth Section */
+        .earth-section {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+        }
+
+        #earth-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .earth-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .earth-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2rem, 8vw, 6rem);
+            font-weight: 700;
+            background: linear-gradient(90deg, #003366, #0077cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .earth-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        @keyframes wakandaGlow {
+            0% { opacity: 0.4; transform: scale(1); }
+            100% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        .earth-subtitle {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            color: #444;
+            opacity: 1.0;
+            margin-bottom: 2rem;
+            font-family: 'Orbitron', monospace;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        /* Clean subtitle - no decorations */
+
+        @keyframes wakandaPulse {
+            0%, 100% { opacity: 0.3; transform: translateY(-50%) scale(0.8); }
+            50% { opacity: 1.0; transform: translateY(-50%) scale(1.2); }
+        }
+
+        /* Clean wireframe interface - no satellite orbits */
+
+        /* Clean wireframe interface - no satellite elements */
+
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @keyframes scan {
+            0%, 100% { opacity: 0; transform: scaleY(0); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+
+        #globe-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .globe-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 2;
+        }
+
+        .globe-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        /* Stats Section with Insane Animations */
+        .stats-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #1a1a1a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-20px) scale(1.05);
+            border-color: var(--primary);
+            box-shadow: 0 30px 60px rgba(0, 212, 255, 0.3);
+        }
+
+        .stat-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #00bfa6, #0077cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            color: #ffffff;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 1rem;
+            opacity: 1.0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Projects Section with 3D Cards */
+        .projects-section {
+            padding: 100px 0;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #003366, #0077cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===== SECTION TITLE COLORS ===== */
+        /* ODD NUMBERS = WHITE BACKGROUNDS = DARK TEXT */
+        .slide:nth-of-type(1) .section-title,
+        .slide:nth-of-type(3) .section-title,
+        .slide:nth-of-type(5) .section-title,
+        .slide:nth-of-type(7) .section-title,
+        .slide:nth-of-type(9) .section-title,
+        .slide:nth-of-type(11) .section-title {
+            background: linear-gradient(90deg, #003366, #0077cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* EVEN NUMBERS = DARK BACKGROUNDS = LIGHT TEXT */
+        .slide:nth-of-type(2) .section-title,
+        .slide:nth-of-type(4) .section-title,
+        .slide:nth-of-type(6) .section-title,
+        .slide:nth-of-type(8) .section-title,
+        .slide:nth-of-type(10) .section-title {
+            background: linear-gradient(90deg, #00aaff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 4rem;
+            color: #666;
+            font-weight: 400;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ===== SECTION SUBTITLE COLORS ===== */
+        /* ODD NUMBERS = WHITE BACKGROUNDS = DARK TEXT */
+        .slide:nth-of-type(1) .section-subtitle,
+        .slide:nth-of-type(3) .section-subtitle,
+        .slide:nth-of-type(5) .section-subtitle,
+        .slide:nth-of-type(7) .section-subtitle,
+        .slide:nth-of-type(9) .section-subtitle,
+        .slide:nth-of-type(11) .section-subtitle {
+            color: #555; /* Dark text on white background */
+        }
+
+        /* EVEN NUMBERS = DARK BACKGROUNDS = LIGHT TEXT */
+        .slide:nth-of-type(2) .section-subtitle,
+        .slide:nth-of-type(4) .section-subtitle,
+        .slide:nth-of-type(6) .section-subtitle,
+        .slide:nth-of-type(8) .section-subtitle,
+        .slide:nth-of-type(10) .section-subtitle {
+            color: #cccccc; /* Light text on black background */
+        }
+
+        /* ===== SLIDE 3: STATS SECTION ===== */
+        .stats-section {
+            padding: 100px 0;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 51, 102, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 51, 102, 0.3);
+        }
+
+        .stat-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #003366, #0077cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            color: #333;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 1rem;
+            opacity: 1.0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ===== SLIDE 4: PROJECTS SECTION ===== */
+        .projects-section {
+            padding: 100px 0;
+            background: #000000;
+            position: relative;
+        }
+
+        .projects-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 3rem;
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+
+        .project-card:hover {
+            transform: rotateY(10deg) rotateX(10deg) translateZ(50px);
+            box-shadow: 0 50px 100px rgba(0, 212, 255, 0.3);
+        }
+
+        .project-name {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .project-card:nth-child(1) .project-name {
+            color: var(--primary);
+        }
+        
+        .project-card:nth-child(2) .project-name {
+            color: var(--secondary);
+        }
+        
+        .project-card:nth-child(3) .project-name {
+            color: var(--accent);
+        }
+
+        .project-location {
+            color: var(--secondary);
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .project-description {
+            color: var(--light);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .project-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .metric-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--secondary);
+            display: block;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+        }
+
+        /* ===== SLIDE 5: PROBLEM SECTION ===== */
+        .problem-section {
+            padding: 100px 0;
+            background: #ffffff;
+            text-align: center;
+        }
+
+        .problem-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .problem-text {
+            font-size: 1.3rem;
+            color: #333;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* Ensure problem text is visible on white background */
+        .slide:nth-of-type(5) .problem-text {
+            color: #333; /* Dark text on white background */
+        }
+
+        /* ===== SLIDE 6: SOLUTION SECTION ===== */
+        .solution-section {
+            padding: 100px 0;
+            background: #000000;
+            text-align: center;
+        }
+
+        .solution-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .solution-text {
+            font-size: 1.3rem;
+            color: #333;
+            line-height: 1.6;
+            font-weight: 400;
+            margin-bottom: 4rem;
+        }
+
+        /* Ensure solution text is visible on black background */
+        .slide:nth-of-type(6) .solution-text {
+            color: #ffffff; /* White text on black background */
+        }
+
+        .solution-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .highlight-item {
+            text-align: center;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .highlight-icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .highlight-item h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .highlight-item p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Ensure highlight items are visible on black background */
+        .slide:nth-of-type(6) .highlight-item h3 {
+            color: #ffffff; /* White text on black background */
+        }
+
+        .slide:nth-of-type(6) .highlight-item p {
+            color: #cccccc; /* Light text on black background */
+        }
+
+        /* ===== SLIDE 7: SATELLITE ANALYTICS ===== */
+        .satellite-slide {
+            background: #ffffff;
+            position: relative;
+        }
+
+        /* ===== SLIDE 8: AI INSIGHTS ===== */
+        .ai-slide {
+            background: #000000;
+            position: relative;
+        }
+
+        /* ===== SLIDE 9: COMMUNITY ENGAGEMENT ===== */
+        .community-slide {
+            background: #ffffff;
+            position: relative;
+        }
+
+        /* ===== SLIDE 10: BLOCKCHAIN VERIFICATION ===== */
+        .blockchain-slide {
+            background: #000000;
+            position: relative;
+        }
+
+        .slide-content {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            max-width: 400px;
+            z-index: 10;
+        }
+
+        .slide-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 20px rgba(0, 191, 166, 0.5);
+        }
+
+        /* Ensure slide titles are visible on both backgrounds */
+        .slide:nth-of-type(7) .slide-title,
+        .slide:nth-of-type(9) .slide-title {
+            color: #333; /* Dark text on white background */
+            text-shadow: 0 0 20px rgba(0, 51, 102, 0.5);
+        }
+
+        .slide:nth-of-type(8) .slide-title,
+        .slide:nth-of-type(10) .slide-title {
+            color: #ffffff; /* White text on black background */
+            text-shadow: 0 0 20px rgba(0, 191, 166, 0.5);
+        }
+
+        .slide-bullets {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .bullet-point {
+            font-size: 1.2rem;
+            color: #ffffff;
+            padding: 1rem;
+            background: rgba(0, 191, 166, 0.1);
+            border-left: 4px solid #00bfa6;
+            border-radius: 8px;
+            opacity: 0;
+            transform: translateX(50px);
+        }
+
+        /* ===== BULLET POINT COLORS ===== */
+        /* ODD NUMBERS = WHITE BACKGROUNDS = DARK TEXT */
+        .slide:nth-of-type(7) .bullet-point,
+        .slide:nth-of-type(9) .bullet-point {
+            color: #333; /* Dark text on white background */
+            background: rgba(0, 51, 102, 0.1);
+            border-left: 4px solid #003366;
+        }
+
+        /* EVEN NUMBERS = DARK BACKGROUNDS = LIGHT TEXT */
+        .slide:nth-of-type(8) .bullet-point,
+        .slide:nth-of-type(10) .bullet-point {
+            color: #ffffff; /* White text on black background */
+            background: rgba(0, 191, 166, 0.1);
+            border-left: 4px solid #00bfa6;
+        }
+
+        .tech-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+
+        .tech-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-30px) scale(1.05);
+            box-shadow: 0 40px 80px rgba(255, 107, 107, 0.3);
+        }
+
+        .tech-icon {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .tech-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .tech-card:nth-child(1) .tech-title {
+            color: var(--primary);
+        }
+        
+        .tech-card:nth-child(2) .tech-title {
+            color: var(--secondary);
+        }
+        
+        .tech-card:nth-child(3) .tech-title {
+            color: var(--accent);
+        }
+        
+        .tech-card:nth-child(4) .tech-title {
+            color: var(--success);
+        }
+
+        .tech-description {
+            color: var(--light);
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .differentiator-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 2rem;
+        }
+
+        .differentiator-item {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 15px;
+        }
+
+        .differentiator-item h3 {
+            font-size: 1.3rem;
+            color: var(--light);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .differentiator-item p {
+            color: var(--light);
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        /* ===== SLIDE 11: CTA SECTION ===== */
+        .cta-section {
+            padding: 100px 0;
+            background: #ffffff;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+        }
+
+        .cta-subtitle {
+            font-size: 1.3rem;
+            color: var(--light);
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 60px 0;
+            background: #ffffff;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+        }
+
+        .footer-text {
+            color: var(--light);
+            opacity: 0.7;
+            margin-bottom: 1rem;
+        }
+
+        .footer-partners {
+            color: var(--light);
+            opacity: 0.5;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Navigation Dots */
+        .nav-dots {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .nav-dot:hover {
+            background: rgba(0, 191, 166, 0.6);
+            transform: scale(1.2);
+        }
+
+        .nav-dot.active {
+            background: #00bfa6;
+            box-shadow: 0 0 15px rgba(0, 191, 166, 0.8);
+            transform: scale(1.3);
+        }
+
+
+        /* Slide Counter */
+        .slide-counter {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(0, 191, 166, 0.8);
+            box-shadow: 0 0 20px rgba(0, 191, 166, 0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .project-metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #ffffff;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient);
+            border-radius: 4px;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Floating Coordinate Text */
+        .floating-text {
+            position: absolute;
+            color: rgba(0, 212, 255, 0.4);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            font-weight: 400;
+            pointer-events: none;
+            z-index: 1;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+            animation: floatText 20s infinite linear;
+        }
+
+        .floating-text.coordinate {
+            color: rgba(255, 215, 0, 0.3);
+            font-size: 0.7rem;
+        }
+
+        .floating-text.project {
+            color: rgba(255, 107, 107, 0.4);
+            font-size: 0.75rem;
+        }
+
+        .floating-text.tech {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.7rem;
+        }
+
+        @keyframes floatText {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Twinkling stars effect */
+        .twinkle {
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Minimized Logo */
+        .minimized-logo {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--light);
+            opacity: 0;
+            transform: translateY(100px) scale(0.5);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            text-shadow: 0 0 10px var(--primary);
+            filter: none;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        .minimized-logo.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .minimized-logo:hover {
+            transform: translateY(-5px) scale(1.1);
+            cursor: pointer;
+            pointer-events: all;
+        }
+
+        /* Logo Minimize Animation */
+        .hero-title.minimized {
+            transform: scale(0.1) translateY(-100vh);
+            opacity: 0;
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Enhanced Floating Element Animations */
+        @keyframes energyFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            50% {
+                transform: translateY(50vh) translateX(50px) rotate(180deg);
+                opacity: 1;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100px) translateX(-50px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes geometricFloat {
+            0% {
+                transform: translateY(100vh) rotate(0deg) scale(0.5);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.6;
+                transform: translateY(80vh) rotate(72deg) scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(50vh) rotate(180deg) scale(1);
+            }
+            80% {
+                opacity: 0.6;
+                transform: translateY(20vh) rotate(288deg) scale(0.8);
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        @keyframes dataStream {
+            0% { 
+                transform: translateY(0); 
+                opacity: 0; 
+            }
+            10% { 
+                opacity: 0.6; 
+            }
+            90% { 
+                opacity: 0.6; 
+            }
+            100% { 
+                transform: translateY(100vh); 
+                opacity: 0; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <!-- Minimized Logo -->
+    <div class="minimized-logo" id="minimizedLogo">ORUN.IO</div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-text">ORUN.IO</div>
+        <div class="loading-bar">
+            <div class="loading-progress" id="loadingProgress"></div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="slide hero" id="hero">
+        <div id="particles-js"></div>
+        <div class="hero-content">
+            <h1 class="hero-title" id="heroTitle">
+                ORUN.IO
+                <!-- Engraved Circuit Nodes within text -->
+                <div class="engraved-node" style="top: 15%; left: 20%;"></div>
+                <div class="engraved-node" style="top: 15%; right: 25%;"></div>
+                <div class="engraved-node" style="top: 35%; left: 15%;"></div>
+                <div class="engraved-node" style="top: 35%; right: 20%;"></div>
+                <div class="engraved-node" style="top: 55%; left: 25%;"></div>
+                <div class="engraved-node" style="top: 55%; right: 15%;"></div>
+                <div class="engraved-node" style="top: 75%; left: 20%;"></div>
+                <div class="engraved-node" style="top: 75%; right: 25%;"></div>
+                
+                <!-- Tribal patterns now flow inside the letters via CSS -->
+            </h1>
+            <p class="hero-subtitle" id="heroSubtitle">We verify real climate impact in Africa using satellites, AI, and blockchain.</p>
+            <p class="hero-subtitle-secondary">Communities need climate funds. We prove results with real data — unlocking finance for resilience projects.</p>
+            <div class="hero-cta">
+                <a href="#projects" class="btn btn-primary" id="btnPrimary">Explore Projects</a>
+                <a href="#technology" class="btn btn-secondary" id="btnSecondary">View Technology</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3D Earth Section -->
+    <section class="slide earth-section" id="earth">
+        <div id="earth-container"></div>
+        
+        <!-- Clean wireframe interface - no orbital rings -->
+        
+        <div class="earth-overlay">
+            <h2 class="earth-title">Climate Impact</h2>
+            <p class="earth-subtitle">Real-time satellite monitoring across Africa</p>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="slide stats-section" id="stats">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number" data-target="3">0</span>
+                <div class="stat-label">Pilot Projects Live</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" data-target="16000">0</span>
+                <div class="stat-label">Community Members Impacted</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" data-target="1100000">0</span>
+                <div class="stat-label">Climate Investment Verified ($)</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" data-target="78">0</span>
+                <div class="stat-label">Average Climate Resilience Boost (%)</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section class="slide projects-section" id="projects">
+        <h2 class="section-title">Climate Adaptation Projects</h2>
+        <div class="projects-grid">
+            <div class="project-card">
+                <h3 class="project-name">Makueni County Sand Dams</h3>
+                <p class="project-location">📍 Kenya</p>
+                <p class="project-description">Providing drought resilience to 5,000 Kenyans through sand dam construction and community water access.</p>
+                <div class="project-metrics">
+                    <div class="metric">
+                        <span class="metric-value">78.5%</span>
+                        <div class="metric-label">Resilience Score</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">5,000</span>
+                        <div class="metric-label">Beneficiaries</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">$250K</span>
+                        <div class="metric-label">Funding</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">+0.13</span>
+                        <div class="metric-label">NDVI Improvement</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <h3 class="project-name">Niger Delta Mangrove Restoration</h3>
+                <p class="project-location">📍 Nigeria</p>
+                <p class="project-description">Protecting coastal communities while storing carbon through mangrove reforestation and ecosystem restoration.</p>
+                <div class="project-metrics">
+                    <div class="metric">
+                        <span class="metric-value">82.3%</span>
+                        <div class="metric-label">Resilience Score</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">8,000</span>
+                        <div class="metric-label">Beneficiaries</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">$500K</span>
+                        <div class="metric-label">Funding</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">+0.18</span>
+                        <div class="metric-label">NDVI Improvement</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <h3 class="project-name">Okavango Basin Water Management</h3>
+                <p class="project-location">📍 Botswana</p>
+                <p class="project-description">Smarter irrigation for farming communities through optimized water management in the Okavango region.</p>
+                <div class="project-metrics">
+                    <div class="metric">
+                        <span class="metric-value">75.2%</span>
+                        <div class="metric-label">Resilience Score</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">3,000</span>
+                        <div class="metric-label">Beneficiaries</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">$350K</span>
+                        <div class="metric-label">Funding</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">+0.11</span>
+                        <div class="metric-label">NDWI Improvement</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="slide problem-section" id="problem">
+        <div class="problem-content">
+            <h2 class="section-title">The Problem</h2>
+            <p class="problem-text">Climate finance is broken. Billions are pledged to Africa, but most projects lack transparent verification. Communities miss out, and investors can't trust the data.</p>
+            </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section class="slide solution-section" id="solution">
+        <div class="solution-content">
+            <h2 class="section-title">Our Solution</h2>
+            <p class="solution-text">ORUN.IO verifies real climate impact using a 4-layer system: Satellite Analytics, AI Modeling, Community Data, and Blockchain Verification.</p>
+            <div class="solution-highlights">
+                <div class="highlight-item">
+                    <span class="highlight-icon">📊</span>
+                    <h3>Real-Time Verification</h3>
+                    <p>Continuous monitoring and validation of climate impact metrics</p>
+            </div>
+                <div class="highlight-item">
+                    <span class="highlight-icon">🔒</span>
+                    <h3>Transparent Data</h3>
+                    <p>Immutable records that investors and communities can trust</p>
+            </div>
+                <div class="highlight-item">
+                    <span class="highlight-icon">💰</span>
+                    <h3>Unlock Finance</h3>
+                    <p>Proven results that unlock climate funding for African communities</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Satellite Analytics Slide -->
+    <section class="slide satellite-slide" id="satellite">
+        <div id="satellite-container"></div>
+        <div class="slide-content">
+            <h2 class="slide-title">Satellite Analytics</h2>
+            <div class="slide-bullets">
+                <div class="bullet-point">High-resolution imaging of African landscapes</div>
+                <div class="bullet-point">Daily revisit frequency for real-time monitoring</div>
+                <div class="bullet-point">Seamless integration with AI for impact verification</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Insights Slide -->
+    <section class="slide ai-slide" id="ai">
+        <div id="neural-network"></div>
+        <div class="slide-content">
+            <h2 class="slide-title">AI Insights</h2>
+            <div class="slide-bullets">
+                <div class="bullet-point">AI models detect deforestation, drought, and crop stress</div>
+                <div class="bullet-point">Automated analysis reduces verification time from months to days</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Engagement Slide -->
+    <section class="slide community-slide" id="community">
+        <div id="community-map"></div>
+        <div class="slide-content">
+            <h2 class="slide-title">Community Engagement</h2>
+            <div class="slide-bullets">
+                <div class="bullet-point">On-the-ground validation from local communities</div>
+                <div class="bullet-point">Mobile-first data collection ensures trustworthiness</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blockchain Verification Slide -->
+    <section class="slide blockchain-slide" id="blockchain">
+        <div id="blockchain-cubes"></div>
+        <div class="slide-content">
+            <h2 class="slide-title">Blockchain Verification</h2>
+            <div class="slide-bullets">
+                <div class="bullet-point">Immutable record of climate impact</div>
+                <div class="bullet-point">Transparency investors can trust</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="slide cta-section" id="impact">
+        <div class="cta-content">
+            <h2 class="cta-title">Join Us in Building Africa's Verified Climate Future</h2>
+            <p class="cta-subtitle">Partner with us to unlock climate finance through transparent, data-driven impact verification.</p>
+            <div class="cta-buttons">
+                <a href="#contact" class="btn btn-primary">Book a Demo</a>
+                <a href="#contact" class="btn btn-secondary">Partner With Us</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="footer-logo">ORUN.IO</div>
+        <p class="footer-text">Climate Impact Verification Platform for Africa</p>
+        <p class="footer-partners">Backed by [insert partners/logos when available]</p>
+        <div class="footer-links">
+            <a href="#projects">Projects</a>
+            <a href="#problem">Problem</a>
+            <a href="#solution">Solution</a>
+            <a href="#technology">Technology</a>
+            <a href="#impact">Impact</a>
+            <a href="mailto:contact@orun.io">Contact</a>
+        </div>
+    </footer>
+
+    <!-- Navigation Progress Dots -->
+    <div class="nav-dots">
+        <div class="nav-dot active" data-slide="hero"></div>
+        <div class="nav-dot" data-slide="earth"></div>
+        <div class="nav-dot" data-slide="stats"></div>
+        <div class="nav-dot" data-slide="projects"></div>
+        <div class="nav-dot" data-slide="problem"></div>
+        <div class="nav-dot" data-slide="solution"></div>
+        <div class="nav-dot" data-slide="satellite"></div>
+        <div class="nav-dot" data-slide="ai"></div>
+        <div class="nav-dot" data-slide="community"></div>
+        <div class="nav-dot" data-slide="blockchain"></div>
+        <div class="nav-dot" data-slide="impact"></div>
+    </div>
+
+
+    <!-- Slide Counter -->
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">11</span>
+    </div>
+
+    <script>
+        // Initialize GSAP
+        gsap.registerPlugin(ScrollTrigger, TextPlugin);
+
+        // Slide Navigation System
+        let currentSlide = 0;
+        let slides, navDots;
+
+        function initSlideSystem() {
+            slides = document.querySelectorAll('.slide');
+            navDots = document.querySelectorAll('.nav-dot');
+            
+            // Show first slide
+            if (slides.length > 0) {
+                slides[0].classList.add('active');
+                navDots[0]?.classList.add('active');
+            }
+            
+            console.log(`Initialized slide system with ${slides.length} slides`);
+        }
+
+        function goToSlide(slideIndex) {
+            if (slideIndex < 0 || slideIndex >= slides.length) return;
+            
+            // Hide current slide
+            slides[currentSlide]?.classList.remove('active');
+            navDots[currentSlide]?.classList.remove('active');
+            
+            // Show new slide
+            currentSlide = slideIndex;
+            slides[currentSlide]?.classList.add('active');
+            navDots[currentSlide]?.classList.add('active');
+            
+            // Update slide counter
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            document.getElementById('totalSlides').textContent = slides.length;
+            
+            // Navigation buttons removed - no longer needed
+            
+            console.log(`Switched to slide ${currentSlide + 1}/${slides.length}`);
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                goToSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                goToSlide(currentSlide - 1);
+            }
+        }
+
+        // Keyboard navigation
+        function setupKeyboardNavigation() {
+            document.addEventListener('keydown', (e) => {
+                switch(e.key) {
+                    case 'ArrowDown':
+                    case 'ArrowRight':
+                    case ' ':
+                        e.preventDefault();
+                        nextSlide();
+                        break;
+                    case 'ArrowUp':
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        prevSlide();
+                        break;
+                    case 'Home':
+                        e.preventDefault();
+                        goToSlide(0);
+                        break;
+                    case 'End':
+                        e.preventDefault();
+                        goToSlide(slides.length - 1);
+                        break;
+                }
+            });
+        }
+
+        // Navigation dot click handlers
+        function setupNavigationDots() {
+            navDots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    goToSlide(index);
+                });
+            });
+        }
+
+        // Mouse wheel navigation - more sensitive
+        function setupWheelNavigation() {
+            let isScrolling = false;
+            
+            document.addEventListener('wheel', (e) => {
+                if (isScrolling) return;
+                
+                isScrolling = true;
+                setTimeout(() => { isScrolling = false; }, 300); // Reduced from 1000ms to 300ms
+                
+                // More sensitive - any scroll movement triggers slide change
+                if (e.deltaY > 10) { // Reduced threshold
+                    nextSlide();
+                } else if (e.deltaY < -10) { // Reduced threshold
+                    prevSlide();
+                }
+            });
+        }
+
+        // Initialize everything
+        function initPresentation() {
+            initSlideSystem();
+            setupKeyboardNavigation();
+            setupNavigationDots();
+            setupWheelNavigation();
+        }
+
+        // Wait for page to load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initPresentation);
+        } else {
+            initPresentation();
+        }
+
+        // Create wireframe/ASCII-style Earth texture
+        function createEarthTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 2048;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+            
+            // Clear background - transparent
+            ctx.clearRect(0, 0, 2048, 1024);
+            
+            // Set line style for wireframe
+            ctx.strokeStyle = '#06b6d4'; // Cyan for wireframe lines
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.8;
+            
+            // Draw latitude lines (horizontal)
+            for (let i = 0; i <= 8; i++) {
+                const y = (i / 8) * 1024;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(2048, y);
+                ctx.stroke();
+            }
+            
+            // Draw longitude lines (vertical)
+            for (let i = 0; i <= 16; i++) {
+                const x = (i / 16) * 2048;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, 1024);
+                ctx.stroke();
+            }
+            
+            // Draw continent outlines in wireframe style
+            ctx.strokeStyle = '#10b981'; // Emerald for continents
+            ctx.lineWidth = 3;
+            ctx.globalAlpha = 1.0;
+            
+            // Africa - wireframe outline
+            ctx.beginPath();
+            ctx.moveTo(960, 200);
+            ctx.lineTo(1000, 180);
+            ctx.lineTo(1040, 200);
+            ctx.lineTo(1080, 220);
+            ctx.lineTo(1100, 260);
+            ctx.lineTo(1080, 300);
+            ctx.lineTo(1060, 340);
+            ctx.lineTo(1040, 380);
+            ctx.lineTo(1020, 420);
+            ctx.lineTo(1000, 460);
+            ctx.lineTo(980, 500);
+            ctx.lineTo(960, 520);
+            ctx.lineTo(940, 540);
+            ctx.lineTo(920, 520);
+            ctx.lineTo(900, 500);
+            ctx.lineTo(880, 460);
+            ctx.lineTo(860, 420);
+            ctx.lineTo(840, 380);
+            ctx.lineTo(820, 340);
+            ctx.lineTo(800, 300);
+            ctx.lineTo(780, 260);
+            ctx.lineTo(800, 220);
+            ctx.lineTo(820, 200);
+            ctx.lineTo(840, 180);
+            ctx.lineTo(860, 200);
+            ctx.lineTo(880, 220);
+            ctx.lineTo(900, 200);
+            ctx.lineTo(920, 180);
+            ctx.lineTo(940, 200);
+            ctx.lineTo(960, 200);
+            ctx.closePath();
+            ctx.stroke();
+            
+            // Europe - wireframe outline
+            ctx.beginPath();
+            ctx.moveTo(960, 120);
+            ctx.lineTo(980, 100);
+            ctx.lineTo(1000, 110);
+            ctx.lineTo(1020, 120);
+            ctx.lineTo(1040, 140);
+            ctx.lineTo(1060, 160);
+            ctx.lineTo(1040, 180);
+            ctx.lineTo(1020, 170);
+            ctx.lineTo(1000, 160);
+            ctx.lineTo(980, 150);
+            ctx.lineTo(960, 140);
+            ctx.lineTo(940, 130);
+            ctx.lineTo(920, 120);
+            ctx.lineTo(900, 110);
+            ctx.lineTo(880, 120);
+            ctx.lineTo(900, 130);
+            ctx.lineTo(920, 140);
+            ctx.lineTo(940, 150);
+            ctx.lineTo(960, 120);
+            ctx.closePath();
+            ctx.stroke();
+            
+            // Asia - wireframe outline
+            ctx.beginPath();
+            ctx.moveTo(1040, 140);
+            ctx.lineTo(1200, 120);
+            ctx.lineTo(1400, 100);
+            ctx.lineTo(1600, 120);
+            ctx.lineTo(1800, 140);
+            ctx.lineTo(1900, 180);
+            ctx.lineTo(1850, 220);
+            ctx.lineTo(1700, 240);
+            ctx.lineTo(1500, 220);
+            ctx.lineTo(1300, 200);
+            ctx.lineTo(1100, 180);
+            ctx.lineTo(1040, 160);
+            ctx.closePath();
+            ctx.stroke();
+            
+            // North America - wireframe outline
+            ctx.beginPath();
+            ctx.moveTo(400, 100);
+            ctx.lineTo(500, 80);
+            ctx.lineTo(600, 100);
+            ctx.lineTo(700, 120);
+            ctx.lineTo(750, 160);
+            ctx.lineTo(800, 200);
+            ctx.lineTo(780, 240);
+            ctx.lineTo(700, 260);
+            ctx.lineTo(600, 240);
+            ctx.lineTo(500, 220);
+            ctx.lineTo(400, 200);
+            ctx.lineTo(350, 160);
+            ctx.lineTo(380, 120);
+            ctx.closePath();
+            ctx.stroke();
+            
+            // South America - wireframe outline
+            ctx.beginPath();
+            ctx.moveTo(560, 280);
+            ctx.lineTo(600, 260);
+            ctx.lineTo(640, 280);
+            ctx.lineTo(680, 320);
+            ctx.lineTo(700, 360);
+            ctx.lineTo(720, 400);
+            ctx.lineTo(700, 440);
+            ctx.lineTo(680, 480);
+            ctx.lineTo(640, 500);
+            ctx.lineTo(600, 520);
+            ctx.lineTo(560, 500);
+            ctx.lineTo(520, 480);
+            ctx.lineTo(500, 440);
+            ctx.lineTo(480, 400);
+            ctx.lineTo(500, 360);
+            ctx.lineTo(520, 320);
+            ctx.closePath();
+            ctx.stroke();
+            
+            // Australia - wireframe outline
+            ctx.beginPath();
+            ctx.moveTo(1500, 350);
+            ctx.lineTo(1600, 340);
+            ctx.lineTo(1700, 350);
+            ctx.lineTo(1750, 370);
+            ctx.lineTo(1700, 390);
+            ctx.lineTo(1600, 400);
+            ctx.lineTo(1500, 390);
+            ctx.lineTo(1450, 370);
+            ctx.closePath();
+            ctx.stroke();
+            
+            // Add some ASCII-style grid points
+            ctx.fillStyle = '#8b5cf6'; // Purple for grid points
+            ctx.globalAlpha = 0.6;
+            for (let i = 0; i < 20; i++) {
+                const x = Math.random() * 2048;
+                const y = Math.random() * 1024;
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+            ctx.fill();
+            }
+            
+            // Add some ASCII-style connection lines
+            ctx.strokeStyle = '#f59e0b'; // Amber for connection lines
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.4;
+            for (let i = 0; i < 15; i++) {
+                const x1 = Math.random() * 2048;
+                const y1 = Math.random() * 1024;
+                const x2 = Math.random() * 2048;
+                const y2 = Math.random() * 1024;
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+            }
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.ClampToEdgeWrapping;
+            texture.generateMipmaps = true;
+            texture.minFilter = THREE.LinearMipmapLinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            texture.anisotropy = 16;
+            return texture;
+        }
+
+        // Create normal map for surface detail
+        function createNormalMap() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 2048;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+            
+            // Create base normal map
+            const imageData = ctx.createImageData(2048, 1024);
+            const data = imageData.data;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                const x = (i / 4) % 2048;
+                const y = Math.floor((i / 4) / 2048);
+                
+                // Generate height-based normal map
+                const height = Math.sin(x * 0.01) * Math.cos(y * 0.01) * 0.5 + 
+                              Math.sin(x * 0.05) * Math.cos(y * 0.05) * 0.3 +
+                              (Math.random() - 0.5) * 0.2;
+                
+                // Convert height to normal vector
+                const normalX = (Math.sin(x * 0.01) * Math.cos(y * 0.01) * 0.1);
+                const normalY = (Math.cos(x * 0.01) * Math.sin(y * 0.01) * 0.1);
+                const normalZ = 1.0;
+                
+                // Normalize and convert to RGB
+                const length = Math.sqrt(normalX * normalX + normalY * normalY + normalZ * normalZ);
+                data[i] = Math.floor(((normalX / length) + 1) * 127.5);     // R
+                data[i + 1] = Math.floor(((normalY / length) + 1) * 127.5); // G
+                data[i + 2] = Math.floor(((normalZ / length) + 1) * 127.5); // B
+                data[i + 3] = 255; // A
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+            
+            const normalTexture = new THREE.CanvasTexture(canvas);
+            normalTexture.wrapS = THREE.RepeatWrapping;
+            normalTexture.wrapT = THREE.ClampToEdgeWrapping;
+            normalTexture.generateMipmaps = true;
+            normalTexture.minFilter = THREE.LinearMipmapLinearFilter;
+            normalTexture.magFilter = THREE.LinearFilter;
+            return normalTexture;
+        }
+
+        // Add continent outlines
+        function addContinentOutlines(scene) {
+            const outlineGeometry = new THREE.SphereGeometry(1.501, 64, 64);
+            const outlineMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00d4ff,
+                transparent: true,
+                opacity: 0.1,
+                side: THREE.BackSide
+            });
+            const outline = new THREE.Mesh(outlineGeometry, outlineMaterial);
+            scene.add(outline);
+            
+            // Add country/region markers
+            const markers = [
+                { lat: -2.0, lon: 37.5, name: 'Kenya', color: 0xff6b6b },
+                { lat: 5.5, lon: 6.4, name: 'Nigeria', color: 0xffd700 },
+                { lat: -20.0, lon: 24.0, name: 'Botswana', color: 0x00d4ff },
+                { lat: -1.0, lon: 35.0, name: 'Tanzania', color: 0xff6b6b },
+                { lat: 6.0, lon: 2.0, name: 'Benin', color: 0xffd700 }
+            ];
+            
+            markers.forEach(marker => {
+                const markerGeometry = new THREE.SphereGeometry(0.02, 8, 8);
+                const markerMaterial = new THREE.MeshBasicMaterial({
+                    color: marker.color
+                });
+                const markerMesh = new THREE.Mesh(markerGeometry, markerMaterial);
+                
+                // Convert lat/lon to 3D position
+                const phi = (90 - marker.lat) * (Math.PI / 180);
+                const theta = (marker.lon + 180) * (Math.PI / 180);
+                
+                markerMesh.position.x = 1.52 * Math.sin(phi) * Math.cos(theta);
+                markerMesh.position.y = 1.52 * Math.cos(phi);
+                markerMesh.position.z = 1.52 * Math.sin(phi) * Math.sin(theta);
+                
+                scene.add(markerMesh);
+            });
+        }
+
+        // Add data visualization rings around Earth
+        function addDataRings(scene) {
+            // Temperature ring
+            const tempRingGeometry = new THREE.RingGeometry(2.2, 2.3, 32);
+            const tempRingMaterial = new THREE.MeshBasicMaterial({
+                color: 0xff6b6b,
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.DoubleSide
+            });
+            const tempRing = new THREE.Mesh(tempRingGeometry, tempRingMaterial);
+            tempRing.rotation.x = Math.PI / 2;
+            scene.add(tempRing);
+            
+            // Carbon ring
+            const carbonRingGeometry = new THREE.RingGeometry(2.4, 2.5, 32);
+            const carbonRingMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00d4ff,
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.DoubleSide
+            });
+            const carbonRing = new THREE.Mesh(carbonRingGeometry, carbonRingMaterial);
+            carbonRing.rotation.x = Math.PI / 2;
+            scene.add(carbonRing);
+            
+            // Water ring
+            const waterRingGeometry = new THREE.RingGeometry(2.6, 2.7, 32);
+            const waterRingMaterial = new THREE.MeshBasicMaterial({
+                color: 0x4a90e2,
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.DoubleSide
+            });
+            const waterRing = new THREE.Mesh(waterRingGeometry, waterRingMaterial);
+            waterRing.rotation.x = Math.PI / 2;
+            scene.add(waterRing);
+        }
+
+        // Add climate data indicators
+        function addClimateIndicators(scene) {
+            const indicators = [
+                { position: [3, 1, 0], color: 0xff6b6b, label: 'Temperature' },
+                { position: [0, 1, 3], color: 0x00d4ff, label: 'Carbon' },
+                { position: [-3, 1, 0], color: 0x4a90e2, label: 'Water' },
+                { position: [0, 1, -3], color: 0xffd700, label: 'Vegetation' }
+            ];
+            
+            indicators.forEach(indicator => {
+                // Create indicator sphere
+                const indicatorGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+                const indicatorMaterial = new THREE.MeshBasicMaterial({
+                    color: indicator.color
+                });
+                const indicatorMesh = new THREE.Mesh(indicatorGeometry, indicatorMaterial);
+                indicatorMesh.position.set(...indicator.position);
+                scene.add(indicatorMesh);
+                
+                // Create connecting line to Earth
+                const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(...indicator.position),
+                    new THREE.Vector3(0, 0, 0)
+                ]);
+                const lineMaterial = new THREE.LineBasicMaterial({
+                    color: indicator.color,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const line = new THREE.Line(lineGeometry, lineMaterial);
+                scene.add(line);
+            });
+        }
+
+        // ORUN Cosmos Data
+        const orunCosmos = {
+            coordinates: [
+                "37.5°E, -2.0°N", "37.8°E, -1.7°N", "6.4°E, 5.5°N", 
+                "24.0°E, -20.0°S", "35.0°E, -1.0°S", "2.0°E, 6.0°N"
+            ],
+            projects: [
+                "Makueni Sand Dams", "Niger Delta Restoration", "Okavango Water Management",
+                "Climate Resilience", "Community Engagement", "Impact Verification"
+            ],
+            technologies: [
+                "Satellite Analytics", "AI Insights", "Blockchain Verification",
+                "Mobile Money", "Real-time Monitoring", "BACI Analysis"
+            ],
+            concepts: [
+                "Climate Finance", "Carbon Credits", "Resilience Score",
+                "NDVI Tracking", "Community Data", "Impact Measurement"
+            ]
+        };
+
+        function createEnhancedFloatingElements() {
+            const hero = document.querySelector('.hero');
+            
+            // Create floating energy orbs
+            function createEnergyOrb() {
+                const orb = document.createElement('div');
+                orb.className = 'energy-orb';
+                orb.style.cssText = `
+                    position: absolute;
+                    width: ${Math.random() * 8 + 4}px;
+                    height: ${Math.random() * 8 + 4}px;
+                    background: radial-gradient(circle, 
+                        rgba(0, 212, 255, 0.6) 0%, 
+                        rgba(245, 245, 245, 0.3) 50%, 
+                        transparent 100%);
+                    border-radius: 50%;
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    opacity: ${Math.random() * 0.6 + 0.4};
+                    animation: energyFloat ${Math.random() * 15 + 10}s linear infinite;
+                    animation-delay: ${Math.random() * 5}s;
+                    pointer-events: none;
+                    z-index: 1;
+                    box-shadow: 
+                        0 0 20px rgba(0, 212, 255, 0.8),
+                        0 0 40px rgba(255, 107, 53, 0.4);
+                `;
+                hero.appendChild(orb);
+                
+                setTimeout(() => {
+                    if (orb.parentNode) {
+                        orb.parentNode.removeChild(orb);
+                    }
+                }, 25000);
+            }
+            
+            // Create floating data streams
+            function createDataStream() {
+                const stream = document.createElement('div');
+                stream.className = 'data-stream';
+                stream.style.cssText = `
+                    position: absolute;
+                    width: 2px;
+                    height: ${Math.random() * 100 + 50}px;
+                    background: linear-gradient(to bottom, 
+                        transparent, 
+                        rgba(0, 212, 255, 0.4), 
+                        rgba(245, 245, 245, 0.2), 
+                        transparent);
+                    left: ${Math.random() * 100}%;
+                    top: -100px;
+                    opacity: 0.7;
+                    animation: dataStream ${Math.random() * 8 + 6}s linear infinite;
+                    animation-delay: ${Math.random() * 3}s;
+                    pointer-events: none;
+                    z-index: 1;
+                    box-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+                `;
+                hero.appendChild(stream);
+                
+                setTimeout(() => {
+                    if (stream.parentNode) {
+                        stream.parentNode.removeChild(stream);
+                    }
+                }, 15000);
+            }
+            
+            // Create floating geometric shapes
+            function createGeometricShape() {
+                const shape = document.createElement('div');
+                const shapes = ['circle', 'triangle', 'square', 'diamond'];
+                const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+                const size = Math.random() * 6 + 3;
+                
+                shape.className = `geometric-shape ${randomShape}`;
+                shape.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    background: linear-gradient(45deg, 
+                        rgba(0, 212, 255, 0.4), 
+                        rgba(224, 168, 46, 0.3));
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    opacity: ${Math.random() * 0.5 + 0.3};
+                    animation: geometricFloat ${Math.random() * 20 + 15}s linear infinite;
+                    animation-delay: ${Math.random() * 5}s;
+                    pointer-events: none;
+                    z-index: 1;
+                    transform: rotate(${Math.random() * 360}deg);
+                `;
+                
+                // Apply shape-specific styles
+                switch(randomShape) {
+                    case 'circle':
+                        shape.style.borderRadius = '50%';
+                        break;
+                    case 'triangle':
+                        shape.style.clipPath = 'polygon(50% 0%, 0% 100%, 100% 100%)';
+                        break;
+                    case 'square':
+                        shape.style.borderRadius = '2px';
+                        break;
+                    case 'diamond':
+                        shape.style.clipPath = 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)';
+                        break;
+                }
+                
+                hero.appendChild(shape);
+                
+                setTimeout(() => {
+                    if (shape.parentNode) {
+                        shape.parentNode.removeChild(shape);
+                    }
+                }, 35000);
+            }
+            
+            // Create initial elements
+            for (let i = 0; i < 12; i++) {
+                setTimeout(createEnergyOrb, i * 1000);
+            }
+            
+            for (let i = 0; i < 6; i++) {
+                setTimeout(createDataStream, i * 2000);
+            }
+            
+            for (let i = 0; i < 8; i++) {
+                setTimeout(createGeometricShape, i * 1500);
+            }
+            
+            // Continue creating new elements
+            setInterval(createEnergyOrb, 4000);
+            setInterval(createDataStream, 6000);
+            setInterval(createGeometricShape, 5000);
+        }
+
+        // Custom Cursor
+        const cursor = document.querySelector('.cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            setTimeout(() => {
+                cursorFollower.style.left = e.clientX + 'px';
+                cursorFollower.style.top = e.clientY + 'px';
+            }, 100);
+        });
+
+        // Loading Animation
+        window.addEventListener('load', () => {
+            const progressBar = document.getElementById('loadingProgress');
+            const loadingScreen = document.getElementById('loadingScreen');
+            
+            // Animate progress bar
+            anime({
+                targets: progressBar,
+                width: '100%',
+                duration: 2000,
+                easing: 'easeInOutQuad',
+                complete: () => {
+                    // Hide loading screen
+                    anime({
+                        targets: loadingScreen,
+                        opacity: 0,
+                        duration: 500,
+                        complete: () => {
+                            console.log('Loading screen hidden, starting main animations');
+                            loadingScreen.style.display = 'none';
+                            startMainAnimations();
+                        }
+                    });
+                }
+            });
+        });
+
+        function startMainAnimations() {
+            console.log('Starting main animations...');
+            
+            // Hero Title Animation with Anime.js
+            anime({
+                targets: '#heroTitle',
+                scale: [0, 1],
+                rotate: [180, 0],
+                duration: 2000,
+                easing: 'easeOutElastic(1, .8)',
+                delay: 500,
+                complete: () => {
+                    console.log('Hero title animation completed');
+                }
+            });
+
+            // Hero Subtitle Animation
+            anime({
+                targets: '#heroSubtitle',
+                opacity: [1, 1],
+                translateY: [0, 0],
+                duration: 1500,
+                easing: 'easeOutQuart',
+                delay: 1000
+            });
+
+            // Button Animations
+            anime({
+                targets: '.btn',
+                opacity: [1, 1],
+                translateY: [0, 0],
+                duration: 1000,
+                easing: 'easeOutQuart',
+                delay: anime.stagger(200, {start: 1500})
+            });
+
+            // Initialize Connection Lines Only (No Dots)
+            console.log('Initializing connection lines only...');
+            particlesJS('particles-js', {
+                particles: {
+                    number: { 
+                        value: 300,
+                        density: { enable: true, value_area: 800 }
+                    },
+                    color: { 
+                        value: ['#00bfa6', '#F5F5F5']  // Teal from refined palette
+                    },
+                    shape: { 
+                        type: 'circle',
+                        stroke: { width: 0, color: '#000000' }
+                    },
+                    opacity: { 
+                        value: 0,  // Hide the dots completely
+                        random: false, 
+                        anim: { 
+                            enable: false
+                        } 
+                    },
+                    size: { 
+                        value: 0,  // Hide the dots completely
+                        random: false, 
+                        anim: { 
+                            enable: false
+                        } 
+                    },
+                    line_linked: {
+                        enable: true,
+                        distance: 120,  // Shorter connections
+                        color: '#00bfa6',  // Teal from refined palette
+                        opacity: 0.3,   // Very subtle background element
+                        width: 1        // Thin and unobtrusive
+                    },
+                    move: {
+                        enable: true,
+                        speed: 0.8,
+                        direction: 'none',
+                        random: true,
+                        straight: false,
+                        out_mode: 'out',
+                        bounce: false,
+                        attract: { 
+                            enable: true, 
+                            rotateX: 600, 
+                            rotateY: 1200 
+                        }
+                    }
+                },
+                interactivity: {
+                    detect_on: 'canvas',
+                    events: {
+                        onhover: { 
+                            enable: true, 
+                            mode: 'repulse'
+                        },
+                        onclick: { 
+                            enable: true, 
+                            mode: 'push',
+                            push: { particles_nb: 4 }
+                        },
+                        resize: true
+                    },
+                    modes: {
+                        grab: {
+                            distance: 200,
+                            line_linked: { opacity: 0.6 }
+                        },
+                        repulse: {
+                            distance: 200,
+                            duration: 0.2,
+                            speed: 2
+                        },
+                        push: {
+                            particles_nb: 4
+                        },
+                        remove: {
+                            particles_nb: 2
+                        }
+                    }
+                },
+                retina_detect: true,
+                background: {
+                    color: 'transparent',
+                    image: '',
+                    position: '50% 50%',
+                    repeat: 'no-repeat',
+                    size: 'cover'
+                }
+            }, function() {
+                console.log('Connection lines initialized successfully');
+            });
+
+        // Initialize Dynamic Mission Particle System (DISABLED)
+        // setTimeout(() => {
+        //     initMissionParticleSystem();
+        // }, 1000);
+
+        // ===== MISSION PARTICLE SYSTEM =====
+        class MissionParticleSystem {
+            constructor() {
+                this.canvas = null;
+                this.ctx = null;
+                this.particles = [];
+                this.currentShape = null;
+                this.shapeIndex = 0;
+                this.cycleTime = 0;
+                this.cycleDuration = 8000; // 8 seconds (faster cycles)
+                this.shapeHoldTime = 3000; // 3 seconds
+                this.isMorphing = false;
+                this.morphProgress = 0;
+                this.targetPositions = [];
+                this.performanceLevel = window.PERFORMANCE_CONFIG?.animationQuality || 'high';
+                
+                this.missionShapes = this.createMissionShapes();
+                this.init();
+            }
+
+            createMissionShapes() {
+                return [
+                    // 🌍 Geography
+                    {
+                        name: 'Africa',
+                        category: 'geography',
+                        color: '#E0A82E',
+                        svg: this.createAfricaSVG(),
+                        scale: 0.8
+                    },
+                    {
+                        name: 'Earth',
+                        category: 'geography', 
+                        color: '#00D4FF',
+                        svg: this.createEarthSVG(),
+                        scale: 0.6
+                    },
+                    {
+                        name: 'Satellite',
+                        category: 'geography',
+                        color: '#00D4FF',
+                        svg: this.createSatelliteSVG(),
+                        scale: 0.7
+                    },
+                    
+                    // 🌱 Climate/Nature
+                    {
+                        name: 'Leaf',
+                        category: 'climate',
+                        color: '#2ECC71',
+                        svg: this.createLeafSVG(),
+                        scale: 0.8
+                    },
+                    {
+                        name: 'Tree',
+                        category: 'climate',
+                        color: '#2ECC71',
+                        svg: this.createTreeSVG(),
+                        scale: 0.7
+                    },
+                    {
+                        name: 'Water',
+                        category: 'climate',
+                        color: '#00D4FF',
+                        svg: this.createWaterSVG(),
+                        scale: 0.8
+                    },
+                    {
+                        name: 'Sun',
+                        category: 'climate',
+                        color: '#FF6B35',
+                        svg: this.createSunSVG(),
+                        scale: 0.6
+                    },
+                    
+                    // 📡 Tech/Verification
+                    {
+                        name: 'Blockchain',
+                        category: 'tech',
+                        color: '#00D4FF',
+                        svg: this.createBlockchainSVG(),
+                        scale: 0.7
+                    },
+                    {
+                        name: 'Network',
+                        category: 'tech',
+                        color: '#00D4FF',
+                        svg: this.createNetworkSVG(),
+                        scale: 0.8
+                    },
+                    {
+                        name: 'Data',
+                        category: 'tech',
+                        color: '#00D4FF',
+                        svg: this.createDataSVG(),
+                        scale: 0.7
+                    },
+                    
+                    // 📊 Economics/Impact
+                    {
+                        name: 'Growth',
+                        category: 'economics',
+                        color: '#2ECC71',
+                        svg: this.createGrowthSVG(),
+                        scale: 0.8
+                    },
+                    {
+                        name: 'Verified',
+                        category: 'economics',
+                        color: '#2ECC71',
+                        svg: this.createVerifiedSVG(),
+                        scale: 0.7
+                    },
+                    {
+                        name: 'Finance',
+                        category: 'economics',
+                        color: '#FF6B35',
+                        svg: this.createFinanceSVG(),
+                        scale: 0.7
+                    },
+                    
+                    // 🌀 Cultural/Aesthetic
+                    {
+                        name: 'Tribal',
+                        category: 'cultural',
+                        color: '#E0A82E',
+                        svg: this.createTribalSVG(),
+                        scale: 0.8
+                    },
+                    {
+                        name: 'Fractal',
+                        category: 'cultural',
+                        color: '#00D4FF',
+                        svg: this.createFractalSVG(),
+                        scale: 0.6
+                    }
+                ];
+            }
+
+            // SVG Creation Methods
+            createAfricaSVG() {
+                return `
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20,15 L25,12 L30,15 L35,18 L40,20 L45,25 L50,30 L55,35 L60,40 L65,45 L70,50 L75,55 L80,60 L75,65 L70,70 L65,75 L60,80 L55,75 L50,70 L45,65 L40,60 L35,55 L30,50 L25,45 L20,40 L15,35 L10,30 L15,25 L20,20 Z" 
+                              fill="none" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                `;
+            }
+
+            createEarthSVG() {
+                return `
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M20,50 Q50,20 80,50 Q50,80 20,50" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M50,20 Q80,50 50,80 Q20,50 50,20" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                `;
+            }
+
+            createSatelliteSVG() {
+                return `
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="40" y="45" width="20" height="10" fill="currentColor"/>
+                        <rect x="25" y="48" width="15" height="4" fill="currentColor"/>
+                        <rect x="60" y="48" width="15" height="4" fill="currentColor"/>
+                        <circle cx="50" cy="50" r="3" fill="currentColor"/>
+                    </svg>
+                `;
+            }
+
+            createLeafSVG() {
+                return `
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50,20 Q30,30 25,50 Q30,70 50,80 Q70,70 75,50 Q70,30 50,20 Z" 
+                              fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M50,20 L50,80" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                `;
+            }
+
+            createTreeSVG() {
+                return `
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="47" y="60" width="6" height="25" fill="currentColor"/>
+                        <path d="M50,20 Q30,40 25,60 Q30,50 50,45 Q70,50 75,60 Q70,40 50,20 Z" 
+                              fill="none" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                `;
+            }
+
+            createWaterSVG() {
+                return `
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20,50 Q30,30 50,50 Q70,30 80,50 Q70,70 50,50 Q30,70 20,50 Z" 
+                              fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M25,60 Q35,45 50,60 Q65,45 75,60" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                `;
+            }
+
+            createSunSVG() {
+                return `
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <line x1="50" y1="10" x2="50" y2="20" stroke="currentColor" stroke-width="2"/>
+                        <line x1="50" y1="80" x2="50" y2="90" stroke="currentColor" stroke-width="2"/>
+                        <line x1="10" y1="50" x2="20" y2="50" stroke="currentColor" stroke-width="2"/>
+                        <line x1="80" y1="50" x2="90" y2="50" stroke="currentColor" stroke-width="2"/>
+                        <line x1="21.7" y1="21.7" x2="28.3" y2="28.3" stroke="currentColor" stroke-width="2"/>
+                        <line x1="71.7" y1="71.7" x2="78.3" y2="78.3" stroke="currentColor" stroke-width="2"/>
+                        <line x1="78.3" y1="21.7" x2="71.7" y2="28.3" stroke="currentColor" stroke-width="2"/>
+                        <line x1="28.3" y1="71.7" x2="21.7" y2="78.3" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                `;
+            }
+
+            createBlockchainSVG() {
+                return `
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="20" y="30" width="15" height="20" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <rect x="40" y="30" width="15" height="20" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <rect x="60" y="30" width="15" height="20" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <line x1="35" y1="40" x2="40" y2="40" stroke="currentColor" stroke-width="2"/>
+                        <line x1="55" y1="40" x2="60" y2="40" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="27.5" cy="40" r="2" fill="currentColor"/>
+                        <circle cx="47.5" cy="40" r="2" fill="currentColor"/>
+                        <circle cx="67.5" cy="40" r="2" fill="currentColor"/>
+                    </svg>
+                `;
+            }
+
+            createNetworkSVG() {
+                return `
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="30" cy="30" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="70" cy="30" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="50" cy="60" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="20" cy="70" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="80" cy="70" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <line x1="30" y1="30" x2="50" y2="60" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="70" y1="30" x2="50" y2="60" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="30" y1="30" x2="20" y2="70" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="70" y1="30" x2="80" y2="70" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                `;
+            }
+
+            createDataSVG() {
+                return `
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="20" y="20" width="60" height="4" fill="currentColor"/>
+                        <rect x="20" y="30" width="50" height="4" fill="currentColor"/>
+                        <rect x="20" y="40" width="55" height="4" fill="currentColor"/>
+                        <rect x="20" y="50" width="45" height="4" fill="currentColor"/>
+                        <rect x="20" y="60" width="60" height="4" fill="currentColor"/>
+                        <rect x="20" y="70" width="40" height="4" fill="currentColor"/>
+                        <circle cx="85" cy="22" r="3" fill="currentColor"/>
+                        <circle cx="75" cy="32" r="3" fill="currentColor"/>
+                        <circle cx="80" cy="42" r="3" fill="currentColor"/>
+                        <circle cx="70" cy="52" r="3" fill="currentColor"/>
+                        <circle cx="85" cy="62" r="3" fill="currentColor"/>
+                        <circle cx="65" cy="72" r="3" fill="currentColor"/>
+                    </svg>
+                `;
+            }
+
+            createGrowthSVG() {
+                return `
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20,80 L30,70 L40,60 L50,50 L60,40 L70,30 L80,20" 
+                              fill="none" stroke="currentColor" stroke-width="3"/>
+                        <circle cx="20" cy="80" r="3" fill="currentColor"/>
+                        <circle cx="30" cy="70" r="3" fill="currentColor"/>
+                        <circle cx="40" cy="60" r="3" fill="currentColor"/>
+                        <circle cx="50" cy="50" r="3" fill="currentColor"/>
+                        <circle cx="60" cy="40" r="3" fill="currentColor"/>
+                        <circle cx="70" cy="30" r="3" fill="currentColor"/>
+                        <circle cx="80" cy="20" r="3" fill="currentColor"/>
+                    </svg>
+                `;
+            }
+
+            createVerifiedSVG() {
+                return `
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="3"/>
+                        <path d="M35,50 L45,60 L65,40" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                    </svg>
+                `;
+            }
+
+            createFinanceSVG() {
+                return `
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <text x="50" y="55" text-anchor="middle" font-family="Arial" font-size="20" fill="currentColor">$</text>
+                        <path d="M30,30 L70,30 L70,70 L30,70 Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                `;
+            }
+
+            createTribalSVG() {
+                return `
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50,20 Q30,30 20,50 Q30,70 50,80 Q70,70 80,50 Q70,30 50,20 Z" 
+                              fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M50,20 L50,80" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M20,50 L80,50" stroke="currentColor" stroke-width="1.5"/>
+                        <circle cx="50" cy="50" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="50" cy="50" r="3" fill="currentColor"/>
+                    </svg>
+                `;
+            }
+
+            createFractalSVG() {
+                return `
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="1"/>
+                        <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" stroke-width="1"/>
+                        <circle cx="50" cy="50" r="15" fill="none" stroke="currentColor" stroke-width="1"/>
+                        <circle cx="50" cy="50" r="8" fill="none" stroke="currentColor" stroke-width="1"/>
+                        <circle cx="50" cy="50" r="3" fill="currentColor"/>
+                    </svg>
+                `;
+            }
+
+            init() {
+                // Create canvas for mission particles
+                this.canvas = document.createElement('canvas');
+                this.canvas.id = 'mission-particles';
+            this.canvas.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 1;
+                opacity: 0;
+                display: none;
+            `;
+                document.body.appendChild(this.canvas);
+                
+                this.ctx = this.canvas.getContext('2d');
+                this.resize();
+                
+                // Add mouse tracking for cursor interaction
+                this.mouse = { x: 0, y: 0 };
+                document.addEventListener('mousemove', (e) => {
+                    this.mouse.x = e.clientX;
+                    this.mouse.y = e.clientY;
+                });
+                
+                // Create particles
+                this.createParticles();
+                
+                // Start animation loop
+                this.animate();
+                
+                // Handle resize
+                window.addEventListener('resize', () => this.resize());
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            createParticles() {
+                const particleCount = this.performanceLevel === 'low' ? 120 : 
+                                    this.performanceLevel === 'medium' ? 180 : 250;
+                
+                this.particles = [];
+                for (let i = 0; i < particleCount; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5,
+                        size: Math.random() * 4 + 2,
+                        opacity: Math.random() * 0.8 + 0.6,
+                        color: this.getRandomColor(),
+                        targetX: 0,
+                        targetY: 0,
+                        isMovingToTarget: false
+                    });
+                }
+            }
+
+            getRandomColor() {
+                const colors = ['#00D4FF', '#2ECC71', '#E0A82E', '#FF6B35'];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            animate() {
+                this.cycleTime += 16; // ~60fps
+                
+                // Clear canvas
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Update cycle
+                if (this.cycleTime >= this.cycleDuration) {
+                    this.cycleTime = 0;
+                    this.nextShape();
+                }
+                
+                // Update particles
+                this.updateParticles();
+                
+                // Render particles
+                this.renderParticles();
+                
+                // Render current shape if morphing
+                if (this.isMorphing && this.currentShape) {
+                    this.renderShape();
+                }
+                
+                requestAnimationFrame(() => this.animate());
+            }
+
+            nextShape() {
+                this.currentShape = this.missionShapes[this.shapeIndex];
+                this.shapeIndex = (this.shapeIndex + 1) % this.missionShapes.length;
+                this.startMorphing();
+            }
+
+            startMorphing() {
+                this.isMorphing = true;
+                this.morphProgress = 0;
+                this.calculateTargetPositions();
+                
+                // Animate particles to shape
+                this.particles.forEach((particle, index) => {
+                    if (index < this.targetPositions.length) {
+                        particle.isMovingToTarget = true;
+                        particle.targetX = this.targetPositions[index].x;
+                        particle.targetY = this.targetPositions[index].y;
+                    }
+                });
+                
+                // Hold shape for specified time
+                setTimeout(() => {
+                    this.disperseParticles();
+                }, this.shapeHoldTime);
+            }
+
+            calculateTargetPositions() {
+                if (!this.currentShape) return;
+                
+                // Create a temporary canvas to sample the SVG shape
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.width = 200;
+                tempCanvas.height = 200;
+                
+                // Create image from SVG
+                const svgBlob = new Blob([this.currentShape.svg], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(svgBlob);
+                const img = new Image();
+                
+                img.onload = () => {
+                    tempCtx.drawImage(img, 0, 0, 200, 200);
+                    const imageData = tempCtx.getImageData(0, 0, 200, 200);
+                    const data = imageData.data;
+                    
+                    this.targetPositions = [];
+                    for (let i = 0; i < data.length; i += 4) {
+                        if (data[i + 3] > 128) { // Non-transparent pixel
+                            const x = (i / 4) % 200;
+                            const y = Math.floor((i / 4) / 200);
+                            this.targetPositions.push({
+                                x: (x / 200) * this.canvas.width,
+                                y: (y / 200) * this.canvas.height
+                            });
+                        }
+                    }
+                    
+                    // Limit to particle count
+                    this.targetPositions = this.targetPositions.slice(0, this.particles.length);
+                    URL.revokeObjectURL(url);
+                };
+                
+                img.src = url;
+            }
+
+            updateParticles() {
+                this.particles.forEach(particle => {
+                    // Cursor repulsion effect
+                    const dx = particle.x - this.mouse.x;
+                    const dy = particle.y - this.mouse.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const repulsionRadius = 120;
+                    
+                    if (distance < repulsionRadius && distance > 0) {
+                        const force = (repulsionRadius - distance) / repulsionRadius;
+                        const repulsionX = (dx / distance) * force * 4;
+                        const repulsionY = (dy / distance) * force * 4;
+                        
+                        particle.vx += repulsionX;
+                        particle.vy += repulsionY;
+                    }
+                    
+                    if (particle.isMovingToTarget) {
+                        // Move towards target
+                        const dx = particle.targetX - particle.x;
+                        const dy = particle.targetY - particle.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance > 2) {
+                            particle.x += dx * 0.05;
+                            particle.y += dy * 0.05;
+                        } else {
+                            particle.isMovingToTarget = false;
+                        }
+                    } else {
+                        // Free floating
+                        particle.x += particle.vx;
+                        particle.y += particle.vy;
+                        
+                        // Apply friction to velocity
+                        particle.vx *= 0.98;
+                        particle.vy *= 0.98;
+                        
+                        // Bounce off edges
+                        if (particle.x < 0 || particle.x > this.canvas.width) particle.vx *= -1;
+                        if (particle.y < 0 || particle.y > this.canvas.height) particle.vy *= -1;
+                        
+                        // Keep in bounds
+                        particle.x = Math.max(0, Math.min(this.canvas.width, particle.x));
+                        particle.y = Math.max(0, Math.min(this.canvas.height, particle.y));
+                    }
+                });
+            }
+
+            renderParticles() {
+                this.particles.forEach(particle => {
+                    this.ctx.save();
+                    this.ctx.globalAlpha = particle.opacity;
+                    this.ctx.fillStyle = particle.color;
+                    this.ctx.beginPath();
+                    this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Add glow effect
+                    if (particle.isMovingToTarget) {
+                        this.ctx.shadowColor = particle.color;
+                        this.ctx.shadowBlur = 10;
+                        this.ctx.beginPath();
+                        this.ctx.arc(particle.x, particle.y, particle.size * 1.5, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    }
+                    
+                    this.ctx.restore();
+                });
+            }
+
+            renderShape() {
+                if (!this.currentShape) return;
+                
+                this.ctx.save();
+                this.ctx.globalAlpha = 0.8;
+                this.ctx.fillStyle = this.currentShape.color;
+                this.ctx.strokeStyle = this.currentShape.color;
+                this.ctx.lineWidth = 3;
+                
+                // Add glow effect
+                this.ctx.shadowColor = this.currentShape.color;
+                this.ctx.shadowBlur = 15;
+                
+                // Center the shape
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+                const scale = this.currentShape.scale * 2;
+                
+                this.ctx.translate(centerX, centerY);
+                this.ctx.scale(scale, scale);
+                this.ctx.translate(-50, -50);
+                
+                // Create image from SVG and draw
+                const svgBlob = new Blob([this.currentShape.svg], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(svgBlob);
+                const img = new Image();
+                
+                img.onload = () => {
+                    this.ctx.drawImage(img, 0, 0, 100, 100);
+                    URL.revokeObjectURL(url);
+                };
+                
+                img.src = url;
+                this.ctx.restore();
+            }
+
+            disperseParticles() {
+                this.isMorphing = false;
+                this.particles.forEach(particle => {
+                    particle.isMovingToTarget = false;
+                    particle.vx = (Math.random() - 0.5) * 0.5;
+                    particle.vy = (Math.random() - 0.5) * 0.5;
+                });
+            }
+        }
+
+        function initMissionParticleSystem() {
+            // Check performance level
+            const performanceLevel = window.PERFORMANCE_CONFIG?.animationQuality || 'high';
+            
+            if (performanceLevel === 'low') {
+                console.log('Low performance detected, using simple particles');
+                return;
+            }
+            
+            // Only initialize if not already running
+            if (window.missionParticleSystem) {
+                console.log('Mission Particle System already running');
+                return;
+            }
+            
+            console.log('Initializing Mission Particle System...');
+            try {
+                window.missionParticleSystem = new MissionParticleSystem();
+                console.log('Mission Particle System initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize Mission Particle System:', error);
+            }
+        }
+
+            // Initialize 3D Globe
+            initGlobe();
+
+            // Scroll-triggered animations
+            initScrollAnimations();
+        }
+
+        function initGlobe() {
+            const container = document.getElementById('earth-container');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+            
+            // Create Earth geometry
+            const geometry = new THREE.SphereGeometry(1.5, 64, 64);
+            
+            // Create Earth material with realistic texture
+            const loader = new THREE.TextureLoader();
+            
+            // Create wireframe Earth material
+            const material = new THREE.MeshBasicMaterial({
+                map: createEarthTexture(),
+                transparent: true,
+                opacity: 0.9,
+                side: THREE.DoubleSide
+            });
+            
+            const earth = new THREE.Mesh(geometry, material);
+            scene.add(earth);
+            
+            // Add wireframe overlay
+            const wireframeMaterial = new THREE.MeshBasicMaterial({
+                color: '#00bfa6',
+                wireframe: true,
+                transparent: true,
+                opacity: 0.2
+            });
+            const wireframeEarth = new THREE.Mesh(geometry, wireframeMaterial);
+            scene.add(wireframeEarth);
+            
+            // Add continent outlines
+            addContinentOutlines(scene);
+            
+            // Add Africa highlight
+            const africaGeometry = new THREE.SphereGeometry(1.51, 32, 32);
+            const africaMaterial = new THREE.MeshPhongMaterial({
+                color: 0x00d4ff,
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.DoubleSide
+            });
+            const africa = new THREE.Mesh(africaGeometry, africaMaterial);
+            scene.add(africa);
+            
+            // Add realistic atmosphere with gradient
+            const atmosphereGeometry = new THREE.SphereGeometry(1.6, 64, 64);
+            const atmosphereMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0x87ceeb,
+                transparent: true,
+                opacity: 0.15,
+                metalness: 0.0,
+                roughness: 0.0,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.0,
+                transmission: 0.8,
+                ior: 1.0,
+                side: THREE.BackSide
+            });
+            const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+            scene.add(atmosphere);
+            
+            // Add outer atmosphere glow
+            const outerAtmosphereGeometry = new THREE.SphereGeometry(1.7, 32, 32);
+            const outerAtmosphereMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00d4ff,
+                transparent: true,
+                opacity: 0.05,
+                side: THREE.BackSide
+            });
+            const outerAtmosphere = new THREE.Mesh(outerAtmosphereGeometry, outerAtmosphereMaterial);
+            scene.add(outerAtmosphere);
+            
+            // Add realistic satellites with different types
+            const satellites = [];
+            const satelliteTypes = [
+                { color: 0x00d4ff, size: 0.03, name: 'Climate Monitor' },
+                { color: 0xff6b6b, size: 0.025, name: 'Temperature Sensor' },
+                { color: 0xffd700, size: 0.035, name: 'Carbon Tracker' }
+            ];
+            
+            for (let i = 0; i < 3; i++) {
+                const satelliteGeometry = new THREE.SphereGeometry(satelliteTypes[i].size, 12, 12);
+                const satelliteMaterial = new THREE.MeshPhongMaterial({
+                    color: satelliteTypes[i].color,
+                    shininess: 100
+                });
+                const satellite = new THREE.Mesh(satelliteGeometry, satelliteMaterial);
+                
+                // Add satellite details
+                const detailGeometry = new THREE.BoxGeometry(0.01, 0.01, 0.02);
+                const detailMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                const detail = new THREE.Mesh(detailGeometry, detailMaterial);
+                detail.position.set(0, 0, satelliteTypes[i].size + 0.01);
+                satellite.add(detail);
+                
+                satellites.push(satellite);
+                scene.add(satellite);
+            }
+            
+            // Add scanning beams
+            const beams = [];
+            for (let i = 0; i < 3; i++) {
+                const beamGeometry = new THREE.CylinderGeometry(0.001, 0.001, 0.3, 8);
+                const beamMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x00d4ff,
+                    transparent: true,
+                    opacity: 0.6
+                });
+                const beam = new THREE.Mesh(beamGeometry, beamMaterial);
+                beams.push(beam);
+                scene.add(beam);
+            }
+            
+            // Add data visualization rings around Earth
+            addDataRings(scene);
+            
+            // Add climate data indicators
+            addClimateIndicators(scene);
+            
+            // Add realistic lighting system
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+            scene.add(ambientLight);
+            
+            // Main sun light (directional) - simulating sunlight
+            const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            sunLight.position.set(15, 8, 8);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 4096;
+            sunLight.shadow.mapSize.height = 4096;
+            sunLight.shadow.camera.near = 0.1;
+            sunLight.shadow.camera.far = 50;
+            sunLight.shadow.camera.left = -10;
+            sunLight.shadow.camera.right = 10;
+            sunLight.shadow.camera.top = 10;
+            sunLight.shadow.camera.bottom = -10;
+            scene.add(sunLight);
+            
+            // Rim lighting for atmosphere effect
+            const rimLight = new THREE.DirectionalLight(0x87ceeb, 0.4);
+            rimLight.position.set(-8, -5, -8);
+            scene.add(rimLight);
+            
+            // Secondary light for better illumination
+            const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
+            fillLight.position.set(-5, 3, 5);
+            scene.add(fillLight);
+            
+            // Point light for dynamic lighting
+            const pointLight = new THREE.PointLight(0x00d4ff, 0.8, 15);
+            pointLight.position.set(0, 0, 8);
+            scene.add(pointLight);
+            
+            // Hemisphere light for natural sky lighting
+            const hemisphereLight = new THREE.HemisphereLight(0x87ceeb, 0x404040, 0.2);
+            scene.add(hemisphereLight);
+            
+            // Position camera
+            camera.position.z = 4;
+            
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Rotate Earth
+                earth.rotation.y += 0.005;
+                wireframeEarth.rotation.y += 0.005;
+                africa.rotation.y += 0.005;
+                atmosphere.rotation.y += 0.003;
+                outerAtmosphere.rotation.y += 0.002;
+                
+                // Animate satellites with realistic orbital mechanics
+                satellites.forEach((satellite, index) => {
+                    const time = Date.now() * 0.001;
+                    const radius = 2.5 + index * 0.5;
+                    const speed = 0.3 + index * 0.15;
+                    const inclination = index * 0.2; // Different orbital inclinations
+                    
+                    // Calculate orbital position
+                    const angle = time * speed;
+                    const x = Math.cos(angle) * radius;
+                    const z = Math.sin(angle) * radius;
+                    const y = Math.sin(angle * 0.3) * Math.sin(inclination) * 0.5;
+                    
+                    satellite.position.set(x, y, z);
+                    
+                    // Make satellite face Earth
+                    satellite.lookAt(0, 0, 0);
+                    
+                    // Add slight rotation to satellite
+                    satellite.rotation.z += 0.01;
+                    
+                    // Animate scanning beams with realistic targeting
+                    if (beams[index]) {
+                        beams[index].position.copy(satellite.position);
+                        beams[index].lookAt(0, 0, 0);
+                        
+                        // Only scan when over Africa (roughly)
+                        const isOverAfrica = Math.abs(angle % (Math.PI * 2)) < Math.PI * 0.3 || 
+                                           Math.abs(angle % (Math.PI * 2)) > Math.PI * 1.7;
+                        
+                        if (isOverAfrica) {
+                            beams[index].material.opacity = 0.6 + Math.sin(time * 4) * 0.4;
+                            beams[index].scale.set(1, 1, 1);
+                        } else {
+                            beams[index].material.opacity = 0.1;
+                            beams[index].scale.set(0.5, 0.5, 0.5);
+                        }
+                    }
+                });
+                
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        function initScrollAnimations() {
+            let isMinimized = false;
+            let isAnimating = false;
+            
+            // Logo minimize effect on scroll
+            ScrollTrigger.create({
+                trigger: '.hero',
+                start: 'top top',
+                end: 'bottom top',
+                onUpdate: (self) => {
+                    const progress = self.progress;
+                    const heroTitle = document.getElementById('heroTitle');
+                    const minimizedLogo = document.getElementById('minimizedLogo');
+                    
+                    // Prevent animation conflicts
+                    if (isAnimating) return;
+                    
+                    if (progress > 0.3 && !isMinimized) {
+                        isAnimating = true;
+                        isMinimized = true;
+                        
+                        // Start minimizing the main logo
+                        anime({
+                            targets: heroTitle,
+                            scale: 0.1,
+                            opacity: 0,
+                            translateY: -100,
+                            duration: 800,
+                            easing: 'easeInOutQuart',
+                            complete: () => {
+                                // Show minimized logo after main logo is hidden
+                                minimizedLogo.classList.add('visible');
+                                anime({
+                                    targets: minimizedLogo,
+                                    scale: [0.5, 1],
+                                    opacity: [0, 1],
+                                    translateY: [100, 0],
+                                    duration: 600,
+                                    easing: 'easeOutElastic(1, .8)',
+                                    complete: () => {
+                                        isAnimating = false;
+                                    }
+                                });
+                            }
+                        });
+                    } else if (progress <= 0.3 && isMinimized) {
+                        isAnimating = true;
+                        isMinimized = false;
+                        
+                        // Hide minimized logo first
+                        anime({
+                            targets: minimizedLogo,
+                            scale: 0.5,
+                            opacity: 0,
+                            translateY: 100,
+                            duration: 300,
+                            easing: 'easeInQuart',
+                            complete: () => {
+                                minimizedLogo.classList.remove('visible');
+                                
+                                // Then show main logo
+                                anime({
+                                    targets: heroTitle,
+                                    scale: 1,
+                                    opacity: 1,
+                                    translateY: 0,
+                                    duration: 600,
+                                    easing: 'easeOutQuart',
+                                    complete: () => {
+                                        isAnimating = false;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            });
+
+            // Click minimized logo to scroll to top
+            document.getElementById('minimizedLogo').addEventListener('click', () => {
+                // Add click animation
+                anime({
+                    targets: '#minimizedLogo',
+                    scale: [1, 1.2, 1],
+                    duration: 200,
+                    easing: 'easeOutQuart'
+                });
+                
+                // Smooth scroll to top
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Stats counter animation
+            ScrollTrigger.create({
+                trigger: '.stats-section',
+                start: 'top 60%',
+                onEnter: () => {
+                    document.querySelectorAll('.stat-number').forEach(stat => {
+                        const target = parseInt(stat.dataset.target);
+                        anime({
+                            targets: stat,
+                            innerHTML: [0, target],
+                            duration: 2000,
+                            easing: 'easeOutQuart',
+                            round: 1,
+                            update: function(anim) {
+                                stat.innerHTML = Math.floor(anim.animatables[0].target.innerHTML).toLocaleString();
+                            }
+                        });
+                    });
+                }
+            });
+
+            // Project cards 3D effect
+            document.querySelectorAll('.project-card').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    anime({
+                        targets: card,
+                        rotateY: 10,
+                        rotateX: 10,
+                        translateZ: 50,
+                        duration: 300,
+                        easing: 'easeOutQuart'
+                    });
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    anime({
+                        targets: card,
+                        rotateY: 0,
+                        rotateX: 0,
+                        translateZ: 0,
+                        duration: 300,
+                        easing: 'easeOutQuart'
+                    });
+                });
+            });
+
+            // Tech cards floating animation
+            document.querySelectorAll('.tech-card').forEach((card, index) => {
+                anime({
+                    targets: card,
+                    translateY: [0, -20, 0],
+                    duration: 3000 + (index * 500),
+                    easing: 'easeInOutSine',
+                    loop: true,
+                    delay: index * 200
+                });
+            });
+
+            // Text reveal animations
+            gsap.utils.toArray('.section-title').forEach(title => {
+                gsap.fromTo(title, {
+                    opacity: 0,
+                    y: 100
+                }, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: title,
+                        start: 'top 80%',
+                        end: 'bottom 20%',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+            });
+        }
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Button hover effects
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                anime({
+                    targets: btn,
+                    scale: 1.05,
+                    duration: 200,
+                    easing: 'easeOutQuart'
+                });
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                anime({
+                    targets: btn,
+                    scale: 1,
+                    duration: 200,
+                    easing: 'easeOutQuart'
+                });
+            });
+        });
+
+        // Initialize 3D Satellite for Satellite Analytics slide
+        function initSatellite() {
+            const container = document.getElementById('satellite-container');
+            if (!container) return;
+            
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+            
+            // Create satellite geometry
+            const satelliteGroup = new THREE.Group();
+            
+            // Main satellite body
+            const bodyGeometry = new THREE.BoxGeometry(0.8, 0.4, 0.6);
+            const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0xcccccc });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            satelliteGroup.add(body);
+            
+            // Solar panels
+            const panelGeometry = new THREE.BoxGeometry(1.2, 0.05, 0.8);
+            const panelMaterial = new THREE.MeshPhongMaterial({ color: 0x0066cc });
+            const leftPanel = new THREE.Mesh(panelGeometry, panelMaterial);
+            leftPanel.position.set(-0.6, 0, 0);
+            satelliteGroup.add(leftPanel);
+            
+            const rightPanel = new THREE.Mesh(panelGeometry, panelMaterial);
+            rightPanel.position.set(0.6, 0, 0);
+            satelliteGroup.add(rightPanel);
+            
+            // Antenna
+            const antennaGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.8);
+            const antennaMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
+            const antenna = new THREE.Mesh(antennaGeometry, antennaMaterial);
+            antenna.position.set(0, 0.6, 0);
+            satelliteGroup.add(antenna);
+            
+            // Position satellite
+            satelliteGroup.position.set(0, 0, -3);
+            scene.add(satelliteGroup);
+            
+            // Add lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 5, 5);
+            scene.add(directionalLight);
+            
+            // Add starfield background
+            const starGeometry = new THREE.BufferGeometry();
+            const starCount = 1000;
+            const starPositions = new Float32Array(starCount * 3);
+            
+            for (let i = 0; i < starCount * 3; i++) {
+                starPositions[i] = (Math.random() - 0.5) * 2000;
+            }
+            
+            starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+            const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 2 });
+            const stars = new THREE.Points(starGeometry, starMaterial);
+            scene.add(stars);
+            
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                satelliteGroup.rotation.y += 0.01;
+                satelliteGroup.rotation.x += 0.005;
+                
+                stars.rotation.y += 0.0005;
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        // Initialize satellite when slide comes into view
+        ScrollTrigger.create({
+            trigger: '#satellite',
+            start: 'top center',
+            onEnter: () => {
+                setTimeout(initSatellite, 500);
+            }
+        });
+
+        // Animate slide content on enter
+        const techSlides = ['#satellite', '#ai', '#community', '#blockchain'];
+        
+        techSlides.forEach(slideId => {
+            ScrollTrigger.create({
+                trigger: slideId,
+                start: 'top center',
+                onEnter: () => {
+                    const slide = document.querySelector(slideId);
+                    const title = slide.querySelector('.slide-title');
+                    const bullets = slide.querySelectorAll('.bullet-point');
+                    
+                    // Animate title
+                    gsap.fromTo(title, 
+                        { opacity: 0, y: 50 },
+                        { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
+                    );
+                    
+                    // Animate bullets with stagger
+                    gsap.fromTo(bullets,
+                        { opacity: 0, x: 50 },
+                        { 
+                            opacity: 1, 
+                            x: 0, 
+                            duration: 0.6, 
+                            stagger: 0.2,
+                            ease: "power2.out",
+                            delay: 0.3
+                        }
+                    );
+                },
+                onLeave: () => {
+                    const slide = document.querySelector(slideId);
+                    const title = slide.querySelector('.slide-title');
+                    const bullets = slide.querySelectorAll('.bullet-point');
+                    
+                    gsap.to([title, ...bullets], {
+                        opacity: 0,
+                        duration: 0.3
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

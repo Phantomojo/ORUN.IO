@@ -1,0 +1,755 @@
+/* ORUN.IO Enhanced Demo Styles */
+/* Modern CSS for cutting-edge climate tech features */
+
+/* Global Enhanced Variables */
+:root {
+    --ai-blue: #00d4ff;
+    --success-green: #00ff88;
+    --warning-orange: #ff8c00;
+    --danger-red: #ff4757;
+    --info-purple: #7c4dff;
+    --carbon-gold: #ffd700;
+    --satellite-silver: #c0c0c0;
+    --glow-effect: 0 0 20px rgba(0, 212, 255, 0.3);
+    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* AI Climate Intelligence Panel */
+.ai-insights-panel {
+    background: rgba(15, 15, 15, 0.95);
+    border: 1px solid var(--ai-blue);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 16px 0;
+    box-shadow: var(--glow-effect);
+    backdrop-filter: blur(20px);
+}
+
+.ai-insights-panel .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+    padding-bottom: 12px;
+}
+
+.ai-insights-panel h3 {
+    color: var(--ai-blue);
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.status-indicator {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-indicator.live {
+    background: var(--success-green);
+    color: #000;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.insight-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 4px solid var(--info-purple);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 12px 0;
+    transition: all 0.3s ease;
+}
+
+.insight-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(4px);
+}
+
+.insight-card.warning {
+    border-left-color: var(--warning-orange);
+}
+
+.insight-card.success {
+    border-left-color: var(--success-green);
+}
+
+.insight-card.info {
+    border-left-color: var(--info-purple);
+}
+
+.insight-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.confidence {
+    background: var(--ai-blue);
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.location {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.insight-message {
+    color: var(--text-primary);
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.insight-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.action-btn {
+    background: var(--gradient-bg);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.timestamp {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+/* Impact Calculator */
+.impact-calculator {
+    background: rgba(15, 15, 15, 0.95);
+    border: 1px solid var(--carbon-gold);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 16px 0;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+.impact-calculator h3 {
+    color: var(--carbon-gold);
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.calculator-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.input-group input,
+.input-group select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: var(--carbon-gold);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.calculator-outputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+}
+
+.output-card {
+    background: var(--gradient-bg);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.output-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow);
+}
+
+.output-card h4 {
+    color: white;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.output-value {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 700;
+    display: block;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Climate Alert System */
+.climate-alerts {
+    background: rgba(15, 15, 15, 0.95);
+    border: 1px solid var(--danger-red);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 16px 0;
+    box-shadow: 0 0 20px rgba(255, 71, 87, 0.2);
+}
+
+.alerts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 71, 87, 0.2);
+    padding-bottom: 12px;
+}
+
+.alerts-header h3 {
+    color: var(--danger-red);
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+    text-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
+}
+
+.alert-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.filter-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-secondary);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-btn.active,
+.filter-btn:hover {
+    background: var(--danger-red);
+    color: white;
+    border-color: var(--danger-red);
+}
+
+.alert {
+    display: flex;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 12px 0;
+    border-left: 4px solid var(--info-purple);
+    transition: all 0.3s ease;
+}
+
+.alert:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(4px);
+}
+
+.alert.urgent {
+    border-left-color: var(--danger-red);
+    background: rgba(255, 71, 87, 0.1);
+}
+
+.alert.warning {
+    border-left-color: var(--warning-orange);
+    background: rgba(255, 140, 0, 0.1);
+}
+
+.alert.info {
+    border-left-color: var(--info-purple);
+    background: rgba(124, 77, 255, 0.1);
+}
+
+.alert-icon {
+    font-size: 1.5rem;
+    margin-right: 12px;
+    margin-top: 2px;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.alert-header h4 {
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.alert-time {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.alert-message {
+    color: var(--text-secondary);
+    margin: 6px 0;
+    line-height: 1.4;
+}
+
+.alert-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.alert-location {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.alert-action {
+    background: var(--gradient-bg);
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.alert-action:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Satellite Time-lapse Viewer */
+.satellite-timelapse {
+    background: rgba(15, 15, 15, 0.95);
+    border: 1px solid var(--satellite-silver);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 16px 0;
+    box-shadow: 0 0 20px rgba(192, 192, 192, 0.2);
+}
+
+.timelapse-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.timelapse-header h3 {
+    color: var(--satellite-silver);
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+    text-shadow: 0 0 10px rgba(192, 192, 192, 0.3);
+}
+
+.location-selector select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 6px 12px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.timelapse-viewer {
+    position: relative;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+}
+
+#timelapseCanvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+}
+
+.frame-overlay {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 12px;
+    border-radius: 6px;
+    backdrop-filter: blur(10px);
+}
+
+.frame-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.frame-info span {
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.timelapse-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.timelapse-controls button {
+    background: var(--gradient-bg);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.timelapse-controls button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#timelineSlider {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+
+#timelineSlider::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--satellite-silver);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.timeline-labels {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-top: 8px;
+}
+
+.ndvi-legend {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.legend-bar {
+    display: flex;
+    gap: 8px;
+}
+
+.legend-bar span {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    color: white;
+    font-weight: 500;
+}
+
+/* Carbon Credit Tracker */
+.carbon-credit-tracker {
+    background: rgba(15, 15, 15, 0.95);
+    border: 1px solid var(--carbon-gold);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 16px 0;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+.tracker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+    padding-bottom: 12px;
+}
+
+.tracker-header h3 {
+    color: var(--carbon-gold);
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.market-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success-green);
+}
+
+.status-dot.live {
+    animation: pulse 2s infinite;
+}
+
+.credit-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--gradient-bg);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow);
+}
+
+.stat-icon {
+    font-size: 2rem;
+    opacity: 0.8;
+}
+
+.stat-content h4 {
+    color: white;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.stat-value {
+    color: white;
+    font-size: 1.6rem;
+    font-weight: 700;
+    display: block;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.stat-unit {
+    color: white;
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin-left: 4px;
+}
+
+.price-ticker {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.current-price {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+}
+
+.price-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--carbon-gold);
+}
+
+.price-change {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.price-change.positive {
+    background: var(--success-green);
+    color: #000;
+}
+
+.price-change.negative {
+    background: var(--danger-red);
+    color: white;
+}
+
+.next-generation {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.countdown {
+    color: var(--carbon-gold);
+    font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .calculator-inputs,
+    .calculator-outputs,
+    .credit-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .alerts-header,
+    .tracker-header,
+    .timelapse-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    
+    .alert-footer,
+    .price-ticker {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+    
+    .timelapse-controls {
+        flex-wrap: wrap;
+    }
+    
+    .legend-bar {
+        flex-wrap: wrap;
+    }
+}
+
+/* Loading and Animation States */
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.loading-spinner::after {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--ai-blue);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    margin-left: 10px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Accessibility Improvements */
+.action-btn:focus,
+.alert-action:focus,
+.filter-btn:focus,
+button:focus {
+    outline: 2px solid var(--ai-blue);
+    outline-offset: 2px;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: 2px solid var(--carbon-gold);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .insight-card,
+    .alert,
+    .stat-card,
+    .output-card {
+        border: 2px solid currentColor;
+    }
+    
+    .status-indicator,
+    .confidence,
+    .price-change {
+        border: 1px solid currentColor;
+    }
+}
+

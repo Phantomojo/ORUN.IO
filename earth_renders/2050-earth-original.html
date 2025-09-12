@@ -1,0 +1,150 @@
+<!doctype html>
+<html class="no-js" lang="" xmlns="http://www.w3.org/1999/xhtml" data-desktop="1" data-mobile="2" data-landscape="3">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Earth 2050: A glimpse into the future | Kaspersky</title>
+    <meta name="description" content="Earth 2050 it's an interactive project that provides a fascinating glimpse at a future based on predictions from futurologists, scientists, and Internet users from all corners of the globe.">
+    <meta name="keywords" content="Future, predictions, futurology, earth 2050,">
+    <link rel="canonical" href="https://2050.earth" />
+    <meta name="theme-color" content="#0c2124">
+    <meta name="msapplication-navbutton-color" content="#0c2124">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="shortcut icon" type="image/gif" href="/favicon.gif">
+    <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+    
+    <!-- Load their CSS -->
+    <link rel="stylesheet" href="2050.earth/css/Kaspersky.min.css">
+    <link rel="stylesheet" href="2050.earth/css/libs.css">
+    <link rel="stylesheet" href="2050.earth/css/app.css">
+    <link rel="stylesheet" href="2050.earth/css/panorama.css">
+    <link rel="stylesheet" href="2050.earth/css/feed.css">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+        }
+        
+        .main-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .h1-invisible {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1 class="h1-invisible">Earth 2050</h1>
+        
+        <!-- Earth popup template -->
+        <script id="earth-popup" type="text/x-handlebars-template">
+            <div class="earth-popup">
+                {{#each this}}
+                    <div class="earth-popup__item earth-popup__item_{{@index}}">
+                        <div class="earth-popup__item-shadow"></div>
+                        <div class="earth-popup__preview-hexagon">
+                            <div class="earth-popup__preview">
+                                <div class="hexagon__image" style="background-image: url('{{preview}}')"></div>
+                            </div>
+                        </div>
+                        <div class="earth-popup__content-container">
+                            <div class="earth-popup__content-top">
+                                <div class="earth-popup__name-contry">{{name}}</div>
+                                <div class="earth-popup__flag">
+                                    <img class="earth-popup__flag-img" src="{{country.flag}}" alt="">
+                                </div>
+                            </div>
+                            <div class="earth-popup__content-count">
+                                {{briefs_text}}
+                            </div>
+                            <div class="earth-popup__content-list">
+                                {{#each works_list}}
+                                    <a class="earth-popup__content-link" href="{{link}}">
+                                        <span class="earth-popup__content-text">{{name}}</span>
+                                    </a>
+                                {{/each}}
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+            </div> 
+        </script>
+        
+        <!-- Mobile tip template -->
+        <script id="earth-mobile-tip" type="text/x-handlebars-template">
+            {{#each this}}
+            <div class="mobile-tip">
+                <div class="mobile-tip__top">
+                    <div class="mobile-tip__name">{{name}}</div>
+                    <div class="mobile-tip__country">{{country.name}}</div>
+                </div>
+                <div class="mobile-tip__content">
+                    {{briefs_text}}
+                </div>
+            </div>
+            {{/each}}
+        </script>
+    </div>
+
+    <!-- Load their JavaScript files -->
+    <script src="2050.earth/js/assets.min.js"></script>
+    <script src="2050.earth/js/libs.js"></script>
+    <script src="2050.earth/js/three.min.js"></script>
+    <script type="module" src="2050.earth/js/panorama.min.js"></script>
+    <script src="2050.earth/js/Kaspersky.min.js"></script>
+    <script src="2050.earth/js/ws-client.js"></script>
+    <script type="module" src="2050.earth/js/hexasphere.min.js"></script>
+    
+    <!-- Initialize their system -->
+    <script>
+        var FileAPI = {
+            debug: false,
+            staticPath: '/assets/fileapi'
+        };
+
+        var kaspersky = window.kaspersky || {},
+            peppers = {};
+        window.langUrl = '/';
+        window.authUser = 0;
+        window.userLang = 'en';
+        
+        // Initialize their panorama system
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing 2050.earth original system...');
+            
+            // Wait for their scripts to load
+            setTimeout(() => {
+                if (typeof PNRM !== 'undefined') {
+                    console.log('PNRM loaded, initializing panorama...');
+                    
+                    // Create their panorama player
+                    const container = document.querySelector('.main-container');
+                    if (container) {
+                        // Initialize their panorama system
+                        const player = new PNRM.Player(container, null, false);
+                        
+                        // Load their data
+                        player.loadData('/data/panorama.json');
+                        
+                        console.log('2050.earth panorama initialized');
+                    }
+                } else {
+                    console.log('PNRM not available, trying alternative initialization...');
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

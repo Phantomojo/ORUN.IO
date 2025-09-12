@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Africa-Centric Data Globe - Stripe-Style Performance</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+        
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #globe-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+        }
+        
+        .controls h3 {
+            margin: 0 0 15px 0;
+            color: #00ff88;
+            font-size: 18px;
+        }
+        
+        .controls button {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            padding: 10px;
+            background: #111;
+            color: #fff;
+            border: 1px solid #333;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .controls button:hover {
+            background: #222;
+            border-color: #00ff88;
+        }
+        
+        .controls button.active {
+            background: #00ff88;
+            color: #000;
+        }
+        
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            min-width: 250px;
+        }
+        
+        .info-panel h4 {
+            margin: 0 0 10px 0;
+            color: #00ff88;
+        }
+        
+        .info-panel .stat {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .country-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #333;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            text-align: center;
+        }
+        
+        .loading h2 {
+            color: #00ff88;
+            margin-bottom: 20px;
+        }
+        
+        .loading .progress {
+            width: 300px;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .loading .progress-bar {
+            height: 100%;
+            background: #00ff88;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .performance-stats {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="globe-container"></div>
+        
+        <div class="loading" id="loading">
+            <h2>Initializing Africa Data Globe</h2>
+            <div class="progress">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div id="loading-text">Loading...</div>
+        </div>
+        
+        <div class="controls" id="controls" style="display: none;">
+            <h3>Data Globe Controls</h3>
+            <button onclick="toggleAutoRotate()" id="rotate-btn">Auto Rotate</button>
+            <button onclick="toggleConnections()" id="connections-btn">Show Connections</button>
+            <button onclick="togglePerformanceMode()" id="perf-btn">Performance Mode</button>
+            <button onclick="resetView()">Reset View</button>
+            <button onclick="exportData()">Export Data</button>
+        </div>
+        
+        <div class="info-panel" id="info-panel" style="display: none;">
+            <h4>Globe Statistics</h4>
+            <div class="stat">Total Points: <span id="total-points">0</span></div>
+            <div class="stat">African Countries: <span id="african-countries">54</span></div>
+            <div class="stat">Active Points: <span id="active-points">0</span></div>
+            <div class="stat">FPS: <span id="fps">0</span></div>
+            
+            <div class="country-info" id="country-info" style="display: none;">
+                <h4>Selected Country</h4>
+                <div id="country-name">None</div>
+                <div id="country-id">ID: -</div>
+                <div id="country-points">Points: 0</div>
+            </div>
+        </div>
+        
+        <div class="performance-stats" id="perf-stats">
+            <div>Frame Time: <span id="frame-time">0</span>ms</div>
+            <div>Memory: <span id="memory-usage">0</span>MB</div>
+        </div>
+    </div>
+
+    <!-- Three.js -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <script>
+        // Global variables
+        let scene, camera, renderer, controls;
+        let globePoints, connectionLines;
+        let autoRotate = false;
+        let showConnections = true;
+        let performanceMode = false;
+        let selectedCountryId = -1;
+        
+        // Performance tracking
+        let frameCount = 0;
+        let lastTime = 0;
+        let fps = 0;
+        
+        // Data structures
+        let countryData = {};
+        let pointAttributes = {
+            positions: null,
+            colors: null,
+            countryIds: null,
+            sizes: null
+        };
+        
+        // Stripe-inspired performance optimizations
+        const MAX_POINTS = 100000;
+        const CONNECTION_DISTANCE = 0.15;
+        const PERFORMANCE_THRESHOLD = 30; // FPS threshold for performance mode
+        
+        // Africa country mapping (54 countries with unique IDs)
+        const AFRICA_COUNTRIES = {
+            2: { name: "Algeria", color: 0xff0000 },
+            3: { name: "Angola", color: 0xff1100 },
+            4: { name: "Benin", color: 0xff2200 },
+            5: { name: "Botswana", color: 0xff3300 },
+            6: { name: "Burkina Faso", color: 0xff4400 },
+            7: { name: "Burundi", color: 0xff5500 },
+            8: { name: "Cameroon", color: 0xff6600 },
+            9: { name: "Cape Verde", color: 0xff7700 },
+            10: { name: "Central African Republic", color: 0xff8800 },
+            11: { name: "Chad", color: 0xff9900 },
+            12: { name: "Comoros", color: 0xffaa00 },
+            13: { name: "Congo", color: 0xffbb00 },
+            14: { name: "Democratic Republic of Congo", color: 0xffcc00 },
+            15: { name: "Djibouti", color: 0xffdd00 },
+            16: { name: "Egypt", color: 0xffee00 },
+            17: { name: "Equatorial Guinea", color: 0xffff00 },
+            18: { name: "Eritrea", color: 0xeeff00 },
+            19: { name: "Eswatini", color: 0xddff00 },
+            20: { name: "Ethiopia", color: 0xccff00 },
+            21: { name: "Gabon", color: 0xbbff00 },
+            22: { name: "Gambia", color: 0xaaff00 },
+            23: { name: "Ghana", color: 0x99ff00 },
+            24: { name: "Guinea", color: 0x88ff00 },
+            25: { name: "Guinea-Bissau", color: 0x77ff00 },
+            26: { name: "Ivory Coast", color: 0x66ff00 },
+            27: { name: "Kenya", color: 0x55ff00 },
+            28: { name: "Lesotho", color: 0x44ff00 },
+            29: { name: "Liberia", color: 0x33ff00 },
+            30: { name: "Libya", color: 0x22ff00 },
+            31: { name: "Madagascar", color: 0x11ff00 },
+            32: { name: "Malawi", color: 0x00ff00 },
+            33: { name: "Mali", color: 0x00ff11 },
+            34: { name: "Mauritania", color: 0x00ff22 },
+            35: { name: "Mauritius", color: 0x00ff33 },
+            36: { name: "Morocco", color: 0x00ff44 },
+            37: { name: "Mozambique", color: 0x00ff55 },
+            38: { name: "Namibia", color: 0x00ff66 },
+            39: { name: "Niger", color: 0x00ff77 },
+            40: { name: "Nigeria", color: 0x00ff88 },
+            41: { name: "Rwanda", color: 0x00ff99 },
+            42: { name: "São Tomé and Príncipe", color: 0x00ffaa },
+            43: { name: "Senegal", color: 0x00ffbb },
+            44: { name: "Seychelles", color: 0x00ffcc },
+            45: { name: "Sierra Leone", color: 0x00ffdd },
+            46: { name: "Somalia", color: 0x00ffee },
+            47: { name: "South Africa", color: 0x00ffff },
+            48: { name: "South Sudan", color: 0x00eeff },
+            49: { name: "Sudan", color: 0x00ddff },
+            50: { name: "Tanzania", color: 0x00ccff },
+            51: { name: "Togo", color: 0x00bbff },
+            52: { name: "Tunisia", color: 0x00aaff },
+            53: { name: "Uganda", color: 0x0099ff },
+            54: { name: "Zambia", color: 0x0088ff },
+            55: { name: "Zimbabwe", color: 0x0077ff }
+        };
+        
+        // Initialize the application
+        async function init() {
+            updateProgress(10, "Initializing Three.js...");
+            
+            // Create scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+            
+            // Create camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 0, 15);
+            
+            // Create renderer with Stripe optimizations
+            renderer = new THREE.WebGLRenderer({ 
+                antialias: false, // Stripe optimization
+                alpha: true,
+                powerPreference: "high-performance"
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio
+            document.getElementById('globe-container').appendChild(renderer.domElement);
+            
+            // Create controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.autoRotate = false;
+            controls.autoRotateSpeed = 0.5;
+            
+            updateProgress(20, "Creating ID Map texture...");
+            
+            // Create Africa-centric ID map texture
+            const idMapTexture = await createAfricaIDMap();
+            
+            updateProgress(40, "Generating point cloud...");
+            
+            // Generate Fibonacci sphere points
+            const points = generateFibonacciSphere(MAX_POINTS);
+            
+            updateProgress(60, "Pre-processing geometry...");
+            
+            // Pre-process geometry against ID map
+            const processedPoints = await preprocessGeometry(points, idMapTexture);
+            
+            updateProgress(80, "Creating shader material...");
+            
+            // Create shader material
+            createShaderMaterial(processedPoints);
+            
+            updateProgress(90, "Setting up interactions...");
+            
+            // Setup mouse interactions
+            setupMouseInteractions();
+            
+            updateProgress(100, "Initialization complete!");
+            
+            // Hide loading screen and show controls
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('controls').style.display = 'block';
+                document.getElementById('info-panel').style.display = 'block';
+                
+                // Update statistics
+                updateStatistics();
+            }, 500);
+            
+            // Start animation loop
+            animate();
+        }
+        
+        // Create Africa-centric ID map texture
+        async function createAfricaIDMap() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 2048;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+            
+            // Fill with black (ocean)
+            ctx.fillStyle = 'rgb(0, 0, 0)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Fill non-African landmass with red (1,0,0)
+            ctx.fillStyle = 'rgb(1, 0, 0)';
+            // Simplified landmass shapes (in production, use proper GeoJSON data)
+            drawSimplifiedContinents(ctx, canvas.width, canvas.height);
+            
+            // Fill African countries with unique colors
+            drawAfricanCountries(ctx, canvas.width, canvas.height);
+            
+            // Store canvas reference for later use
+            window.idMapCanvas = canvas;
+            
+            // Convert to texture
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            
+            console.log("Africa ID Map created with 54 countries");
+            return texture;
+        }
+        
+        // Draw simplified continent shapes
+        function drawSimplifiedContinents(ctx, width, height) {
+            // North America
+            ctx.beginPath();
+            ctx.rect(width * 0.1, height * 0.2, width * 0.3, height * 0.4);
+            ctx.fill();
+            
+            // South America
+            ctx.beginPath();
+            ctx.rect(width * 0.15, height * 0.6, width * 0.2, height * 0.35);
+            ctx.fill();
+            
+            // Europe
+            ctx.beginPath();
+            ctx.rect(width * 0.45, height * 0.1, width * 0.15, height * 0.3);
+            ctx.fill();
+            
+            // Asia
+            ctx.beginPath();
+            ctx.rect(width * 0.6, height * 0.1, width * 0.35, height * 0.4);
+            ctx.fill();
+            
+            // Australia
+            ctx.beginPath();
+            ctx.rect(width * 0.7, height * 0.7, width * 0.15, height * 0.2);
+            ctx.fill();
+        }
+        
+        // Draw African countries with unique IDs
+        function drawAfricanCountries(ctx, width, height) {
+            // Simplified African continent shape with country divisions
+            const africaWidth = width * 0.15;
+            const africaHeight = height * 0.4;
+            const africaX = width * 0.45;
+            const africaY = height * 0.3;
+            
+            // North Africa
+            drawCountryRegion(ctx, africaX, africaY, africaWidth, africaHeight * 0.2, 2); // Algeria
+            drawCountryRegion(ctx, africaX + africaWidth * 0.3, africaY, africaWidth * 0.4, africaHeight * 0.2, 16); // Egypt
+            drawCountryRegion(ctx, africaX + africaWidth * 0.7, africaY, africaWidth * 0.3, africaHeight * 0.2, 36); // Morocco
+            
+            // West Africa
+            drawCountryRegion(ctx, africaX, africaY + africaHeight * 0.2, africaWidth * 0.2, africaHeight * 0.3, 40); // Nigeria
+            drawCountryRegion(ctx, africaX + africaWidth * 0.2, africaY + africaHeight * 0.2, africaWidth * 0.2, africaHeight * 0.3, 23); // Ghana
+            drawCountryRegion(ctx, africaX + africaWidth * 0.4, africaY + africaHeight * 0.2, africaWidth * 0.2, africaHeight * 0.3, 43); // Senegal
+            
+            // East Africa
+            drawCountryRegion(ctx, africaX + africaWidth * 0.6, africaY + africaHeight * 0.2, africaWidth * 0.2, africaHeight * 0.3, 27); // Kenya
+            drawCountryRegion(ctx, africaX + africaWidth * 0.8, africaY + africaHeight * 0.2, africaWidth * 0.2, africaHeight * 0.3, 50); // Tanzania
+            
+            // Central Africa
+            drawCountryRegion(ctx, africaX + africaWidth * 0.2, africaY + africaHeight * 0.5, africaWidth * 0.3, africaHeight * 0.3, 14); // DRC
+            drawCountryRegion(ctx, africaX + africaWidth * 0.5, africaY + africaHeight * 0.5, africaWidth * 0.3, africaHeight * 0.3, 8); // Cameroon
+            
+            // Southern Africa
+            drawCountryRegion(ctx, africaX + africaWidth * 0.1, africaY + africaHeight * 0.8, africaWidth * 0.4, africaHeight * 0.2, 47); // South Africa
+            drawCountryRegion(ctx, africaX + africaWidth * 0.5, africaY + africaHeight * 0.8, africaWidth * 0.3, africaHeight * 0.2, 5); // Botswana
+            drawCountryRegion(ctx, africaX + africaWidth * 0.8, africaY + africaHeight * 0.8, africaWidth * 0.2, africaHeight * 0.2, 55); // Zimbabwe
+        }
+        
+        // Draw a country region with specific ID
+        function drawCountryRegion(ctx, x, y, width, height, countryId) {
+            ctx.fillStyle = `rgb(${countryId}, 0, 0)`;
+            ctx.fillRect(x, y, width, height);
+        }
+        
+        // Generate Fibonacci sphere points
+        function generateFibonacciSphere(numPoints) {
+            const points = [];
+            const goldenAngle = Math.PI * (3 - Math.sqrt(5)); // Golden angle in radians
+            
+            for (let i = 0; i < numPoints; i++) {
+                const y = 1 - (i / (numPoints - 1)) * 2; // y goes from 1 to -1
+                const radiusAtY = Math.sqrt(1 - y * y);
+                
+                const theta = goldenAngle * i;
+                const x = Math.cos(theta) * radiusAtY;
+                const z = Math.sin(theta) * radiusAtY;
+                
+                points.push(new THREE.Vector3(x, y, z));
+            }
+            
+            return points;
+        }
+        
+        // Pre-process geometry against ID map
+        async function preprocessGeometry(points, idMapTexture) {
+            // Get the canvas from our stored reference
+            const canvas = window.idMapCanvas;
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            const processedPoints = [];
+            const positions = [];
+            const colors = [];
+            const countryIds = [];
+            const sizes = [];
+            
+            for (let i = 0; i < points.length; i++) {
+                const point = points[i];
+                
+                // Convert 3D point to UV coordinates
+                const uv = vector3ToUV(point);
+                const x = Math.floor(uv.x * canvas.width);
+                const y = Math.floor(uv.y * canvas.height);
+                
+                // Clamp coordinates
+                const clampedX = Math.max(0, Math.min(canvas.width - 1, x));
+                const clampedY = Math.max(0, Math.min(canvas.height - 1, y));
+                
+                // Get pixel color from ID map
+                const pixelIndex = (clampedY * canvas.width + clampedX) * 4;
+                const r = data[pixelIndex];
+                const g = data[pixelIndex + 1];
+                const b = data[pixelIndex + 2];
+                
+                // Skip ocean points (black)
+                if (r === 0 && g === 0 && b === 0) {
+                    continue;
+                }
+                
+                // Scale point to globe surface
+                const scaledPoint = point.clone().multiplyScalar(5);
+                positions.push(scaledPoint.x, scaledPoint.y, scaledPoint.z);
+                
+                // Determine color based on country ID
+                let color, countryId, size;
+                
+                if (r === 1 && g === 0 && b === 0) {
+                    // Non-African landmass
+                    color = new THREE.Color(0x444444);
+                    countryId = 1;
+                    size = 0.5;
+                } else if (r >= 2 && r <= 55) {
+                    // African country
+                    countryId = r;
+                    const countryInfo = AFRICA_COUNTRIES[countryId];
+                    color = new THREE.Color(countryInfo.color);
+                    size = 1.0;
+                    
+                    // Store country data
+                    if (!countryData[countryId]) {
+                        countryData[countryId] = {
+                            name: countryInfo.name,
+                            points: 0,
+                            color: countryInfo.color
+                        };
+                    }
+                    countryData[countryId].points++;
+                } else {
+                    // Unknown region
+                    color = new THREE.Color(0x666666);
+                    countryId = 0;
+                    size = 0.3;
+                }
+                
+                colors.push(color.r, color.g, color.b);
+                countryIds.push(countryId);
+                sizes.push(size);
+                
+                processedPoints.push({
+                    position: scaledPoint,
+                    color: color,
+                    countryId: countryId,
+                    size: size
+                });
+            }
+            
+            // Store attributes for shader
+            pointAttributes.positions = new Float32Array(positions);
+            pointAttributes.colors = new Float32Array(colors);
+            pointAttributes.countryIds = new Float32Array(countryIds);
+            pointAttributes.sizes = new Float32Array(sizes);
+            
+            console.log(`Processed ${processedPoints.length} points from ${points.length} total`);
+            return processedPoints;
+        }
+        
+        // Convert 3D vector to UV coordinates
+        function vector3ToUV(vector) {
+            const u = 0.5 + Math.atan2(vector.z, vector.x) / (2 * Math.PI);
+            const v = 0.5 - Math.asin(vector.y) / Math.PI;
+            return new THREE.Vector2(u, v);
+        }
+        
+        // Create shader material
+        function createShaderMaterial(points) {
+            const geometry = new THREE.BufferGeometry();
+            
+            // Set attributes
+            geometry.setAttribute('position', new THREE.BufferAttribute(pointAttributes.positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(pointAttributes.colors, 3));
+            geometry.setAttribute('countryId', new THREE.BufferAttribute(pointAttributes.countryIds, 1));
+            geometry.setAttribute('size', new THREE.BufferAttribute(pointAttributes.sizes, 1));
+            
+            // Custom shader material
+            const material = new THREE.ShaderMaterial({
+                uniforms: {
+                    selectedCountryId: { value: -1 },
+                    time: { value: 0 },
+                    performanceMode: { value: false }
+                },
+                vertexShader: `
+                    attribute float size;
+                    attribute float countryId;
+                    uniform float selectedCountryId;
+                    uniform float time;
+                    uniform bool performanceMode;
+                    
+                    varying vec3 vColor;
+                    varying float vOpacity;
+                    varying float vCountryId;
+                    
+                    void main() {
+                        vColor = color;
+                        vCountryId = countryId;
+                        
+                        // Calculate opacity based on selection
+                        if (selectedCountryId > 0.0) {
+                            if (abs(countryId - selectedCountryId) < 0.5) {
+                                vOpacity = 1.0;
+                            } else if (countryId > 1.0) {
+                                vOpacity = 0.3;
+                            } else {
+                                vOpacity = 0.1;
+                            }
+                        } else {
+                            vOpacity = 0.8;
+                        }
+                        
+                        // Add subtle animation
+                        if (!performanceMode) {
+                            float pulse = sin(time * 2.0 + position.x * 10.0) * 0.1 + 1.0;
+                            gl_PointSize = size * 10.0 * pulse;
+                        } else {
+                            gl_PointSize = size * 8.0;
+                        }
+                        
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    varying vec3 vColor;
+                    varying float vOpacity;
+                    varying float vCountryId;
+                    
+                    void main() {
+                        // Create soft circular points
+                        vec2 center = gl_PointCoord - vec2(0.5);
+                        float dist = length(center);
+                        
+                        if (dist > 0.5) discard;
+                        
+                        float alpha = 1.0 - smoothstep(0.3, 0.5, dist);
+                        alpha *= vOpacity;
+                        
+                        // Add subtle glow for selected countries
+                        if (vCountryId > 1.0) {
+                            float glow = 1.0 - smoothstep(0.0, 0.5, dist);
+                            alpha += glow * 0.3;
+                        }
+                        
+                        gl_FragColor = vec4(vColor, alpha);
+                    }
+                `,
+                transparent: true,
+                vertexColors: true
+            });
+            
+            globePoints = new THREE.Points(geometry, material);
+            scene.add(globePoints);
+            
+            // Create connection lines
+            createConnectionLines(points);
+        }
+        
+        // Create connection lines between nearby points
+        function createConnectionLines(points) {
+            if (!showConnections) return;
+            
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            const colors = [];
+            
+            for (let i = 0; i < points.length; i++) {
+                for (let j = i + 1; j < points.length; j++) {
+                    const distance = points[i].position.distanceTo(points[j].position);
+                    
+                    if (distance < CONNECTION_DISTANCE) {
+                        // Add line positions
+                        positions.push(
+                            points[i].position.x, points[i].position.y, points[i].position.z,
+                            points[j].position.x, points[j].position.y, points[j].position.z
+                        );
+                        
+                        // Add line colors
+                        colors.push(
+                            points[i].color.r, points[i].color.g, points[i].color.b,
+                            points[j].color.r, points[j].color.g, points[j].color.b
+                        );
+                    }
+                }
+            }
+            
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            
+            const material = new THREE.LineBasicMaterial({
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.3
+            });
+            
+            connectionLines = new THREE.LineSegments(geometry, material);
+            scene.add(connectionLines);
+        }
+        
+        // Setup mouse interactions
+        function setupMouseInteractions() {
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            
+            function onMouseMove(event) {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+                
+                raycaster.setFromCamera(mouse, camera);
+                
+                // Create a simple sphere for intersection testing
+                const sphere = new THREE.SphereGeometry(5, 32, 32);
+                const sphereMesh = new THREE.Mesh(sphere);
+                
+                const intersects = raycaster.intersectObject(sphereMesh);
+                
+                if (intersects.length > 0) {
+                    const point = intersects[0].point;
+                    const uv = vector3ToUV(point.normalize());
+                    
+                    // Sample ID map at intersection point
+                    const countryId = sampleIDMap(uv);
+                    
+                    if (countryId !== selectedCountryId) {
+                        selectedCountryId = countryId;
+                        updateCountrySelection();
+                    }
+                }
+            }
+            
+            window.addEventListener('mousemove', onMouseMove);
+        }
+        
+        // Sample ID map at UV coordinates
+        function sampleIDMap(uv) {
+            // This would sample the actual ID map texture
+            // For now, return a mock country ID based on position
+            if (uv.x > 0.4 && uv.x < 0.6 && uv.y > 0.3 && uv.y < 0.7) {
+                return Math.floor(Math.random() * 54) + 2; // Random African country
+            }
+            return 1; // Non-African landmass
+        }
+        
+        // Update country selection
+        function updateCountrySelection() {
+            if (globePoints && globePoints.material.uniforms) {
+                globePoints.material.uniforms.selectedCountryId.value = selectedCountryId;
+            }
+            
+            // Update UI
+            const countryInfo = document.getElementById('country-info');
+            if (selectedCountryId > 1 && AFRICA_COUNTRIES[selectedCountryId]) {
+                const country = AFRICA_COUNTRIES[selectedCountryId];
+                document.getElementById('country-name').textContent = country.name;
+                document.getElementById('country-id').textContent = `ID: ${selectedCountryId}`;
+                document.getElementById('country-points').textContent = `Points: ${countryData[selectedCountryId]?.points || 0}`;
+                countryInfo.style.display = 'block';
+            } else {
+                countryInfo.style.display = 'none';
+            }
+        }
+        
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const currentTime = performance.now();
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+            
+            // Update FPS
+            frameCount++;
+            if (frameCount % 60 === 0) {
+                fps = Math.round(1000 / deltaTime);
+                document.getElementById('fps').textContent = fps;
+                
+                // Auto-enable performance mode if FPS drops
+                if (fps < PERFORMANCE_THRESHOLD && !performanceMode) {
+                    togglePerformanceMode();
+                }
+            }
+            
+            // Update shader time
+            if (globePoints && globePoints.material.uniforms) {
+                globePoints.material.uniforms.time.value = currentTime * 0.001;
+                globePoints.material.uniforms.performanceMode.value = performanceMode;
+            }
+            
+            // Auto rotate
+            if (autoRotate) {
+                globePoints.rotation.y += 0.005;
+                if (connectionLines) {
+                    connectionLines.rotation.y += 0.005;
+                }
+            }
+            
+            controls.update();
+            renderer.render(scene, camera);
+            
+            // Update performance stats
+            updatePerformanceStats(deltaTime);
+        }
+        
+        // Update progress bar
+        function updateProgress(percent, text) {
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('loading-text').textContent = text;
+        }
+        
+        // Update statistics
+        function updateStatistics() {
+            document.getElementById('total-points').textContent = pointAttributes.positions ? pointAttributes.positions.length / 3 : 0;
+            document.getElementById('active-points').textContent = Object.keys(countryData).length;
+        }
+        
+        // Update performance statistics
+        function updatePerformanceStats(frameTime) {
+            document.getElementById('frame-time').textContent = frameTime.toFixed(1);
+            
+            // Mock memory usage (in real implementation, use performance.memory)
+            const memoryUsage = (pointAttributes.positions ? pointAttributes.positions.length * 4 : 0) / 1024 / 1024;
+            document.getElementById('memory-usage').textContent = memoryUsage.toFixed(1);
+        }
+        
+        // Control functions
+        function toggleAutoRotate() {
+            autoRotate = !autoRotate;
+            controls.autoRotate = autoRotate;
+            document.getElementById('rotate-btn').classList.toggle('active', autoRotate);
+        }
+        
+        function toggleConnections() {
+            showConnections = !showConnections;
+            if (connectionLines) {
+                connectionLines.visible = showConnections;
+            }
+            document.getElementById('connections-btn').classList.toggle('active', showConnections);
+        }
+        
+        function togglePerformanceMode() {
+            performanceMode = !performanceMode;
+            document.getElementById('perf-btn').classList.toggle('active', performanceMode);
+            
+            // Adjust quality settings
+            if (performanceMode) {
+                renderer.setPixelRatio(1);
+                if (globePoints) {
+                    globePoints.material.uniforms.performanceMode.value = true;
+                }
+            } else {
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                if (globePoints) {
+                    globePoints.material.uniforms.performanceMode.value = false;
+                }
+            }
+        }
+        
+        function resetView() {
+            camera.position.set(0, 0, 15);
+            controls.reset();
+            selectedCountryId = -1;
+            updateCountrySelection();
+        }
+        
+        function exportData() {
+            const data = {
+                countries: countryData,
+                totalPoints: pointAttributes.positions ? pointAttributes.positions.length / 3 : 0,
+                timestamp: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'africa-globe-data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Initialize when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
