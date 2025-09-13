@@ -1,0 +1,86 @@
+# GitHub Pages Configuration for ORUN.IO
+# This file tells GitHub Pages to serve static files without Jekyll processing
+
+# Site settings
+title: "ORUN.IO - Climate Impact Verification Platform"
+description: "Transforming Climate Finance in Africa through Satellite Technology, AI, and Blockchain"
+url: "https://phantomojo.github.io"
+baseurl: "/ORUN.IO"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: jekyll-theme-minimal
+
+# Exclude files from processing
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - .git
+  - .gitignore
+  - .nojekyll
+  - docs/
+  - earth_renders/
+  - frontend/
+  - orun-3d/
+  - src/
+  - venv/
+  - __pycache__/
+  - "*.py"
+  - "*.pyc"
+  - "*.log"
+  - "*.md"
+  - "*.pdf"
+  - "*.tar.gz"
+  - "*.json"
+  - "*.lock"
+  - "*.tool"
+  - "*.tsx"
+  - "*.ts"
+  - "*.css"
+  - "*.js"
+  - "*.html"
+  - "*.jpg"
+  - "*.png"
+  - "*.ico"
+  - "*.xml"
+  - "*.txt"
+
+# Include only necessary files
+include:
+  - index.html
+  - assets/
+  - favicon.ico
+  - robots.txt
+  - sitemap.xml
+  - CNAME
+  - 404.html
+  - .htaccess
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
