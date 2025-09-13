@@ -2347,6 +2347,33 @@
             margin: 0;
         }
         
+        .github-links {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(0, 191, 166, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 191, 166, 0.3);
+        }
+        
+        .github-links h4 {
+            color: #00bfa6;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        .github-links a {
+            color: #00bfa6;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .github-links a:hover {
+            color: #1a1a1a;
+            text-decoration: underline;
+        }
+        
         .acknowledgments {
             margin: 3rem 0;
             text-align: center;
@@ -2546,6 +2573,17 @@
         <div class="neural-network"></div>
         <div id="earth-container">
             <!-- 3D Globe will be loaded here -->
+            <!-- Interaction cues -->
+            <div class="globe-interaction-cues">
+                <div class="interaction-hint">
+                    <span class="hint-icon">🖱️</span>
+                    <span class="hint-text">Drag to rotate • Scroll to zoom</span>
+                </div>
+                <div class="scroll-hint">
+                    <span class="scroll-icon">↓</span>
+                    <span class="scroll-text">Scroll down to continue</span>
+                </div>
+            </div>
         </div>
         <div class="earth-overlay">
             <div class="overlay-header">
@@ -2558,28 +2596,114 @@
             </div>
             
             <div class="climate-stats">
-                <div class="stat-item">
-                    <div class="stat-icon">🌡️</div>
+                <div class="stat-item temperature-stat">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 13V5C15 3.34 13.66 2 12 2S9 3.34 9 5V13C7.79 14.16 7 15.73 7 17.5C7 20.54 9.46 23 12.5 23S18 20.54 18 17.5C18 15.73 17.21 14.16 16 13ZM12 21C10.62 21 9.5 19.88 9.5 18.5S10.62 16 12 16S14.5 17.12 14.5 18.5S13.38 21 12 21Z" fill="#ff6b6b"/>
+                        </svg>
+                    </div>
                     <div class="stat-info">
-                        <div class="stat-value">+2.1°C</div>
+                        <div class="stat-value positive">+28.5°C</div>
                         <div class="stat-label">Temperature</div>
                         <div class="stat-trend">+0.3°C this week</div>
+                        <div class="stat-location">Lagos, Nigeria</div>
                     </div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-icon">🌧️</div>
+                <div class="stat-item rainfall-stat">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4C9.11 4 6.6 5.64 5.35 8.04C2.34 8.36 0 10.91 0 14C0 17.31 2.69 20 6 20H19C21.76 20 24 17.76 24 15C24 12.36 21.95 10.22 19.35 10.04ZM19 18H6C3.79 18 2 16.21 2 14S3.79 10 6 10H6.71C7.37 7.69 9.48 6 12 6C14.52 6 16.63 7.69 17.29 10H19C20.66 10 22 11.34 22 13S20.66 16 19 16V18Z" fill="#4fc3f7"/>
+                            <path d="M7 16L9 18L11 16" stroke="#4fc3f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
                     <div class="stat-info">
-                        <div class="stat-value">-15%</div>
+                        <div class="stat-value negative">-12%</div>
                         <div class="stat-label">Rainfall</div>
-                        <div class="stat-trend">-2% this month</div>
+                        <div class="stat-trend">-2.1% this month</div>
+                        <div class="stat-location">East Africa Region</div>
                     </div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-icon">🌱</div>
+                <div class="stat-item vegetation-stat">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22L6.66 19.7C7.14 19.87 7.64 20 8 20C19 20 22 3 22 3C21 5 14 5.25 9 6.25C4 7.25 2 11.5 2 13.5C2 15.5 3.75 17.25 6 17.25C7.12 17.25 8.12 16.75 8.84 16L10.5 18.5C9.5 19.5 7.75 20.25 6 20.25C2.69 20.25 0 17.56 0 14.25C0 11.5 2.5 6.5 8.5 4.5C13.5 2.5 17 8 17 8Z" fill="#66bb6a"/>
+                        </svg>
+                    </div>
                     <div class="stat-info">
-                        <div class="stat-value">+8%</div>
+                        <div class="stat-value positive">+8.2%</div>
                         <div class="stat-label">Vegetation</div>
                         <div class="stat-trend">+1.2% this month</div>
+                        <div class="stat-location">Sahel Region</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="data-status">
+                <div class="last-updated">Last Updated: 2 minutes ago</div>
+                <div class="data-sources">Data Points: 1.2M collected</div>
+            </div>
+            
+            <div class="target-users-section">
+                <h3 class="users-title">Target Users</h3>
+                <div class="users-grid">
+                    <div class="user-card">
+                        <div class="user-icon">🌾</div>
+                        <div class="user-info">
+                            <div class="user-name">African Farmers</div>
+                            <div class="user-desc">Crop planning and weather monitoring</div>
+                        </div>
+                    </div>
+                    <div class="user-card">
+                        <div class="user-icon">🏛️</div>
+                        <div class="user-info">
+                            <div class="user-name">Policy Makers</div>
+                            <div class="user-desc">Climate policy and disaster response</div>
+                        </div>
+                    </div>
+                    <div class="user-card">
+                        <div class="user-icon">🔬</div>
+                        <div class="user-info">
+                            <div class="user-name">Researchers</div>
+                            <div class="user-desc">Climate data analysis and modeling</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="project-metrics">
+                <h3 class="metrics-title">Project Metrics & Budget</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">💰</div>
+                        <div class="metric-info">
+                            <div class="metric-value">$2,500</div>
+                            <div class="metric-label">Development Budget</div>
+                            <div class="metric-desc">Initial development costs</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">👥</div>
+                        <div class="metric-info">
+                            <div class="metric-value">10K+</div>
+                            <div class="metric-label">Target Users</div>
+                            <div class="metric-desc">African farmers & researchers</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">📊</div>
+                        <div class="metric-info">
+                            <div class="metric-value">1.2M</div>
+                            <div class="metric-label">Data Points</div>
+                            <div class="metric-desc">Real-time climate data</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">🌍</div>
+                        <div class="metric-info">
+                            <div class="metric-value">54</div>
+                            <div class="metric-label">Countries</div>
+                            <div class="metric-desc">African continent coverage</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3715,6 +3839,16 @@
         <div class="contact-info">
             <h3>Team Nexus Neural</h3>
             <p>📧 hello@orun.io | 🌐 orun.io | 📱 +254 700 000 000</p>
+            
+            <div class="github-links">
+                <h4>🔗 Open Source</h4>
+                <p>
+                    <a href="https://github.com/Phantomojo/ORUN.IO" target="_blank" rel="noopener">💻 View Source Code on GitHub</a> |
+                    <a href="https://github.com/Phantomojo/ORUN.IO/stargazers" target="_blank" rel="noopener">⭐ Star the Repository</a> |
+                    <a href="https://github.com/Phantomojo/ORUN.IO/fork" target="_blank" rel="noopener">🍴 Fork the Project</a>
+                </p>
+            </div>
+            
             <p class="acknowledgments">Special thanks to the CHAI.Africa Hackathon for fostering innovation in blockchain and climate solutions.</p>
         </div>
     </section>
@@ -3740,6 +3874,7 @@
     <script src="js/interactive-slide6.js"></script>
     <script src="js/satellite-animations.js"></script>
     <script src="js/loading-globe.js"></script>
+    <script src="js/real-time-climate-data.js"></script>
     <script src="js/main.js"></script>
     
     <!-- All Slides Dropdown Functionality -->
@@ -3828,13 +3963,13 @@
                     'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_specular_2048.jpg'
                 ];
                 
-                // Create a beautiful Earth material with procedural colors
+                // Create a bright, clear Earth material
                 const earthMaterial = new THREE.MeshPhongMaterial({
                     color: 0x4a90e2, // Blue oceans
                     shininess: 100,
                     transparent: false,
                     specular: 0x222222,
-                    emissive: 0x001122 // Subtle blue glow
+                    emissive: 0x000000 // No blue glow - completely clear
                 });
                 
                 // Try to load texture asynchronously and update material when ready
@@ -3857,23 +3992,26 @@
                 
                 // Globe is ready with beautiful procedural material
 
-                // Add enhanced lighting for better visibility
-                const ambientLight = new THREE.AmbientLight(0x404040, 0.8); // Increased intensity
+                // Add bright, even lighting to eliminate dark areas
+                const ambientLight = new THREE.AmbientLight(0xffffff, 1.0); // Bright white ambient light
                 scene.add(ambientLight);
                 
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2); // Increased intensity
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5); // Bright directional light
                 directionalLight.position.set(5, 3, 5);
                 scene.add(directionalLight);
                 
-                // Add additional fill light for better illumination
-                const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
-                fillLight.position.set(-5, -3, -5);
-                scene.add(fillLight);
+                // Add multiple fill lights to eliminate shadows
+                const fillLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+                fillLight1.position.set(-5, -3, -5);
+                scene.add(fillLight1);
                 
-                // Add rim light for better definition
-                const rimLight = new THREE.DirectionalLight(0xffffff, 0.2);
-                rimLight.position.set(0, 0, 5);
-                scene.add(rimLight);
+                const fillLight2 = new THREE.DirectionalLight(0xffffff, 0.6);
+                fillLight2.position.set(0, 5, 0);
+                scene.add(fillLight2);
+                
+                const fillLight3 = new THREE.DirectionalLight(0xffffff, 0.4);
+                fillLight3.position.set(-5, 0, 5);
+                scene.add(fillLight3);
 
                 camera.position.z = 2.5;
 
@@ -4111,6 +4249,8 @@
         });
     </script>
 </body>
+</html>
+</html>
 </html>
 </html>
 </html>

@@ -1,204 +1,103 @@
-# 🌍 ORUN.IO - Climate Impact Verification Platform
+# ORUN.IO Frontend
 
-> **Transforming Climate Finance in Africa through Satellite Technology, AI, and Blockchain**
+This is the organized frontend structure for the ORUN.IO demo, split from the original monolithic HTML file.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub stars](https://img.shields.io/github/stars/Phantomojo/ORUN.IO.svg)](https://github.com/Phantomojo/ORUN.IO/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/Phantomojo/ORUN.IO.svg)](https://github.com/Phantomojo/ORUN.IO/network)
-
-## 🚀 Live Demo
-
-**🌐 [View Live Demo - Netlify](https://nexorun.netlify.app/)**
-**🌐 [View Live Demo - Surge](https://orun-io.surge.sh)**
-**🌐 [View Live Demo - GitHub Pages](https://phantomojo.github.io/ORUN.IO/)**
-
-## 📋 Overview
-
-ORUN.IO is a revolutionary platform that verifies real climate impact in Africa using cutting-edge technology:
-
-- **🛰️ Satellite Monitoring**: Real-time data from 12+ satellite constellations
-- **🤖 AI Analysis**: BACI methodology for causal impact verification  
-- **⛓️ Blockchain Records**: Immutable, transparent impact records
-- **💰 Climate Finance**: Unlocking funding for African communities
-
-## ✨ Key Features
-
-### 🎯 **Auto-Rotation Globe**
-- Smooth 3D Earth visualization with auto-rotation
-- Interactive controls: drag to rotate, scroll to zoom
-- Smart pause/resume when user interacts
-- Mobile-friendly touch controls
-
-### 📊 **Real-Time Monitoring**
-- Live satellite data streaming
-- Climate impact verification
-- Community empowerment tools
-- Transparent blockchain records
-
-### 🎨 **Modern UI/UX**
-- Responsive design for all devices
-- Smooth animations and transitions
-- Professional 3D visualizations
-- Interactive slide system
-
-## 🛠️ Technology Stack
-
-- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **3D Graphics**: Three.js with OrbitControls
-- **Animations**: GSAP, CSS Animations
-- **Data Visualization**: Custom satellite data integration
-- **Blockchain**: Smart contracts for transparency
-- **AI/ML**: BACI methodology implementation
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Modern web browser with WebGL support
-- Node.js (for development)
-- Python 3.8+ (for backend services)
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Phantomojo/ORUN.IO.git
-   cd ORUN.IO
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   pip install -r requirements.txt
-   ```
-
-3. **Run the development server**
-   ```bash
-   # Frontend
-   cd frontend
-   python3 -m http.server 8000
-   
-   # Backend (optional)
-   python3 main.py
-   ```
-
-4. **Open your browser**
-   ```
-   http://localhost:8000
-   ```
-
-## 📁 Project Structure
+## 📁 Directory Structure
 
 ```
-ORUN.IO/
-├── index.html              # Main application entry point
-├── assets/                 # Static assets
-│   ├── css/               # Stylesheets
-│   ├── js/                # JavaScript modules
-│   └── images/            # Images and textures
-├── frontend/              # Frontend development files
-├── docs/                  # Documentation
-├── src/                   # React components (alternative)
-├── public/                # Public assets
-└── requirements.txt       # Python dependencies
+frontend/
+├── index.html              # Main HTML file
+├── css/
+│   └── styles.css          # All CSS styles
+├── js/
+│   ├── main.js            # Core functionality (slides, navigation, etc.)
+│   ├── particles.js       # Particles.js configuration
+│   ├── earth3d.js         # 3D Earth component with Three.js
+│   └── stats.js           # Stats animations and floating elements
+├── libs/
+│   └── dependencies.html  # External library CDN links
+├── assets/
+│   ├── images/            # Image assets (if any)
+│   └── fonts/             # Custom fonts (if any)
+└── README.md              # This file
 ```
 
-## 🎮 Interactive Features
+## 🚀 External Dependencies
 
-### 🌍 **3D Globe Controls**
-- **Auto-rotation**: Globe slowly rotates automatically
-- **Manual rotation**: Click and drag to rotate
-- **Zoom**: Scroll wheel to zoom in/out
-- **Mobile**: Pinch gestures for zoom
+The project uses the following external libraries (loaded via CDN):
 
-### 📱 **Responsive Design**
-- Desktop: Full interactive experience
-- Tablet: Optimized touch controls
-- Mobile: Simplified interface with touch support
+- **Anime.js** (3.2.1) - For smooth animations
+- **Three.js** (r128) - For 3D graphics and WebGL
+- **GSAP** (3.12.2) - For advanced animations
+  - ScrollTrigger plugin
+  - TextPlugin
+- **Particles.js** (2.0.0) - For particle effects and network backgrounds
+- **Chart.js** - For data visualization
+- **Lottie Player** - For Lottie animations
+- **Google Fonts** - Inter, Orbitron, Poppins, Montserrat
 
-## 🔧 Development
+## 🎯 Features
 
-### Adding New Features
-1. Create feature branch: `git checkout -b feature/new-feature`
-2. Make changes and test locally
-3. Commit changes: `git commit -m "Add new feature"`
-4. Push to repository: `git push origin feature/new-feature`
-5. Create pull request
+- **Full-page slide navigation** with smooth transitions
+- **3D Earth visualization** with Three.js
+- **Particle background effects** with Particles.js
+- **Animated statistics** with Anime.js
+- **Responsive design** for all screen sizes
+- **Keyboard navigation** (arrow keys, space, home, end)
+- **Mouse wheel navigation** with sensitivity control
+- **Custom cursor** effects
+- **Loading screen** with progress bar
 
-### Code Style
-- Use ES6+ JavaScript features
-- Follow CSS BEM methodology
-- Comment complex functions
-- Maintain responsive design principles
+## 🎨 Design System
+
+- **Color Palette**: Teal (#00bfa6), Blue (#0077cc), Orange (#ff5722)
+- **Typography**: Orbitron (headings), Inter (body text)
+- **Background Pattern**: Alternating white/black slides
+- **Animations**: Smooth transitions with GSAP and Anime.js
+
+## 🛠️ Development
+
+To run the demo:
+
+1. Serve the files from a web server (required for CORS)
+2. Open `index.html` in a modern browser
+3. Use arrow keys or mouse wheel to navigate between slides
+
+## 📱 Responsive Design
+
+The demo is fully responsive and works on:
+- Desktop computers
+- Tablets
+- Mobile phones
+- Various screen orientations
+
+## 🔧 Customization
+
+Each component is modular and can be easily customized:
+
+- **CSS**: Modify `css/styles.css` for styling changes
+- **JavaScript**: Edit individual JS files for functionality
+- **Content**: Update `index.html` for text and structure changes
+- **Dependencies**: Modify `libs/dependencies.html` for library updates
 
 ## 📊 Performance
 
-- **Loading Time**: < 3 seconds on 3G
-- **Bundle Size**: Optimized for fast loading
-- **3D Performance**: 60fps on modern devices
-- **Mobile**: Touch-optimized interactions
+- Optimized for smooth 60fps animations
+- Efficient memory management for 3D graphics
+- Lazy loading of heavy components
+- Responsive image handling
 
-## 🌐 Deployment
+## 🌍 Browser Support
 
-### Multiple Hosting Options
+- Chrome 80+
+- Firefox 75+
+- Safari 13+
+- Edge 80+
 
-#### 🚀 **Netlify** (Recommended)
-- **URL**: https://nexorun.netlify.app/
-- **Auto-deploy**: Connected to GitHub repository
-- **Features**: CDN, HTTPS, custom domains
+## 📝 Notes
 
-#### ⚡ **Surge.sh** (Fast Deploy)
-- **URL**: https://orun-io.surge.sh
-- **Deploy**: `surge . orun-io.surge.sh`
-- **Features**: Instant deployment, custom domains
-
-#### 📄 **GitHub Pages**
-- **URL**: https://phantomojo.github.io/ORUN.IO/
-- **Auto-deploy**: From `gh-pages` branch
-- **Features**: Free hosting, GitHub integration
-
-### Manual Deployment
-```bash
-# Deploy to Surge.sh
-surge . your-domain.surge.sh
-
-# Deploy to Netlify (via CLI)
-netlify deploy --prod --dir=frontend
-
-# Deploy to GitHub Pages
-git checkout gh-pages
-cp -r frontend/* .
-git add . && git commit -m "Deploy" && git push
-```
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **CHAI.Africa Hackathon** for fostering innovation
-- **NASA** for satellite data APIs
-- **Three.js** community for 3D graphics
-- **African Climate Communities** for inspiration
-
-## 📞 Contact
-
-- **Website**: [orun.io](https://orun.io)
-- **Email**: hello@orun.io
-- **GitHub**: [@Phantomojo](https://github.com/Phantomojo)
-
----
-
-**🌍 Building a sustainable future through transparent climate finance**
-
-*Made with ❤️ for Africa's climate resilience*
+- The original monolithic file was 3,883 lines
+- This organized structure is much more maintainable
+- Each component can be developed and tested independently
+- External dependencies are clearly documented
+- Easy to add new features or modify existing ones
