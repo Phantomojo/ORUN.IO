@@ -3828,13 +3828,13 @@
                     'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_specular_2048.jpg'
                 ];
                 
-                // Create a beautiful Earth material with procedural colors
+                // Create a bright, clear Earth material
                 const earthMaterial = new THREE.MeshPhongMaterial({
                     color: 0x4a90e2, // Blue oceans
                     shininess: 100,
                     transparent: false,
                     specular: 0x222222,
-                    emissive: 0x001122 // Subtle blue glow
+                    emissive: 0x000000 // No blue glow - completely clear
                 });
                 
                 // Try to load texture asynchronously and update material when ready
@@ -3857,23 +3857,26 @@
                 
                 // Globe is ready with beautiful procedural material
 
-                // Add enhanced lighting for better visibility
-                const ambientLight = new THREE.AmbientLight(0x404040, 0.8); // Increased intensity
+                // Add bright, even lighting to eliminate dark areas
+                const ambientLight = new THREE.AmbientLight(0xffffff, 1.0); // Bright white ambient light
                 scene.add(ambientLight);
                 
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2); // Increased intensity
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5); // Bright directional light
                 directionalLight.position.set(5, 3, 5);
                 scene.add(directionalLight);
                 
-                // Add additional fill light for better illumination
-                const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
-                fillLight.position.set(-5, -3, -5);
-                scene.add(fillLight);
+                // Add multiple fill lights to eliminate shadows
+                const fillLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+                fillLight1.position.set(-5, -3, -5);
+                scene.add(fillLight1);
                 
-                // Add rim light for better definition
-                const rimLight = new THREE.DirectionalLight(0xffffff, 0.2);
-                rimLight.position.set(0, 0, 5);
-                scene.add(rimLight);
+                const fillLight2 = new THREE.DirectionalLight(0xffffff, 0.6);
+                fillLight2.position.set(0, 5, 0);
+                scene.add(fillLight2);
+                
+                const fillLight3 = new THREE.DirectionalLight(0xffffff, 0.4);
+                fillLight3.position.set(-5, 0, 5);
+                scene.add(fillLight3);
 
                 camera.position.z = 2.5;
 

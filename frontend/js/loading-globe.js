@@ -47,17 +47,24 @@ function initLoadingGlobe() {
         const texturePath = textureOptions[textureIndex];
         console.log(`Loading globe: Attempting to load texture: ${texturePath}`);
         
+        // Create fallback globe immediately for faster loading
+        createFallbackGlobe(geometry);
+        
         const earthTexture = textureLoader.load(
             texturePath,
             () => {
                 console.log(`✅ Loading globe texture loaded: ${texturePath}`);
-                createGlobeWithTexture(geometry, earthTexture);
+                // Update the existing globe with texture
+                if (loadingGlobe && loadingGlobe.material) {
+                    loadingGlobe.material.map = earthTexture;
+                    loadingGlobe.material.needsUpdate = true;
+                }
             },
             undefined,
             (error) => {
                 console.warn(`❌ Loading globe texture failed ${texturePath}:`, error);
                 textureIndex++;
-                tryLoadTexture();
+                // Don't retry - keep the fallback globe
             }
         );
     }
@@ -67,12 +74,12 @@ function initLoadingGlobe() {
         texture.anisotropy = loadingRenderer.capabilities.getMaxAnisotropy();
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         
-        // Create material with texture
+        // Create bright, clear material with texture
         const material = new THREE.MeshPhongMaterial({
             map: texture,
             shininess: 100,
             specular: new THREE.Color(0x222222),
-            emissive: new THREE.Color(0x001122)
+            emissive: new THREE.Color(0x000000) // No blue glow
         });
         
         loadingGlobe = new THREE.Mesh(geometry, material);
@@ -94,12 +101,12 @@ function initLoadingGlobe() {
     }
     
     function createFallbackGlobe(geometry) {
-        // Fallback material without texture
+        // Fallback material without texture - bright and clear
         const material = new THREE.MeshPhongMaterial({
             color: 0x3b82f6,
             shininess: 100,
             specular: new THREE.Color(0x222222),
-            emissive: new THREE.Color(0x001122)
+            emissive: new THREE.Color(0x000000) // No blue glow
         });
         
         loadingGlobe = new THREE.Mesh(geometry, material);
@@ -134,20 +141,24 @@ function initLoadingGlobe() {
     }
     
     function addLighting() {
-        // Ambient light
-        const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+        // Bright ambient light to eliminate dark areas
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
         loadingScene.add(ambientLight);
         
         // Main directional light
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
         directionalLight.position.set(5, 3, 5);
         directionalLight.castShadow = true;
         loadingScene.add(directionalLight);
         
-        // Secondary light for better illumination
-        const secondaryLight = new THREE.DirectionalLight(0x87CEEB, 0.3);
-        secondaryLight.position.set(-3, 2, -2);
-        loadingScene.add(secondaryLight);
+        // Multiple fill lights for even illumination
+        const fillLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+        fillLight1.position.set(-3, 2, -2);
+        loadingScene.add(fillLight1);
+        
+        const fillLight2 = new THREE.DirectionalLight(0xffffff, 0.6);
+        fillLight2.position.set(0, 5, 0);
+        loadingScene.add(fillLight2);
     }
     
     function animateLoadingGlobe() {
