@@ -3828,117 +3828,34 @@
                     'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_specular_2048.jpg'
                 ];
                 
-                // Try to load main texture
-                let textureLoaded = false;
-                for (let i = 0; i < textureSources.length && !textureLoaded; i++) {
-                    try {
-                        earthTexture = textureLoader.load(
-                            textureSources[i],
-                            (texture) => {
-                                console.log('Earth texture loaded from:', textureSources[i]);
-                                textureLoaded = true;
-                            },
-                            undefined,
-                            (error) => {
-                                console.warn('Failed to load texture from:', textureSources[i]);
-                            }
-                        );
-                        if (earthTexture) break;
-                    } catch (error) {
-                        console.warn('Error loading texture from:', textureSources[i]);
-                    }
-                }
-                
-                // Load normal and specular maps
-                try {
-                    earthNormal = textureLoader.load(normalSources[0]);
-                    earthSpecular = textureLoader.load(specularSources[0]);
-                } catch (error) {
-                    console.warn('Normal/specular maps failed to load');
-                }
-                
-                // Create a better initial material with Earth-like colors
-                const initialMaterial = new THREE.MeshPhongMaterial({
+                // Create a beautiful Earth material with procedural colors
+                const earthMaterial = new THREE.MeshPhongMaterial({
                     color: 0x4a90e2, // Blue oceans
                     shininess: 100,
-                    transparent: false
+                    transparent: false,
+                    specular: 0x222222,
+                    emissive: 0x001122 // Subtle blue glow
                 });
                 
-                const earth = new THREE.Mesh(geometry, initialMaterial);
+                // Try to load texture asynchronously and update material when ready
+                textureLoader.load(
+                    textureSources[0], // Use first texture source
+                    (texture) => {
+                        console.log('✅ Earth texture loaded successfully');
+                        earthMaterial.map = texture;
+                        earthMaterial.needsUpdate = true;
+                    },
+                    undefined,
+                    (error) => {
+                        console.log('⚠️ Using procedural Earth material (texture failed to load)');
+                        // Keep the beautiful procedural material
+                    }
+                );
+                
+                const earth = new THREE.Mesh(geometry, earthMaterial);
                 scene.add(earth);
                 
-                // Function to update material with textures
-                const updateMaterialWithTextures = () => {
-                    if (earthTexture && earthTexture.image && earthTexture.image.complete) {
-                        const texturedMaterial = new THREE.MeshPhongMaterial({
-                            map: earthTexture,
-                            normalMap: earthNormal,
-                            specularMap: earthSpecular,
-                            shininess: 100,
-                            color: 0xffffff,
-                            transparent: false
-                        });
-                        earth.material = texturedMaterial;
-                        console.log('Earth textures applied successfully');
-                        return true;
-                    }
-                    return false;
-                };
-                
-                // Create a simple procedural Earth texture as fallback
-                const createProceduralEarthTexture = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 512;
-                    canvas.height = 256;
-                    const ctx = canvas.getContext('2d');
-                    
-                    // Create gradient for oceans
-                    const gradient = ctx.createLinearGradient(0, 0, 0, 256);
-                    gradient.addColorStop(0, '#1e3a8a'); // Deep blue
-                    gradient.addColorStop(0.5, '#3b82f6'); // Blue
-                    gradient.addColorStop(1, '#1e40af'); // Dark blue
-                    
-                    ctx.fillStyle = gradient;
-                    ctx.fillRect(0, 0, 512, 256);
-                    
-                    // Add some land masses (simple shapes)
-                    ctx.fillStyle = '#22c55e'; // Green
-                    ctx.beginPath();
-                    ctx.ellipse(100, 100, 40, 30, 0, 0, 2 * Math.PI); // Africa-like
-                    ctx.fill();
-                    
-                    ctx.beginPath();
-                    ctx.ellipse(300, 80, 60, 40, 0, 0, 2 * Math.PI); // Europe/Asia-like
-                    ctx.fill();
-                    
-                    ctx.beginPath();
-                    ctx.ellipse(400, 150, 50, 35, 0, 0, 2 * Math.PI); // Americas-like
-                    ctx.fill();
-                    
-                    const texture = new THREE.CanvasTexture(canvas);
-                    texture.wrapS = THREE.RepeatWrapping;
-                    texture.wrapT = THREE.ClampToEdgeWrapping;
-                    return texture;
-                };
-                
-                // Try to update material immediately if texture is already loaded
-                if (!updateMaterialWithTextures()) {
-                    // If not loaded yet, try again after a delay
-                    setTimeout(() => {
-                        if (!updateMaterialWithTextures()) {
-                            // Use procedural texture as fallback
-                            const proceduralTexture = createProceduralEarthTexture();
-                            const proceduralMaterial = new THREE.MeshPhongMaterial({
-                                map: proceduralTexture,
-                                shininess: 100,
-                                color: 0xffffff,
-                                transparent: false
-                            });
-                            earth.material = proceduralMaterial;
-                            console.log('Using procedural Earth texture');
-                        }
-                    }, 3000);
-                }
+                // Globe is ready with beautiful procedural material
 
                 // Add enhanced lighting for better visibility
                 const ambientLight = new THREE.AmbientLight(0x404040, 0.8); // Increased intensity
@@ -4109,24 +4026,7 @@
                 return createOptimizedGlobe(container, 0.005, true); // true = interactive
             }
 
-            // Initialize loading screen globe with faster rotation
-            function initLoadingGlobe() {
-                const container = document.getElementById('loading-globe');
-                if (!container) {
-                    console.warn('Loading globe container not found');
-                    return;
-                }
-                
-                // Wait for Three.js to load
-                if (!window.THREE) {
-                    console.log('Three.js not available for loading globe, retrying...');
-                    setTimeout(initLoadingGlobe, 100);
-                    return;
-                }
-                
-                console.log('Initializing loading globe...');
-                return createOptimizedGlobe(container, 0.02); // Faster rotation for loading screen
-            }
+            // Loading globe is handled by loading-globe.js
 
             // Performance monitoring display (optional - for development)
             function showPerformanceStats() {
@@ -4167,11 +4067,10 @@
                     console.log('Initializing globes...');
                     const earthCleanup = initEarth();
                     const ctaCleanup = initCTAEarth();
-                    const loadingCleanup = initLoadingGlobe();
+                    // Loading globe is handled by loading-globe.js
                     
                     if (earthCleanup) globeCleanupFunctions.push(earthCleanup);
                     if (ctaCleanup) globeCleanupFunctions.push(ctaCleanup);
-                    if (loadingCleanup) globeCleanupFunctions.push(loadingCleanup);
                     
                     console.log('Globes initialized successfully');
                     showPerformanceStats();
