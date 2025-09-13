@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORUN.IO - Advanced Satellite Technology</title>
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fffe 0%, #f0f9ff 100%);
+            color: #1a1a1a;
+            overflow-x: hidden;
+        }
+
+        .slide {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .satellite-content {
+            max-width: 1400px;
+            width: 100%;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .satellite-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .satellite-subtitle {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 3rem;
+            font-weight: 400;
+        }
+
+        .satellite-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin: 3rem 0;
+            padding: 0 2rem;
+        }
+
+        .satellite-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(0, 191, 166, 0.2);
+            border-radius: 24px;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 191, 166, 0.1);
+        }
+
+        .satellite-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 191, 166, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 191, 166, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .satellite-icon {
+            font-size: 2.5rem;
+            margin-right: 1rem;
+        }
+
+        .card-title h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 0.3rem;
+        }
+
+        .card-title p {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            margin-left: auto;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.active {
+            background: linear-gradient(135deg, #00BFA6, #00E5D4);
+            color: white;
+        }
+
+        .card-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0, 191, 166, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 191, 166, 0.1);
+        }
+
+        .metric-value {
+            display: block;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #00BFA6;
+            margin-bottom: 0.3rem;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .card-dropdown {
+            margin-top: 1rem;
+        }
+
+        .dropdown-toggle {
+            width: 100%;
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, #00BFA6, #00E5D4);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dropdown-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 191, 166, 0.3);
+        }
+
+        .dropdown-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-toggle.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .dropdown-content.active {
+            max-height: 500px;
+        }
+
+        .detail-section {
+            background: rgba(0, 191, 166, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(0, 191, 166, 0.1);
+        }
+
+        .detail-section h4 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+        }
+
+        .detail-section ul {
+            list-style: none;
+        }
+
+        .detail-section li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0, 191, 166, 0.1);
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .detail-section li:last-child {
+            border-bottom: none;
+        }
+
+        .satellite-performance {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 3rem 0;
+            padding: 0 2rem;
+        }
+
+        .performance-stat {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(0, 191, 166, 0.2);
+            border-radius: 24px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 191, 166, 0.1);
+        }
+
+        .performance-stat:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 191, 166, 0.4);
+        }
+
+        .performance-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #00BFA6;
+        }
+
+        .performance-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .performance-label {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .satellite-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+            
+            .satellite-performance {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .satellite-title {
+                font-size: 2.5rem;
+            }
+            
+            .satellite-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .satellite-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                padding: 0 1rem;
+            }
+            
+            .satellite-performance {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                padding: 0 1rem;
+            }
+            
+            .satellite-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="slide">
+        <div class="satellite-content">
+            <h2 class="satellite-title">Advanced Satellite Technology</h2>
+            <p class="satellite-subtitle">Real-time monitoring from 12+ satellite constellations across Africa</p>
+            
+            <!-- Enhanced Satellite Grid with Dropdowns -->
+            <div class="satellite-grid">
+                <div class="satellite-card" data-satellite="landsat">
+                    <div class="card-header">
+                        <div class="satellite-icon">🛰️</div>
+                        <div class="card-title">
+                            <h3>Landsat 8/9</h3>
+                            <p>Vegetation monitoring</p>
+                        </div>
+                        <div class="status-badge active">Active</div>
+                    </div>
+                    <div class="card-metrics">
+                        <div class="metric">
+                            <span class="metric-value">30m</span>
+                            <span class="metric-label">Resolution</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">16d</span>
+                            <span class="metric-label">Revisit</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">99.2%</span>
+                            <span class="metric-label">Accuracy</span>
+                        </div>
+                    </div>
+                    <div class="card-dropdown">
+                        <button class="dropdown-toggle">
+                            <span>View Details</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="dropdown-content">
+                            <div class="detail-section">
+                                <h4>Technical Specifications</h4>
+                                <ul>
+                                    <li>Launched: 2013 (Landsat 8), 2021 (Landsat 9)</li>
+                                    <li>Orbit: 705 km altitude, sun-synchronous</li>
+                                    <li>Spectral bands: 11 bands from visible to thermal</li>
+                                    <li>Swath width: 185 km</li>
+                                </ul>
+                            </div>
+                            <div class="detail-section">
+                                <h4>Applications</h4>
+                                <ul>
+                                    <li>Agricultural monitoring</li>
+                                    <li>Forest management</li>
+                                    <li>Urban planning</li>
+                                    <li>Environmental assessment</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="satellite-card" data-satellite="sentinel">
+                    <div class="card-header">
+                        <div class="satellite-icon">🛰️</div>
+                        <div class="card-title">
+                            <h3>Sentinel-2</h3>
+                            <p>High-resolution imaging</p>
+                        </div>
+                        <div class="status-badge active">Active</div>
+                    </div>
+                    <div class="card-metrics">
+                        <div class="metric">
+                            <span class="metric-value">10m</span>
+                            <span class="metric-label">Resolution</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">5d</span>
+                            <span class="metric-label">Revisit</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">Real-time</span>
+                            <span class="metric-label">Data</span>
+                        </div>
+                    </div>
+                    <div class="card-dropdown">
+                        <button class="dropdown-toggle">
+                            <span>View Details</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="dropdown-content">
+                            <div class="detail-section">
+                                <h4>Technical Specifications</h4>
+                                <ul>
+                                    <li>Launched: 2015-2017 (Sentinel-2A/B)</li>
+                                    <li>Orbit: 786 km altitude, sun-synchronous</li>
+                                    <li>Spectral bands: 13 bands from visible to SWIR</li>
+                                    <li>Swath width: 290 km</li>
+                                </ul>
+                            </div>
+                            <div class="detail-section">
+                                <h4>Applications</h4>
+                                <ul>
+                                    <li>Land cover mapping</li>
+                                    <li>Vegetation monitoring</li>
+                                    <li>Water quality assessment</li>
+                                    <li>Disaster management</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="satellite-card" data-satellite="modis">
+                    <div class="card-header">
+                        <div class="satellite-icon">🛰️</div>
+                        <div class="card-title">
+                            <h3>MODIS</h3>
+                            <p>Climate monitoring</p>
+                        </div>
+                        <div class="status-badge active">Active</div>
+                    </div>
+                    <div class="card-metrics">
+                        <div class="metric">
+                            <span class="metric-value">250m</span>
+                            <span class="metric-label">Resolution</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">Daily</span>
+                            <span class="metric-label">Updates</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">Global</span>
+                            <span class="metric-label">Coverage</span>
+                        </div>
+                    </div>
+                    <div class="card-dropdown">
+                        <button class="dropdown-toggle">
+                            <span>View Details</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="dropdown-content">
+                            <div class="detail-section">
+                                <h4>Technical Specifications</h4>
+                                <ul>
+                                    <li>Launched: 1999 (Terra), 2002 (Aqua)</li>
+                                    <li>Orbit: 705 km altitude, sun-synchronous</li>
+                                    <li>Spectral bands: 36 bands from visible to thermal</li>
+                                    <li>Swath width: 2330 km</li>
+                                </ul>
+                            </div>
+                            <div class="detail-section">
+                                <h4>Applications</h4>
+                                <ul>
+                                    <li>Global climate monitoring</li>
+                                    <li>Atmospheric studies</li>
+                                    <li>Ocean color monitoring</li>
+                                    <li>Fire detection</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="satellite-card" data-satellite="galileo">
+                    <div class="card-header">
+                        <div class="satellite-icon">🛰️</div>
+                        <div class="card-title">
+                            <h3>Galileo</h3>
+                            <p>GNSS constellation</p>
+                        </div>
+                        <div class="status-badge active">Active</div>
+                    </div>
+                    <div class="card-metrics">
+                        <div class="metric">
+                            <span class="metric-value">Sub-m</span>
+                            <span class="metric-label">Accuracy</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">24/7</span>
+                            <span class="metric-label">Coverage</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">30</span>
+                            <span class="metric-label">Satellites</span>
+                        </div>
+                    </div>
+                    <div class="card-dropdown">
+                        <button class="dropdown-toggle">
+                            <span>View Details</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="dropdown-content">
+                            <div class="detail-section">
+                                <h4>Technical Specifications</h4>
+                                <ul>
+                                    <li>Launched: 2011-2021 (30 satellites)</li>
+                                    <li>Orbit: 23,222 km altitude, medium Earth orbit</li>
+                                    <li>Constellation: 30 satellites in 3 orbital planes</li>
+                                    <li>Coverage: Global, 24/7</li>
+                                </ul>
+                            </div>
+                            <div class="detail-section">
+                                <h4>Applications</h4>
+                                <ul>
+                                    <li>Precision navigation</li>
+                                    <li>Timing services</li>
+                                    <li>Search and rescue</li>
+                                    <li>Autonomous vehicle guidance</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Performance Metrics -->
+            <div class="satellite-performance">
+                <div class="performance-stat">
+                    <div class="performance-icon">⏱️</div>
+                    <div class="performance-number">6hrs</div>
+                    <div class="performance-label">Data Update Frequency</div>
+                </div>
+                <div class="performance-stat">
+                    <div class="performance-icon">🎯</div>
+                    <div class="performance-number">99.2%</div>
+                    <div class="performance-label">Accuracy Rate</div>
+                </div>
+                <div class="performance-stat">
+                    <div class="performance-icon">💰</div>
+                    <div class="performance-number">90%</div>
+                    <div class="performance-label">Cost Reduction</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+            
+            dropdownToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const isActive = content.classList.contains('active');
+                    
+                    // Close all other dropdowns
+                    document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+                        dropdown.classList.remove('active');
+                    });
+                    document.querySelectorAll('.dropdown-toggle').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Toggle current dropdown
+                    if (!isActive) {
+                        content.classList.add('active');
+                        this.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

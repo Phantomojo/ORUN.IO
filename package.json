@@ -4,20 +4,20 @@
   "description": "Orun.io Frontend Dashboard - Climate Impact Verification Platform",
   "private": true,
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4",
-    "react-router-dom": "^6.20.1",
-    "axios": "^1.6.2",
-    "recharts": "^2.8.0",
-    "leaflet": "^1.9.4",
-    "react-leaflet": "^4.2.1",
+    "@ant-design/icons": "^5.2.6",
     "@types/leaflet": "^1.9.8",
     "antd": "^5.12.8",
-    "@ant-design/icons": "^5.2.6",
-    "dayjs": "^1.11.10"
+    "axios": "^1.6.2",
+    "dayjs": "^1.11.10",
+    "leaflet": "^1.9.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-leaflet": "^4.2.1",
+    "react-router-dom": "^6.20.1",
+    "react-scripts": "5.0.1",
+    "recharts": "^2.8.0",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -47,14 +47,14 @@
     ]
   },
   "devDependencies": {
+    "@types/react-dom": "^18.3.7",
     "@types/react-router-dom": "^5.3.3",
-    "eslint": "^8.55.0",
     "@typescript-eslint/eslint-plugin": "^6.13.1",
     "@typescript-eslint/parser": "^6.13.1",
-    "prettier": "^3.1.0",
+    "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.0.1"
+    "eslint-plugin-prettier": "^5.0.1",
+    "prettier": "^3.1.0"
   },
   "proxy": "http://localhost:8000"
 }
-

@@ -330,7 +330,7 @@ const App: React.FC = () => {
                     <Statistic
                       title="Cost per Beneficiary"
                       value={selectedProject.funding_amount / selectedProject.beneficiaries}
-                      formatter={(value) => `$${value?.toFixed(0)}`}
+                      formatter={(value) => `$${typeof value === 'number' ? value.toFixed(0) : value}`}
                     />
                   </Col>
                 </Row>
