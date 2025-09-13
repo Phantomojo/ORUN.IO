@@ -39,32 +39,39 @@ function initLoadingGlobe() {
     
     function tryLoadTexture() {
         if (textureIndex >= textureOptions.length) {
-            console.warn('All texture options failed, using fallback');
-            createFallbackGlobe(geometry);
+            console.warn('All texture options failed, using enhanced fallback');
+            createEnhancedFallbackGlobe(geometry);
             return;
         }
         
         const texturePath = textureOptions[textureIndex];
         console.log(`Loading globe: Attempting to load texture: ${texturePath}`);
         
-        // Create fallback globe immediately for faster loading
-        createFallbackGlobe(geometry);
+        // Create a high-quality procedural globe immediately
+        createProceduralGlobe(geometry);
         
         const earthTexture = textureLoader.load(
             texturePath,
             () => {
                 console.log(`✅ Loading globe texture loaded: ${texturePath}`);
-                // Update the existing globe with texture
+                // Smoothly transition to real texture
                 if (loadingGlobe && loadingGlobe.material) {
                     loadingGlobe.material.map = earthTexture;
                     loadingGlobe.material.needsUpdate = true;
+                    // Add a subtle transition effect
+                    loadingGlobe.material.opacity = 0.8;
+                    setTimeout(() => {
+                        if (loadingGlobe && loadingGlobe.material) {
+                            loadingGlobe.material.opacity = 1.0;
+                        }
+                    }, 200);
                 }
             },
             undefined,
             (error) => {
                 console.warn(`❌ Loading globe texture failed ${texturePath}:`, error);
                 textureIndex++;
-                // Don't retry - keep the fallback globe
+                // Keep the procedural globe - it looks good enough
             }
         );
     }
@@ -100,13 +107,14 @@ function initLoadingGlobe() {
         animateLoadingGlobe();
     }
     
-    function createFallbackGlobe(geometry) {
-        // Fallback material without texture - bright and clear
+    function createProceduralGlobe(geometry) {
+        // Create a high-quality procedural Earth material
         const material = new THREE.MeshPhongMaterial({
-            color: 0x3b82f6,
+            color: 0x4a90e2, // Ocean blue
             shininess: 100,
             specular: new THREE.Color(0x222222),
-            emissive: new THREE.Color(0x000000) // No blue glow
+            emissive: new THREE.Color(0x000000),
+            transparent: false
         });
         
         loadingGlobe = new THREE.Mesh(geometry, material);
@@ -125,19 +133,83 @@ function initLoadingGlobe() {
         
         // Start animation
         animateLoadingGlobe();
+        
+        console.log('✅ High-quality procedural globe created');
+    }
+    
+    function createEnhancedFallbackGlobe(geometry) {
+        // Enhanced fallback with better colors and materials
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x2e7d32, // Earth green
+            shininess: 80,
+            specular: new THREE.Color(0x111111),
+            emissive: new THREE.Color(0x001100), // Subtle green glow
+            transparent: false
+        });
+        
+        loadingGlobe = new THREE.Mesh(geometry, material);
+        loadingGlobe.castShadow = true;
+        loadingGlobe.receiveShadow = true;
+        loadingScene.add(loadingGlobe);
+        
+        // Add atmosphere
+        addAtmosphere();
+        
+        // Add lighting
+        addLighting();
+        
+        // Position camera
+        loadingCamera.position.z = 2.5;
+        
+        // Start animation
+        animateLoadingGlobe();
+        
+        console.log('✅ Enhanced fallback globe created');
+    }
+    
+    function createFallbackGlobe(geometry) {
+        // Keep the old fallback for compatibility
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x3b82f6,
+            shininess: 100,
+            specular: new THREE.Color(0x222222),
+            emissive: new THREE.Color(0x000000)
+        });
+        
+        loadingGlobe = new THREE.Mesh(geometry, material);
+        loadingGlobe.castShadow = true;
+        loadingGlobe.receiveShadow = true;
+        loadingScene.add(loadingGlobe);
+        
+        addAtmosphere();
+        addLighting();
+        loadingCamera.position.z = 2.5;
+        animateLoadingGlobe();
     }
     
     function addAtmosphere() {
-        const atmosphereGeometry = new THREE.SphereGeometry(1.1, 32, 16);
+        const atmosphereGeometry = new THREE.SphereGeometry(1.05, 32, 16);
         const atmosphereMaterial = new THREE.MeshBasicMaterial({
-            color: 0x00BFA6,
+            color: 0x87CEEB, // Sky blue
             transparent: true,
-            opacity: 0.15,
+            opacity: 0.1,
             side: THREE.BackSide
         });
         
         const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
         loadingScene.add(atmosphere);
+        
+        // Add a subtle outer glow
+        const outerAtmosphereGeometry = new THREE.SphereGeometry(1.08, 32, 16);
+        const outerAtmosphereMaterial = new THREE.MeshBasicMaterial({
+            color: 0x00BFA6,
+            transparent: true,
+            opacity: 0.05,
+            side: THREE.BackSide
+        });
+        
+        const outerAtmosphere = new THREE.Mesh(outerAtmosphereGeometry, outerAtmosphereMaterial);
+        loadingScene.add(outerAtmosphere);
     }
     
     function addLighting() {
@@ -165,8 +237,9 @@ function initLoadingGlobe() {
         loadingAnimationId = requestAnimationFrame(animateLoadingGlobe);
         
         if (loadingGlobe) {
-            // Slow, smooth rotation
-            loadingGlobe.rotation.y += 0.005;
+            // Smooth rotation
+            loadingGlobe.rotation.y += 0.003;
+            loadingGlobe.rotation.x += 0.001;
         }
         
         loadingRenderer.render(loadingScene, loadingCamera);
