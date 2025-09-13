@@ -2411,6 +2411,118 @@
             border: 1px solid rgba(0, 191, 166, 0.2);
         }
         
+        /* Judge Video Section */
+        .judge-video-section {
+            margin: 3rem 0;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .video-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(0, 191, 166, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .video-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #00bfa6;
+            margin: 0 0 0.5rem 0;
+            text-align: center;
+        }
+        
+        .video-subtitle {
+            font-size: 1rem;
+            color: #666;
+            margin: 0 0 1.5rem 0;
+            text-align: center;
+        }
+        
+        .video-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .video-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+        
+        .primary-video {
+            background: linear-gradient(135deg, #00bfa6, #00a693);
+            color: white;
+        }
+        
+        .secondary-video {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+        }
+        
+        .github-video {
+            background: linear-gradient(135deg, #333333, #24292e);
+            color: white;
+        }
+        
+        .video-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .video-icon {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+        }
+        
+        .video-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .video-text strong {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .video-text span {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .judge-video-section {
+                margin: 2rem 0;
+                width: 95%;
+            }
+            
+            .video-container {
+                padding: 1.5rem;
+            }
+            
+            .video-links {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .video-link {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
         /* Hero Scroll Indicator */
         .hero-scroll-indicator {
             display: flex;
@@ -3715,6 +3827,44 @@
         <div class="contact-info">
             <h3>Team Nexus Neural</h3>
             <p>📧 hello@orun.io | 🌐 orun.io | 📱 +254 700 000 000</p>
+            
+            <!-- Video Section for Judges -->
+            <div class="judge-video-section">
+                <div class="video-container">
+                    <h3 class="video-title">📹 Watch Our Demo Videos</h3>
+                    <p class="video-subtitle">Learn more about ORUN.IO's climate impact verification platform</p>
+                    <div class="video-links">
+                        <a href="https://drive.google.com/file/d/1_X2T1QMGYEUOIExr46gczi8QVvqQL6oN/view?usp=drive_link" 
+                           target="_blank" 
+                           class="video-link primary-video">
+                            <div class="video-icon">🎥</div>
+                            <div class="video-text">
+                                <strong>Main Demo Video</strong>
+                                <span>Complete platform walkthrough</span>
+                            </div>
+                        </a>
+                        <a href="https://youtu.be/gr_Jbax821I?si=Zht9WmGlPNAXlL4_" 
+                           target="_blank" 
+                           class="video-link secondary-video">
+                            <div class="video-icon">📺</div>
+                            <div class="video-text">
+                                <strong>YouTube Demo</strong>
+                                <span>Quick overview and features</span>
+                            </div>
+                        </a>
+                        <a href="https://github.com/Phantomojo/ORUN.IO" 
+                           target="_blank" 
+                           class="video-link github-video">
+                            <div class="video-icon">💻</div>
+                            <div class="video-text">
+                                <strong>GitHub Repository</strong>
+                                <span>View source code and documentation</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
             <p class="acknowledgments">Special thanks to the CHAI.Africa Hackathon for fostering innovation in blockchain and climate solutions.</p>
         </div>
     </section>
@@ -3811,11 +3961,16 @@
                 // Try to load textures with multiple fallback sources
                 let earthTexture, earthNormal, earthSpecular;
                 
-                // Primary texture source
+                // Primary texture source with local fallbacks
                 const textureSources = [
                     'https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg',
                     'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
-                    'https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/textures/planets/earth_atmos_2048.jpg'
+                    'https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/textures/planets/earth_atmos_2048.jpg',
+                    'world-map-topography.jpg',
+                    'world-map-8k.jpg',
+                    'world-map-4k.jpg',
+                    'world-map-blue-marble.jpg',
+                    'world-map-satellite-political.jpg'
                 ];
                 
                 const normalSources = [

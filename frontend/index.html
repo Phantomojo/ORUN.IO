@@ -2,12 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>ORUN.IO - Verifying Climate Impact in Africa</title>
     <meta name="description" content="We verify real climate impact in Africa using satellites, AI, and blockchain technology.">
     
     <!-- Optimized External Libraries - Only Essential -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
     
     <!-- Three.js for Globes - Optimized -->
@@ -30,6 +34,7 @@
     
     <!-- Custom Styles -->
     <link rel="stylesheet" href="css/styles.css?v=27">
+    <link rel="stylesheet" href="css/mobile-layouts.css?v=1">
     
     <!-- Performance Optimizations -->
     <meta name="theme-color" content="#00bfa6">
@@ -2438,6 +2443,118 @@
             border: 1px solid rgba(0, 191, 166, 0.2);
         }
         
+        /* Judge Video Section */
+        .judge-video-section {
+            margin: 3rem 0;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .video-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(0, 191, 166, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .video-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #00bfa6;
+            margin: 0 0 0.5rem 0;
+            text-align: center;
+        }
+        
+        .video-subtitle {
+            font-size: 1rem;
+            color: #666;
+            margin: 0 0 1.5rem 0;
+            text-align: center;
+        }
+        
+        .video-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .video-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+        
+        .primary-video {
+            background: linear-gradient(135deg, #00bfa6, #00a693);
+            color: white;
+        }
+        
+        .secondary-video {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+        }
+        
+        .github-video {
+            background: linear-gradient(135deg, #333333, #24292e);
+            color: white;
+        }
+        
+        .video-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .video-icon {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+        }
+        
+        .video-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .video-text strong {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .video-text span {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .judge-video-section {
+                margin: 2rem 0;
+                width: 95%;
+            }
+            
+            .video-container {
+                padding: 1.5rem;
+            }
+            
+            .video-links {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .video-link {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
         /* Hero Scroll Indicator */
         .hero-scroll-indicator {
             display: flex;
@@ -2553,7 +2670,7 @@
 
     <!-- Slide Counter -->
     <div class="slide-counter">1/11</div>
-
+    
     <!-- Slide 1: Hero Section -->
     <section class="slide hero active">
         <div class="neural-network"></div>
@@ -3849,6 +3966,43 @@
                 </p>
             </div>
             
+            <!-- Video Section for Judges -->
+            <div class="judge-video-section">
+                <div class="video-container">
+                    <h3 class="video-title">📹 Watch Our Demo Videos</h3>
+                    <p class="video-subtitle">Learn more about ORUN.IO's climate impact verification platform</p>
+                    <div class="video-links">
+                        <a href="https://drive.google.com/file/d/1_X2T1QMGYEUOIExr46gczi8QVvqQL6oN/view?usp=drive_link" 
+                           target="_blank" 
+                           class="video-link primary-video">
+                            <div class="video-icon">🎥</div>
+                            <div class="video-text">
+                                <strong>Main Demo Video</strong>
+                                <span>Complete platform walkthrough</span>
+                            </div>
+                        </a>
+                        <a href="https://youtu.be/gr_Jbax821I?si=Zht9WmGlPNAXlL4_" 
+                           target="_blank" 
+                           class="video-link secondary-video">
+                            <div class="video-icon">📺</div>
+                            <div class="video-text">
+                                <strong>YouTube Demo</strong>
+                                <span>Quick overview and features</span>
+                            </div>
+                        </a>
+                        <a href="https://github.com/Phantomojo/ORUN.IO" 
+                           target="_blank" 
+                           class="video-link github-video">
+                            <div class="video-icon">💻</div>
+                            <div class="video-text">
+                                <strong>GitHub Repository</strong>
+                                <span>View source code and documentation</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
             <p class="acknowledgments">Special thanks to the CHAI.Africa Hackathon for fostering innovation in blockchain and climate solutions.</p>
         </div>
     </section>
@@ -3875,6 +4029,8 @@
     <script src="js/satellite-animations.js"></script>
     <script src="js/loading-globe.js"></script>
     <script src="js/real-time-climate-data.js"></script>
+    <script src="js/mobile-touch-interactions.js"></script>
+    <script src="js/mobile-layout-manager.js"></script>
     <script src="js/main.js"></script>
     
     <!-- All Slides Dropdown Functionality -->
@@ -3922,7 +4078,16 @@
 
             // Optimized Globe Creation Function
             function createOptimizedGlobe(container, rotationSpeed = 0.005, interactive = false) {
-                if (!container || !window.THREE) return null;
+                if (!container) {
+                    console.error('❌ Container not provided to createOptimizedGlobe');
+                    return null;
+                }
+                if (!window.THREE) {
+                    console.error('❌ Three.js not available in createOptimizedGlobe');
+                    return null;
+                }
+                
+                console.log('🔧 Creating optimized globe...');
 
                 const scene = new THREE.Scene();
                 const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
@@ -3937,8 +4102,8 @@
                 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for performance
                 container.appendChild(renderer.domElement);
 
-                // Optimized Earth geometry (reduced segments for better performance)
-                const geometry = new THREE.SphereGeometry(1, 32, 32);
+                // Optimized Earth geometry with better quality
+                const geometry = new THREE.SphereGeometry(1, 64, 32);
                 
                 // Create Earth material with texture and fallback
                 const textureLoader = new THREE.TextureLoader();
@@ -3946,11 +4111,16 @@
                 // Try to load textures with multiple fallback sources
                 let earthTexture, earthNormal, earthSpecular;
                 
-                // Primary texture source
+                // Primary texture source with local fallbacks
                 const textureSources = [
                     'https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg',
                     'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
-                    'https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/textures/planets/earth_atmos_2048.jpg'
+                    'https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/textures/planets/earth_atmos_2048.jpg',
+                    'world-map-topography.jpg',
+                    'world-map-8k.jpg',
+                    'world-map-4k.jpg',
+                    'world-map-blue-marble.jpg',
+                    'world-map-satellite-political.jpg'
                 ];
                 
                 const normalSources = [
@@ -3963,55 +4133,73 @@
                     'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_specular_2048.jpg'
                 ];
                 
-                // Create a bright, clear Earth material
+                // Create a beautiful Earth material with better colors
                 const earthMaterial = new THREE.MeshPhongMaterial({
                     color: 0x4a90e2, // Blue oceans
-                    shininess: 100,
+                    shininess: 30,
                     transparent: false,
-                    specular: 0x222222,
-                    emissive: 0x000000 // No blue glow - completely clear
+                    specular: 0x111111,
+                    emissive: 0x000000,
+                    side: THREE.FrontSide
                 });
                 
-                // Try to load texture asynchronously and update material when ready
-                textureLoader.load(
-                    textureSources[0], // Use first texture source
-                    (texture) => {
-                        console.log('✅ Earth texture loaded successfully');
-                        earthMaterial.map = texture;
-                        earthMaterial.needsUpdate = true;
-                    },
-                    undefined,
-                    (error) => {
-                        console.log('⚠️ Using procedural Earth material (texture failed to load)');
-                        // Keep the beautiful procedural material
-                    }
-                );
+                // Try to load texture with fallback to procedural material
+                let textureLoaded = false;
+                function tryLoadTexture() {
+                    const currentTexture = textureSources[0]; // Try first texture
+                    console.log(`🔄 Trying to load texture: ${currentTexture}`);
+                    
+                    textureLoader.load(
+                        currentTexture,
+                        (texture) => {
+                            console.log(`✅ Earth texture loaded successfully: ${currentTexture}`);
+                            earthMaterial.map = texture;
+                            earthMaterial.needsUpdate = true;
+                            textureLoaded = true;
+                        },
+                        undefined,
+                        (error) => {
+                            console.log(`⚠️ Using procedural Earth material (texture failed to load)`);
+                            // Keep the beautiful procedural material - no need to try other textures
+                        }
+                    );
+                }
+                
+                tryLoadTexture();
                 
                 const earth = new THREE.Mesh(geometry, earthMaterial);
                 scene.add(earth);
                 
+                // Add atmospheric glow effect
+                const atmosphereGeometry = new THREE.SphereGeometry(1.05, 32, 16);
+                const atmosphereMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x4a90e2,
+                    transparent: true,
+                    opacity: 0.1,
+                    side: THREE.BackSide
+                });
+                const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+                scene.add(atmosphere);
+                
                 // Globe is ready with beautiful procedural material
 
-                // Add bright, even lighting to eliminate dark areas
-                const ambientLight = new THREE.AmbientLight(0xffffff, 1.0); // Bright white ambient light
+                // Add realistic lighting setup
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.6); // Soft ambient light
                 scene.add(ambientLight);
                 
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5); // Bright directional light
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2); // Main sun light
                 directionalLight.position.set(5, 3, 5);
+                directionalLight.castShadow = true;
                 scene.add(directionalLight);
                 
-                // Add multiple fill lights to eliminate shadows
-                const fillLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
-                fillLight1.position.set(-5, -3, -5);
+                // Add subtle fill lights for better visibility
+                const fillLight1 = new THREE.DirectionalLight(0xffffff, 0.3);
+                fillLight1.position.set(-3, -2, -3);
                 scene.add(fillLight1);
                 
-                const fillLight2 = new THREE.DirectionalLight(0xffffff, 0.6);
-                fillLight2.position.set(0, 5, 0);
+                const fillLight2 = new THREE.DirectionalLight(0xffffff, 0.2);
+                fillLight2.position.set(0, 3, 0);
                 scene.add(fillLight2);
-                
-                const fillLight3 = new THREE.DirectionalLight(0xffffff, 0.4);
-                fillLight3.position.set(-5, 0, 5);
-                scene.add(fillLight3);
 
                 camera.position.z = 2.5;
 
@@ -4130,19 +4318,25 @@
             function initEarth() {
                 const container = document.getElementById('earth-container');
                 if (!container) {
-                    console.warn('Earth container not found');
+                    console.warn('❌ Earth container not found');
                     return;
                 }
                 
                 // Wait for Three.js to load
                 if (!window.THREE) {
-                    console.log('Three.js not available for earth, retrying...');
+                    console.log('⏳ Three.js not available for earth, retrying...');
                     setTimeout(initEarth, 100);
                     return;
                 }
                 
-                console.log('Initializing earth globe...');
-                return createOptimizedGlobe(container, 0.005);
+                console.log('🌍 Initializing earth globe...');
+                const result = createOptimizedGlobe(container, 0.005);
+                if (result) {
+                    console.log('✅ Earth globe initialized successfully');
+                } else {
+                    console.error('❌ Failed to initialize earth globe');
+                }
+                return result;
             }
 
             // Initialize 3D Globe for Slide 11 (CTA) - Interactive
@@ -4207,6 +4401,16 @@
                     console.log('Three.js not loaded yet, retrying in 100ms...');
                     setTimeout(initializeGlobes, 100);
                     return;
+                }
+                
+                // Mobile device detection and optimization
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+                
+                if (isMobile || isTouchDevice) {
+                    console.log('Mobile device detected, applying optimizations...');
+                    // Reduce quality for mobile devices
+                    window.MOBILE_OPTIMIZATION = true;
                 }
                 
                 try {

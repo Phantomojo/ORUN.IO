@@ -28,6 +28,9 @@ function initLoadingGlobe() {
     // Try to load Earth texture
     const textureLoader = new THREE.TextureLoader();
     const textureOptions = [
+        'https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg',
+        'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
+        'https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/textures/planets/earth_atmos_2048.jpg',
         'world-map-topography.jpg',
         'world-map-8k.jpg',
         'world-map-4k.jpg',

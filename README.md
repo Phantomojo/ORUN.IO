@@ -12,6 +12,14 @@
 **🌐 [View Live Demo - Surge](https://orun-io.surge.sh)**
 **🌐 [View Live Demo - GitHub Pages](https://phantomojo.github.io/ORUN.IO/)**
 
+## 📹 Demo Videos
+
+**🎥 [Main Demo Video - Google Drive](https://drive.google.com/file/d/1_X2T1QMGYEUOIExr46gczi8QVvqQL6oN/view?usp=drive_link)**
+**📺 [YouTube Demo Video](https://youtu.be/gr_Jbax821I?si=Zht9WmGlPNAXlL4_)**
+**💻 [GitHub Repository](https://github.com/Phantomojo/ORUN.IO)**
+
+> **For Judges**: Please watch our demo videos and explore the GitHub repository to see the complete platform walkthrough, features demonstration, and source code.
+
 ## 📋 Overview
 
 ORUN.IO is a revolutionary platform that verifies real climate impact in Africa using cutting-edge technology:
