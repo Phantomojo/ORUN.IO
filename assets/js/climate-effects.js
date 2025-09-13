@@ -7,8 +7,16 @@ class ClimateEffects {
     }
     
     init() {
-        // Wait for Vanta.js to load
-        if (typeof VANTA === 'undefined') {
+        // Wait for Vanta.js to load with timeout
+        if (typeof VANTA === 'undefined' && typeof vanta === 'undefined') {
+            if (!this.retryCount) this.retryCount = 0;
+            this.retryCount++;
+            
+            if (this.retryCount > 50) { // 5 second timeout
+                console.warn('⚠️ Vanta.js failed to load after 5 seconds, skipping climate effects');
+                return;
+            }
+            
             console.log('⏳ Waiting for Vanta.js to load...');
             setTimeout(() => this.init(), 100);
             return;

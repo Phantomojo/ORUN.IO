@@ -11,8 +11,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
     
     <!-- Three.js for Globes - Optimized -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" defer></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- Anime.js for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <!-- Vanta.js for background effects -->
+    <script src="https://www.unpkg.com/vanta@latest/dist/vanta.waves.min.js"></script>
     
     <!-- Optimized Fonts - Only Essential Weights -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Orbitron:wght@400;600;700&display=swap" rel="stylesheet">
@@ -4068,42 +4074,57 @@
             // Initialize 3D Globe for Slide 2
             function initEarth() {
                 const container = document.getElementById('earth-container');
-                if (!container) return;
+                if (!container) {
+                    console.warn('Earth container not found');
+                    return;
+                }
                 
                 // Wait for Three.js to load
                 if (!window.THREE) {
+                    console.log('Three.js not available for earth, retrying...');
                     setTimeout(initEarth, 100);
                     return;
                 }
                 
+                console.log('Initializing earth globe...');
                 return createOptimizedGlobe(container, 0.005);
             }
 
             // Initialize 3D Globe for Slide 11 (CTA) - Interactive
             function initCTAEarth() {
                 const container = document.getElementById('cta-earth-container');
-                if (!container) return;
+                if (!container) {
+                    console.warn('CTA earth container not found');
+                    return;
+                }
                 
                 // Wait for Three.js and OrbitControls to load
                 if (!window.THREE || !window.THREE.OrbitControls) {
+                    console.log('Three.js or OrbitControls not available for CTA earth, retrying...');
                     setTimeout(initCTAEarth, 100);
                     return;
                 }
                 
+                console.log('Initializing CTA earth globe...');
                 return createOptimizedGlobe(container, 0.005, true); // true = interactive
             }
 
             // Initialize loading screen globe with faster rotation
             function initLoadingGlobe() {
                 const container = document.getElementById('loading-globe');
-                if (!container) return;
+                if (!container) {
+                    console.warn('Loading globe container not found');
+                    return;
+                }
                 
                 // Wait for Three.js to load
                 if (!window.THREE) {
+                    console.log('Three.js not available for loading globe, retrying...');
                     setTimeout(initLoadingGlobe, 100);
                     return;
                 }
                 
+                console.log('Initializing loading globe...');
                 return createOptimizedGlobe(container, 0.02); // Faster rotation for loading screen
             }
 
@@ -4135,7 +4156,15 @@
             let globeCleanupFunctions = [];
             
             function initializeGlobes() {
+                // Wait for Three.js to be fully loaded
+                if (typeof THREE === 'undefined') {
+                    console.log('Three.js not loaded yet, retrying in 100ms...');
+                    setTimeout(initializeGlobes, 100);
+                    return;
+                }
+                
                 try {
+                    console.log('Initializing globes...');
                     const earthCleanup = initEarth();
                     const ctaCleanup = initCTAEarth();
                     const loadingCleanup = initLoadingGlobe();
@@ -4144,9 +4173,12 @@
                     if (ctaCleanup) globeCleanupFunctions.push(ctaCleanup);
                     if (loadingCleanup) globeCleanupFunctions.push(loadingCleanup);
                     
+                    console.log('Globes initialized successfully');
                     showPerformanceStats();
                 } catch (error) {
-                    console.warn('Globe initialization failed:', error);
+                    console.error('Globe initialization failed:', error);
+                    // Retry after a delay
+                    setTimeout(initializeGlobes, 1000);
                 }
             }
 
