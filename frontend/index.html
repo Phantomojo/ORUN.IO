@@ -4056,8 +4056,16 @@
             let globeCleanupFunctions = [];
             
             function initializeGlobes() {
-                // Wait for Three.js to be fully loaded
+                // Wait for Three.js to be fully loaded with timeout
                 if (typeof THREE === 'undefined') {
+                    if (!window.threeRetryCount) window.threeRetryCount = 0;
+                    window.threeRetryCount++;
+                    
+                    if (window.threeRetryCount > 50) { // 5 second timeout
+                        console.error('Three.js failed to load after 5 seconds');
+                        return;
+                    }
+                    
                     console.log('Three.js not loaded yet, retrying in 100ms...');
                     setTimeout(initializeGlobes, 100);
                     return;
@@ -4089,9 +4097,15 @@
             });
 
             // Initialize globes when DOM is ready
+            console.log('Setting up globe initialization...');
+            console.log('Document ready state:', document.readyState);
+            console.log('Three.js available:', typeof THREE !== 'undefined');
+            
             if (document.readyState === 'loading') {
+                console.log('DOM still loading, waiting for DOMContentLoaded...');
                 document.addEventListener('DOMContentLoaded', initializeGlobes);
             } else {
+                console.log('DOM already loaded, initializing immediately...');
                 initializeGlobes();
             }
         });
