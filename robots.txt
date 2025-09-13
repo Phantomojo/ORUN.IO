@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://phantomojo.github.io/ORUN.IO/sitemap.xml
+
+# Disallow certain directories
+Disallow: /node_modules/
+Disallow: /venv/
+Disallow: /__pycache__/
+Disallow: /.git/
+Disallow: /docs/
+Disallow: /earth_renders/
+
+# Allow main pages
+Allow: /index.html
+Allow: /assets/
+Allow: /frontend/
