@@ -8,7 +8,9 @@
 
 ## 🚀 Live Demo
 
-**🌐 [View Live Demo](https://phantomojo.github.io/ORUN.IO/)**
+**🌐 [View Live Demo - Netlify](https://nexorun.netlify.app/)**
+**🌐 [View Live Demo - Surge](https://orun-io.surge.sh)**
+**🌐 [View Live Demo - GitHub Pages](https://phantomojo.github.io/ORUN.IO/)**
 
 ## 📋 Overview
 
@@ -137,18 +139,35 @@ ORUN.IO/
 
 ## 🌐 Deployment
 
-### GitHub Pages
-The site is automatically deployed to GitHub Pages:
+### Multiple Hosting Options
+
+#### 🚀 **Netlify** (Recommended)
+- **URL**: https://nexorun.netlify.app/
+- **Auto-deploy**: Connected to GitHub repository
+- **Features**: CDN, HTTPS, custom domains
+
+#### ⚡ **Surge.sh** (Fast Deploy)
+- **URL**: https://orun-io.surge.sh
+- **Deploy**: `surge . orun-io.surge.sh`
+- **Features**: Instant deployment, custom domains
+
+#### 📄 **GitHub Pages**
 - **URL**: https://phantomojo.github.io/ORUN.IO/
-- **Custom Domain**: orun.io (configured via CNAME)
+- **Auto-deploy**: From `gh-pages` branch
+- **Features**: Free hosting, GitHub integration
 
 ### Manual Deployment
 ```bash
-# Build for production
-npm run build
+# Deploy to Surge.sh
+surge . your-domain.surge.sh
 
-# Deploy to your server
-rsync -av dist/ user@server:/var/www/orun.io/
+# Deploy to Netlify (via CLI)
+netlify deploy --prod --dir=frontend
+
+# Deploy to GitHub Pages
+git checkout gh-pages
+cp -r frontend/* .
+git add . && git commit -m "Deploy" && git push
 ```
 
 ## 🤝 Contributing
