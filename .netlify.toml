@@ -1,0 +1,15 @@
+[build]
+  # No build command needed for static site
+  command = ""
+  # Publish the frontend directory
+  publish = "frontend"
+
+[build.environment]
+  # No environment variables needed for static site
+  NODE_VERSION = "18"
+
+# Redirect rules (optional)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

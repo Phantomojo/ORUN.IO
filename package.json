@@ -1,60 +1,13 @@
 {
-  "name": "orun-frontend",
+  "name": "orun-io",
   "version": "1.0.0",
-  "description": "Orun.io Frontend Dashboard - Climate Impact Verification Platform",
-  "private": true,
-  "dependencies": {
-    "@ant-design/icons": "^5.2.6",
-    "@types/leaflet": "^1.9.8",
-    "antd": "^5.12.8",
-    "axios": "^1.6.2",
-    "dayjs": "^1.11.10",
-    "leaflet": "^1.9.4",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-leaflet": "^4.2.1",
-    "react-router-dom": "^6.20.1",
-    "react-scripts": "5.0.1",
-    "recharts": "^2.8.0",
-    "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
-  },
+  "description": "ORUN.IO - Verifying Climate Impact in Africa",
+  "main": "frontend/index.html",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "lint": "eslint src --ext .ts,.tsx",
-    "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    "type-check": "tsc --noEmit"
+    "build": "echo 'Static site - no build needed'",
+    "start": "cd frontend && python3 -m http.server 8000"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "@types/react-dom": "^18.3.7",
-    "@types/react-router-dom": "^5.3.3",
-    "@typescript-eslint/eslint-plugin": "^6.13.1",
-    "@typescript-eslint/parser": "^6.13.1",
-    "eslint": "^8.55.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.0.1",
-    "prettier": "^3.1.0"
-  },
-  "proxy": "http://localhost:8000"
+  "keywords": ["climate", "africa", "satellite", "blockchain"],
+  "author": "Nexus Neural",
+  "license": "MIT"
 }
