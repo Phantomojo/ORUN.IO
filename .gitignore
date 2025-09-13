@@ -1,85 +1,41 @@
-# Python
+# GitHub Pages deployment branch - only include frontend files
+# Ignore everything except what we need for the website
+
+# Ignore all Python files
+*.py
+*.pyc
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Virtual environments
 venv/
-env/
-ENV/
-env.bak/
-venv.bak/
 
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.npm
-.yarn-integrity
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Logs
-*.log
-logs/
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Temporary files
-*.tmp
-*.temp
-.cache/
-
-# Large media files (optional - uncomment if you want to exclude)
-# *.mp4
-# *.avi
-# *.mov
-# *.mkv
-
-# Compressed files
+# Ignore development files
+*.md
+*.pdf
 *.tar.gz
-*.zip
-*.rar
+*.log
+*.json
+*.lock
+*.tool
 
-# Backup files
-*.bak
-*.backup
-node_modules
+# Ignore other directories
+docs/
+earth_renders/
+orun-3d/
+src/
+node_modules/
+
+# Ignore other HTML files (keep only index.html)
+*.html
+!index.html
+
+# Ignore other assets (keep only css/ and js/)
+assets/
+frontend/
+libs/
+public/
+
+# Keep only essential files
+!css/
+!js/
+!index.html
+!favicon.ico
+!404.html
